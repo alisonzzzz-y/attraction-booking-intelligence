@@ -12,8 +12,8 @@ Phase 0 只有在以下条件全部满足后才算完成：
 
 - [x] 当前项目已经初始化 Git，并保存工程骨架基线提交。
 - [x] 项目已经推送到 GitHub 私有仓库。
-- [ ] Docker 本地环境可以启动 PostgreSQL 和 Redis。
-- [ ] 后端 Testcontainers 集成测试已经实际运行并通过。
+- [x] Docker 本地环境可以启动 PostgreSQL 和 Redis。
+- [x] 后端 Testcontainers 集成测试已经实际运行并通过。
 - [x] GitHub Actions CI 已经运行并通过。
 - [ ] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。
 - [ ] 已记录 provider 的字段、配额、缓存、归因和购买跳转限制。
@@ -31,9 +31,9 @@ Phase 0 只有在以下条件全部满足后才算完成：
 - [x] 检查待提交文件，确认没有 `.env`、API key、密码或 token。
 - [x] 创建项目骨架基线提交。
 - [x] 创建 GitHub 私有仓库并推送代码。
-- [ ] 安装并启动 Docker Desktop。详细步骤见 [`docker-setup.md`](docker-setup.md)。
-- [ ] 使用 Docker Compose 启动 PostgreSQL 和 Redis。
-- [ ] 运行后端完整验证，确认数据库、Flyway、Redis 和 Actuator 测试通过。
+- [x] 安装并启动 Docker Desktop。详细步骤见 [`docker-setup.md`](docker-setup.md)。
+- [x] 使用 Docker Compose 启动 PostgreSQL 和 Redis。
+- [x] 运行后端完整验证，确认数据库、Flyway、Redis 和 Actuator 测试通过。
 - [x] 确认前端 lint、格式、单元测试、构建和 Playwright smoke test 通过。
 - [x] 确认 GitHub Actions CI 通过。
 

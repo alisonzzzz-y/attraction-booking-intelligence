@@ -11,8 +11,9 @@ Docker Desktop 是本项目运行本地容器和后端集成测试的前提。
 - CPU 架构：Apple Silicon (`arm64`)
 - macOS：26.2
 - Homebrew：已安装
-- Docker CLI：尚未安装
-- Docker Desktop：尚未完成安装
+- Docker CLI：29.7.2
+- Docker Desktop：4.86.0（Engine 29.7.2）
+- Docker Compose：5.3.1
 - Colima：未安装
 - Podman：未安装
 
@@ -43,19 +44,19 @@ Homebrew 会下载适用于 Apple Silicon 的官方 Docker Desktop 安装包，�
 
 不要把电脑密码、GitHub token 或其他凭据发送给 Codex，也不要把密码写入命令、脚本或项目文件。
 
-## 5. 本次自动安装结果
+## 5. 本次安装结果
 
 2026-08-17 已通过 Homebrew 下载 Docker Desktop 4.86.0 的 Apple Silicon 安装包。
 
 自动安装在创建系统级 CLI 链接时需要 `sudo` 密码，因此被安全停止。Homebrew 随后回滚了 `/Applications/Docker.app`，没有留下半安装应用。
 
-用户需要在真实 Terminal 中重新执行：
+随后用户已在真实 Terminal 中重新执行：
 
 ```bash
 brew install --cask docker
 ```
 
-下载文件通常已经进入 Homebrew 缓存，因此重新执行时一般不需要重新下载完整 DMG。
+安装已成功完成，Docker Desktop 也已通过首次启动和系统权限确认。
 
 ## 6. 首次启动
 
@@ -87,6 +88,14 @@ docker info
 
 只安装 CLI 但没有启动 Docker Desktop，不算验证完成。
 
+本机验证结果：
+
+- Docker Client：29.7.2
+- Docker Server：Docker Desktop 4.86.0，Engine 29.7.2
+- Docker Compose：5.3.1
+- Docker context：`desktop-linux`
+- Docker 架构：Linux `aarch64`
+
 ## 8. 项目基础设施验证
 
 Docker Engine 正常后，在项目根目录运行：
@@ -106,6 +115,18 @@ cd backend
 
 这一次后端结果必须显示 Testcontainers 集成测试实际执行，不能再显示3个测试因缺少 Docker 而跳过。
 
+2026-08-17 的实际验证结果：
+
+- `docker compose config`：通过
+- PostgreSQL 17.10：healthy
+- Redis 8.8.0：healthy
+- Testcontainers：成功连接 Docker Desktop
+- Flyway：成功验证并应用 v1 migration
+- Infrastructure integration tests：3个通过，0个跳过
+- Spring Modulith test：1个通过
+- Maven 总结果：4个测试通过，0个失败，0个错误，0个跳过
+- Backend package：构建成功
+
 ## 9. 停止本地容器
 
 完成验证后，可以在项目根目录运行：
@@ -116,6 +137,11 @@ docker compose down
 
 该命令停止并移除项目容器和默认网络，但保留命名数据卷。除非明确需要清空本地数据库，否则不要加入 `--volumes`。
 
+本次验证完成后已执行 `docker compose down`。两个验证容器和项目网络已移除，以下命名数据卷仍保留：
+
+- `attraction-booking-intelligence_postgres-data`
+- `attraction-booking-intelligence_redis-data`
+
 ## 10. 当前下一项操作
 
-用户需要先在 IntelliJ IDEA 的 Terminal 中完成 Docker Desktop 安装和首次启动。完成后再由 Codex 继续验证 Docker Engine、Compose、PostgreSQL、Redis 和 Testcontainers。
+Docker 本地环境和 Testcontainers 验证已经完成。下一步进入 Phase 0 Provider 调查，先确认 Viator、Tiqets 和 GetYourGuide 的正式接入资格与数据限制。
