@@ -179,4 +179,23 @@ git status -sb
 gh repo view --json nameWithOwner,visibility,url,defaultBranchRef
 ```
 
-验证结果确认仓库为 Private，默认分支为 `main`，本地分支正在跟踪 `origin/main`。首次推送已经触发 GitHub Actions CI，CI 结果需要单独确认后再更新 Phase 0 清单。
+验证结果确认仓库为 Private，默认分支为 `main`，本地分支正在跟踪 `origin/main`。
+
+## 9. GitHub Actions 验证
+
+推送 `main` 后，GitHub Actions 自动运行 `.github/workflows/ci.yml`。
+
+检查命令：
+
+```bash
+gh run list --workflow CI --limit 5
+gh run watch <run-id> --exit-status
+```
+
+验证结果：
+
+- Frontend job：通过
+- Backend job：通过
+- CI 总结论：通过
+
+GitHub 给出了 Action 运行时版本的弃用警告，包括 `setup-java@v4`。这些警告没有导致本次 CI 失败，但应作为独立维护任务升级 Action 版本，并在升级后重新验证 CI。
