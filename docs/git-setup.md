@@ -198,4 +198,10 @@ gh run watch <run-id> --exit-status
 - Backend job：通过
 - CI 总结论：通过
 
-GitHub 给出了 Action 运行时版本的弃用警告，包括 `setup-java@v4`。这些警告没有导致本次 CI 失败，但应作为独立维护任务升级 Action 版本，并在升级后重新验证 CI。
+首次运行曾出现 Action 运行时版本弃用警告。根据 GitHub 官方 Action 仓库在 2026-08-17 提供的稳定版本，CI 已升级为：
+
+- `actions/checkout@v7`
+- `actions/setup-java@v5`
+- `actions/setup-node@v7`
+
+升级后必须通过新的 CI 运行，才能认为弃用警告处理完成。
