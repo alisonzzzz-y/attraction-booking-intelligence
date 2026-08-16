@@ -1,0 +1,1 @@
+-- Establishes Flyway schema history without introducing business tables.
