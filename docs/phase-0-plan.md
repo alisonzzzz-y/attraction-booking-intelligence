@@ -31,7 +31,7 @@ Phase 0 只有在以下条件全部满足后才算完成：
 - [x] 检查待提交文件，确认没有 `.env`、API key、密码或 token。
 - [x] 创建项目骨架基线提交。
 - [x] 创建 GitHub 私有仓库并推送代码。
-- [ ] 安装并启动 Docker Desktop。
+- [ ] 安装并启动 Docker Desktop。详细步骤见 [`docker-setup.md`](docker-setup.md)。
 - [ ] 使用 Docker Compose 启动 PostgreSQL 和 Redis。
 - [ ] 运行后端完整验证，确认数据库、Flyway、Redis 和 Actuator 测试通过。
 - [x] 确认前端 lint、格式、单元测试、构建和 Playwright smoke test 通过。
