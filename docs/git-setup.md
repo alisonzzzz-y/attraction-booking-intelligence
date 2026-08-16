@@ -4,14 +4,15 @@
 
 本文件记录项目的 Git 初始化过程，以及创建第一次工程骨架提交前需要完成的检查。
 
-本地仓库初始化和工程骨架基线提交已经完成。GitHub 远程仓库连接将在下一步单独执行。
+本地仓库初始化、工程骨架基线提交和 GitHub 私有仓库连接已经完成。
 
 ## 2. 当前状态
 
 - Git 仓库：已初始化
 - 默认分支：`main`
 - 首次提交：已创建工程骨架基线提交
-- GitHub 远程仓库：尚未连接
+- GitHub 远程仓库：已连接到 `origin`
+- GitHub 可见性：Private
 - Git 用户身份：本机已配置
 - 初始化日期：2026-08-17
 
@@ -141,16 +142,41 @@ git commit -m "chore: establish project foundation"
 
 执行前已完成敏感信息检查，并在创建提交前检查了暂存区。提交没有包含 `.env`、IDE 文件、依赖目录、构建产物或测试报告。
 
-## 8. 后续 GitHub 步骤
+## 8. GitHub 私有仓库
 
-下一步是单独创建 GitHub 私有仓库并连接远程地址。建议先使用私有仓库，等 provider 条款、数据声明和公开文档稳定后，再决定是否公开。
+项目已经创建并连接到以下 GitHub 私有仓库：
 
-连接远程仓库前需要确认：
+```text
+https://github.com/alisonzzzz-y/attraction-booking-intelligence
+```
+
+创建前已确认：
 
 - GitHub 仓库名称和所有者
 - 仓库可见性
 - 当前 Git 身份是否正确
-- 是否使用 SSH 或 HTTPS
+- 使用 HTTPS 进行 Git 操作
 - 首次提交是否已经通过测试
 
-本阶段不会自动创建 GitHub 仓库，也不会自动推送代码。
+执行命令：
+
+```bash
+gh repo create attraction-booking-intelligence --private --source=. --remote=origin --push
+```
+
+该命令完成了以下操作：
+
+1. 在当前 GitHub 账号下创建私有仓库。
+2. 将远程地址保存为 `origin`。
+3. 推送本地 `main` 分支。
+4. 将本地 `main` 设置为跟踪 `origin/main`。
+
+验证命令：
+
+```bash
+git remote -v
+git status -sb
+gh repo view --json nameWithOwner,visibility,url,defaultBranchRef
+```
+
+验证结果确认仓库为 Private，默认分支为 `main`，本地分支正在跟踪 `origin/main`。首次推送已经触发 GitHub Actions CI，CI 结果需要单独确认后再更新 Phase 0 清单。
