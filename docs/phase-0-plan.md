@@ -15,7 +15,7 @@ Phase 0 只有在以下条件全部满足后才算完成：
 - [x] Docker 本地环境可以启动 PostgreSQL 和 Redis。
 - [x] 后端 Testcontainers 集成测试已经实际运行并通过。
 - [x] GitHub Actions CI 已经运行并通过。
-- [ ] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。
+- [x] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。目前仅确认 Viator Basic Access 的公开资格和能力边界，尚未完成账号验证。
 - [ ] 已记录 provider 的字段、配额、缓存、归因和购买跳转限制。
 - [ ] 已确定 MVP 使用的 provider 范围。
 - [ ] 已确定 MVP 可以展示和不能展示的数据。
@@ -187,10 +187,10 @@ Phase 0 完成后，只选择一个权限最明确的 provider，实现第一条
 
 ## 8. 需要用户准备的事项
 
-- [ ] 安装 Docker Desktop。
-- [ ] 确定是否使用 GitHub 私有仓库。
+- [x] 安装 Docker Desktop。
+- [x] 确定使用 GitHub 私有仓库。
 - [ ] 准备 provider 申请使用的邮箱和必要资料。
-- [ ] 确定第一版优先支持的城市。
+- [x] 确定第一版优先支持 Rome。
 - [ ] 明确项目主要用于学习、作品集，还是未来商业化。
 - [ ] 保存 provider 的正式回复、条款链接和权限截图。
 
@@ -209,4 +209,4 @@ Phase 0 结束时应交付：
 
 ## 10. 当前下一项任务
 
-先完成 Git、Docker 和 CI 收尾，然后开始核实 Viator、Tiqets 和 GetYourGuide 的当前 API 权限。未获得真实权限前，不开始 provider 业务实现。
+提交 Viator 和 Tiqets 的 affiliate 申请，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。随后联系 GetYourGuide Partner team，确认 Public Partner API 的准入条件。未获得真实权限前，不开始 provider 业务实现。
