@@ -15,6 +15,7 @@ Phase 0 只有在以下条件全部满足后才算完成：
 - [x] Docker 本地环境可以启动 PostgreSQL 和 Redis。
 - [x] 后端 Testcontainers 集成测试已经实际运行并通过。
 - [x] GitHub Actions CI 已经运行并通过。
+- [x] 公开前端已经部署，并获得稳定 HTTPS 地址：<https://attraction-booking-intelligence.vercel.app/>。
 - [x] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。目前仅确认 Viator Basic Access 的公开资格和能力边界，尚未完成账号验证。
 - [ ] 已记录 provider 的字段、配额、缓存、归因和购买跳转限制。
 - [ ] 已确定 MVP 使用的 provider 范围。
@@ -209,4 +210,4 @@ Phase 0 结束时应交付：
 
 ## 10. 当前下一项任务
 
-执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 5，部署已经完成的不含票务数据的公开前端并获得真实网站 URL。随后提交 Viator 和 Tiqets 的 affiliate 申请，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。未获得真实权限前，不开始 provider 业务实现。
+执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 6，使用已部署的公开网站提交 Viator 和 Tiqets 的 affiliate 申请。提交后记录日期、申请类型和正式回复，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。未获得真实权限前，不开始 provider 业务实现。

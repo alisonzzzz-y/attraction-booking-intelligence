@@ -2,9 +2,11 @@
 
 This is a full-stack project for independent travellers visiting Europe. In the future, it will combine authorised ticket data and help users decide which attractions need advance booking, when to book, and which options are available for a chosen date.
 
+Public preview: <https://attraction-booking-intelligence.vercel.app/>
+
 ## Current scope
 
-The repository currently contains the project foundation only:
+The repository currently contains the project foundation and a deployed public preview:
 
 - A Spring Boot modular monolith with Spring Modulith boundary checks
 - Basic PostgreSQL, Flyway, Redis, Actuator, Spring Security, and OpenAPI configuration
@@ -131,6 +133,8 @@ This repository contains no real ticket data and makes no production API calls. 
 - Provider timeouts, retries, circuit breakers, and business caching
 - Booking priorities, alerts, notifications, and deduplication
 - Full trip and attraction pages
-- Payments, ticket fulfilment, email, LLM calls, microservices, Kafka, Kubernetes, or cloud deployment
+- Payments, ticket fulfilment, email, LLM calls, microservices, Kafka, Kubernetes, or backend cloud deployment
 
-Recommended next task: follow Part 5 of the [coding roadmap](docs/coding-roadmap.md), deploy the static public preview, and verify its public URL. Provider applications come after the URL is available, while ticket-data features remain blocked until real API access is verified.
+Deployment details are recorded in [deployment.md](docs/deployment.md).
+
+Recommended next task: follow Part 6 of the [coding roadmap](docs/coding-roadmap.md) and submit the Viator and Tiqets provider applications with the public URL. Ticket-data features remain blocked until real API access is verified.

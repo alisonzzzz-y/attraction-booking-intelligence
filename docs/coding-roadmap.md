@@ -99,6 +99,8 @@
 
 ### Part 5：部署公开前端
 
+状态：已完成部署（2026-08-18），独立网络 smoke test 待补。
+
 目标：获得可提交给 Provider 的稳定 HTTPS URL。
 
 范围：
@@ -225,6 +227,6 @@
 
 ## 4. 当前只执行的下一部分
 
-下一次只执行 **Part 5：部署公开前端**。
+下一次只执行 **Part 6：提交 Provider 申请**。
 
-Part 1–4 已完成并通过 lint、format、组件测试、production build 和 Playwright 浏览器测试。Part 5 只处理托管平台确认、部署配置和公开 URL 验证，不部署后端，也不申请 API。
+Part 1–4 已完成并通过 lint、format、组件测试、production build 和 Playwright 浏览器测试。Part 5 已通过 Vercel 部署到 <https://attraction-booking-intelligence.vercel.app/>，GitHub commit status 显示部署成功。Codex 当前网络访问 `vercel.app` 超时，因此线上首页、深层路由刷新和控制台 smoke test 仍需从独立网络补充验证。详细配置与验证记录见 [`deployment.md`](deployment.md)。Part 6 只提交并记录 Provider 申请，不提前实现依赖 API 的业务功能。
