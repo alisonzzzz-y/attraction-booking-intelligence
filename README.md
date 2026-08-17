@@ -9,8 +9,8 @@ The repository currently contains the project foundation only:
 - A Spring Boot modular monolith with Spring Modulith boundary checks
 - Basic PostgreSQL, Flyway, Redis, Actuator, Spring Security, and OpenAPI configuration
 - PostgreSQL, Redis, and health integration tests with Testcontainers
-- A Vite and React application shell with routing, TanStack Query, and a backend health check
-- A Vitest component test and a Playwright smoke test
+- A responsive Vite and React public preview with home and methodology routes
+- Vitest component tests and Playwright desktop and mobile smoke tests
 - Local infrastructure with Docker Compose and CI with GitHub Actions
 - Architecture notes, provider access notes, and ADRs
 
@@ -46,7 +46,7 @@ The main frontend versions come from the current lockfile.
 | ESLint | 10.8.1 |
 | Prettier | 3.9.6 |
 
-The application shell uses a small amount of plain CSS. Tailwind is not included because the project does not yet have a full interface. This decision can be reviewed when UI development begins.
+The public preview uses a small, project-specific set of plain CSS tokens and components. Tailwind is not included because the current interface does not need a larger styling dependency.
 
 ## Requirements
 
@@ -90,7 +90,7 @@ npm ci
 npm run dev
 ```
 
-The Vite development server proxies `/actuator` to `http://localhost:8080`. The home page only shows the backend connection status and does not request ticket data.
+The Vite development server proxies `/actuator` to `http://localhost:8080` for later development checks. The public home and methodology pages are static, do not require the backend, and do not request ticket data.
 
 ## Tests and builds
 
@@ -133,4 +133,4 @@ This repository contains no real ticket data and makes no production API calls. 
 - Full trip and attraction pages
 - Payments, ticket fulfilment, email, LLM calls, microservices, Kafka, Kubernetes, or cloud deployment
 
-Recommended next task: complete the Phase 0 data feasibility review, then define the provider scope and MVP data claims based on real API access.
+Recommended next task: follow Part 5 of the [coding roadmap](docs/coding-roadmap.md), deploy the static public preview, and verify its public URL. Provider applications come after the URL is available, while ticket-data features remain blocked until real API access is verified.

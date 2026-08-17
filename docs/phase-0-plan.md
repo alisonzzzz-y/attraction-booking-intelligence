@@ -209,4 +209,4 @@ Phase 0 结束时应交付：
 
 ## 10. 当前下一项任务
 
-提交 Viator 和 Tiqets 的 affiliate 申请，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。随后联系 GetYourGuide Partner team，确认 Public Partner API 的准入条件。未获得真实权限前，不开始 provider 业务实现。
+执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 5，部署已经完成的不含票务数据的公开前端并获得真实网站 URL。随后提交 Viator 和 Tiqets 的 affiliate 申请，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。未获得真实权限前，不开始 provider 业务实现。

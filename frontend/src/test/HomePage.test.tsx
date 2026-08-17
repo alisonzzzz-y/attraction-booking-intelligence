@@ -1,34 +1,27 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it } from 'vitest'
 import { HomePage } from '../app/HomePage'
 
 describe('HomePage', () => {
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('shows the project scope and a successful backend health check', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ status: 'UP' }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    )
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    })
-
+  it('explains the product direction without presenting ticket data', () => {
     render(
-      <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
         <HomePage />
-      </QueryClientProvider>,
+      </MemoryRouter>,
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Attraction Booking Intelligence' }),
+      screen.getByRole('heading', {
+        name: 'Plan the attractions that cannot wait.',
+      }),
     ).toBeInTheDocument()
-    expect(await screen.findByText('Connected')).toBeInTheDocument()
-    expect(screen.getByText(/Attraction search/)).toBeInTheDocument()
+    expect(screen.getByText('Pre-API phase')).toBeInTheDocument()
+    expect(
+      screen.getByText('Workflow preview only. No ticket data is shown.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'See how the data works' }),
+    ).toHaveAttribute('href', '/methodology')
   })
 })

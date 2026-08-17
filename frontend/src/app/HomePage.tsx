@@ -1,30 +1,147 @@
-import { useHealth } from '../shared/api/health'
+import { Link } from 'react-router-dom'
+
+const decisionSteps = [
+  {
+    number: '01',
+    title: 'Start with the trip',
+    description:
+      'Choose a city and travel date before looking at individual ticket options.',
+  },
+  {
+    number: '02',
+    title: 'Check authorised sources',
+    description:
+      'Keep each provider response tied to its source, retrieval time, and permitted use.',
+  },
+  {
+    number: '03',
+    title: 'Make uncertainty visible',
+    description:
+      'Separate unavailable, stale, and failed responses instead of turning them into a false answer.',
+  },
+]
+
+const evidencePrinciples = [
+  'Every ticket fact keeps its provider and retrieval time.',
+  'A failed request is not treated as a sold-out attraction.',
+  'AI may explain verified facts, but it cannot create them.',
+]
 
 export function HomePage() {
-  const health = useHealth()
-
   return (
-    <section className="hero" aria-labelledby="page-title">
-      <p className="eyebrow">European attraction planning</p>
-      <h1 id="page-title">Attraction Booking Intelligence</h1>
-      <p className="intro">
-        This application will help travellers decide which attractions need
-        advance booking and when to check official or authorised ticket sources.
-      </p>
+    <>
+      <section className="hero page-section" aria-labelledby="page-title">
+        <div className="hero-copy">
+          <p className="eyebrow">Rome first. Evidence first.</p>
+          <h1 id="page-title">Plan the attractions that cannot wait.</h1>
+          <p className="intro">
+            A decision tool for independent travellers who need to know what to
+            book early, what can wait, and what the available evidence actually
+            supports.
+          </p>
+          <div className="hero-actions">
+            <Link className="button button-primary" to="/methodology">
+              See how the data works
+            </Link>
+            <a className="button button-secondary" href="#build-status">
+              View current build
+            </a>
+          </div>
+        </div>
 
-      <div className="status-card" aria-live="polite">
-        <span>Backend connection</span>
-        {health.isPending && <strong>Checking</strong>}
-        {health.isSuccess && <strong className="status-up">Connected</strong>}
-        {health.isError && (
-          <strong className="status-down">Not connected</strong>
-        )}
-      </div>
+        <aside className="preview-card" aria-label="Planned decision flow">
+          <div className="preview-card-header">
+            <span className="status-dot" aria-hidden="true" />
+            <span>Planned decision flow</span>
+          </div>
+          <ol className="preview-list">
+            <li>
+              <span>Trip context</span>
+              <strong>Rome · selected date</strong>
+            </li>
+            <li>
+              <span>Evidence</span>
+              <strong>Authorised provider responses</strong>
+            </li>
+            <li>
+              <span>Decision support</span>
+              <strong>Source, freshness, and clear unknowns</strong>
+            </li>
+          </ol>
+          <p className="preview-disclaimer">
+            Workflow preview only. No ticket data is shown.
+          </p>
+        </aside>
+      </section>
 
-      <p className="scope-note">
-        This version contains the project foundation only. Attraction search,
-        prices, availability, and purchase links are not available.
-      </p>
-    </section>
+      <section
+        className="page-section decision-section"
+        aria-labelledby="decision-title"
+      >
+        <div className="section-heading">
+          <p className="eyebrow">A clearer booking decision</p>
+          <h2 id="decision-title">
+            One question, supported by visible evidence.
+          </h2>
+          <p>
+            The product is designed around the decision a traveller needs to
+            make, not around a wall of unexplained listings.
+          </p>
+        </div>
+        <div className="step-grid">
+          {decisionSteps.map((step) => (
+            <article className="step-card" key={step.number}>
+              <span className="step-number">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="evidence-band" aria-labelledby="evidence-title">
+        <div className="page-section evidence-layout">
+          <div>
+            <p className="eyebrow eyebrow-light">Data integrity</p>
+            <h2 id="evidence-title">Built to keep facts and guesses apart.</h2>
+          </div>
+          <ul className="principle-list">
+            {evidencePrinciples.map((principle) => (
+              <li key={principle}>{principle}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section
+        className="page-section build-section"
+        id="build-status"
+        aria-labelledby="build-title"
+      >
+        <div className="build-status-card">
+          <div>
+            <p className="eyebrow">Current build</p>
+            <h2 id="build-title">The public product preview is in progress.</h2>
+          </div>
+          <span className="status-badge">Pre-API phase</span>
+        </div>
+        <div className="build-columns">
+          <div>
+            <h3>Available now</h3>
+            <p>
+              A tested full-stack foundation, public product explanation, and a
+              documented approach to provider data.
+            </p>
+          </div>
+          <div>
+            <h3>Not published yet</h3>
+            <p>
+              Attraction search, prices, availability, booking links, and AI
+              explanations remain unavailable until authorised access is tested.
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
   )
 }

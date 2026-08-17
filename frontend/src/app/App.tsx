@@ -1,22 +1,57 @@
-import { Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
+
+const navigationItems = [
+  { label: 'Home', to: '/' },
+  { label: 'Methodology', to: '/methodology' },
+]
 
 export function App() {
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <header className="site-header">
-        <a className="brand" href="/">
-          Attraction Booking Intelligence
-        </a>
-        <span className="phase-label">Project foundation</span>
+        <Link
+          className="brand"
+          to="/"
+          aria-label="Attraction Booking Intelligence home"
+        >
+          <span className="brand-mark" aria-hidden="true">
+            ABI
+          </span>
+          <span className="brand-name">Attraction Booking Intelligence</span>
+        </Link>
+
+        <nav className="site-nav" aria-label="Primary navigation">
+          {navigationItems.map((item) => (
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? 'nav-link nav-link-active' : 'nav-link'
+              }
+              end={item.to === '/'}
+              key={item.to}
+              to={item.to}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
       </header>
 
-      <main>
+      <main id="main-content">
         <Outlet />
       </main>
 
-      <footer>
-        Prices, availability, and booking rules will be added only after an
-        authorised data source is available. There is no real ticket data yet.
+      <footer className="site-footer">
+        <div>
+          <strong>Attraction Booking Intelligence</strong>
+          <p>An independent portfolio project, starting with Rome.</p>
+        </div>
+        <div className="footer-note">
+          <span>Public preview</span>
+          <p>No live prices or availability are published yet.</p>
+        </div>
       </footer>
     </div>
   )

@@ -2,16 +2,18 @@
 
 ## 当前阶段
 
-Phase 0 之前的工程骨架。目标是建立可运行、可测试的模块化单体后端、React 前端、本地基础设施和 CI，不实现票务业务。
+工程骨架和公开产品预览页面已经完成。首页、Methodology 页面、响应式布局、基础元数据、组件测试和浏览器测试均已通过。项目当前仍处于 Phase 0 数据可行性验证阶段，下一步部署静态前端并获得公开 URL，但仍不实现未经授权的票务查询功能。
 
 ## 后续阶段
 
-1. Phase 0：确认真实 API 权限、字段、配额、缓存和 attribution 限制。
-2. 冻结 MVP provider 范围及数据真实性声明。
-3. 定义统一 provider adapter 与标准化数据模型。
-4. 在真实权限范围内实现首个 provider，并加入 timeout、partial failure 和测试。
-5. 再逐步实现预约优先级、提醒、通知和 AI 解释。
+1. 完成公开网站的信息结构、视觉基础、数据边界说明和发布检查。
+2. 部署前端并获得稳定的公开 URL。
+3. 提交 Provider 申请，确认真实 API 权限、字段、配额、缓存和 attribution 限制。
+4. 冻结 MVP Provider 范围及数据真实性声明。
+5. 定义统一 Provider adapter 与标准化数据模型。
+6. 在真实权限范围内实现首个 Provider，并加入 timeout、partial failure 和测试。
+7. 再逐步实现预约优先级、提醒、通知和 AI 解释。
 
 每个阶段都以可验证的数据来源和自动化测试为准，不因演示需要伪造实时能力。
 
-Phase 0 的详细执行清单、完成条件和交付物见 [`phase-0-plan.md`](phase-0-plan.md)。
+详细的逐 Part coding 顺序和验收条件见 [`coding-roadmap.md`](coding-roadmap.md)。Phase 0 的完成条件和交付物见 [`phase-0-plan.md`](phase-0-plan.md)。
