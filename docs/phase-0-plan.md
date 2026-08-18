@@ -190,9 +190,9 @@ Phase 0 完成后，只选择一个权限最明确的 provider，实现第一条
 
 - [x] 安装 Docker Desktop。
 - [x] 确定使用 GitHub 私有仓库。
-- [ ] 准备 provider 申请使用的邮箱和必要资料。
+- [x] 准备 provider 申请使用的邮箱和必要资料。
 - [x] 确定第一版优先支持 Rome。
-- [ ] 明确项目主要用于学习、作品集，还是未来商业化。
+- [x] 当前主要定位为学习和求职作品集；未来是否商业化保持开放，不在当前范围内承诺。
 - [ ] 保存 provider 的正式回复、条款链接和权限截图。
 
 ## 9. Phase 0 交付物
@@ -210,4 +210,4 @@ Phase 0 结束时应交付：
 
 ## 10. 当前下一项任务
 
-执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 6，使用已部署的公开网站提交 Viator 和 Tiqets 的 affiliate 申请。提交后记录日期、申请类型和正式回复，并在账号获批后验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求。未获得真实权限前，不开始 provider 业务实现。
+等待 Viator 身份验证和 Tiqets 资格审核结果。收到正式回复后执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 7，验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求，并根据真实权限冻结 MVP。未获得可测试的正式权限前，不开始 provider 业务实现。

@@ -137,4 +137,6 @@ This repository contains no real ticket data and makes no production API calls. 
 
 Deployment details are recorded in [deployment.md](docs/deployment.md).
 
-Recommended next task: follow Part 6 of the [coding roadmap](docs/coding-roadmap.md) and submit the Viator and Tiqets provider applications with the public URL. Ticket-data features remain blocked until real API access is verified.
+The Viator and Tiqets provider applications were submitted on 18 August 2026. Viator identity verification and Tiqets qualification review are still pending.
+
+Recommended next task: follow Part 7 of the [coding roadmap](docs/coding-roadmap.md) after at least one provider grants testable access. Ticket-data features remain blocked until real API permissions and usage rules are verified.

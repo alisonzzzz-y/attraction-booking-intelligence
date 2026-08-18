@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-工程骨架和公开产品预览页面已经完成。首页、Methodology 页面、响应式布局、基础元数据、组件测试和浏览器测试均已通过。静态前端已部署到 <https://attraction-booking-intelligence.vercel.app/>。项目当前仍处于 Phase 0 数据可行性验证阶段，下一步使用公开 URL 提交 Provider 申请，但仍不实现未经授权的票务查询功能。
+工程骨架和公开产品预览页面已经完成。首页、Methodology 页面、响应式布局、基础元数据、组件测试和浏览器测试均已通过。静态前端已部署到 <https://attraction-booking-intelligence.vercel.app/>。Viator 和 Tiqets 申请已提交，项目当前仍处于 Phase 0 数据可行性验证阶段。下一步等待并核对真实权限，但仍不实现未经授权的票务查询功能。
 
 ## 后续阶段
 

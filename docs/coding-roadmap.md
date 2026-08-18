@@ -115,6 +115,8 @@
 
 ### Part 6：提交 Provider 申请
 
+状态：已完成（2026-08-18）。Viator 正在等待身份验证，Tiqets 正在等待资格审核。
+
 目标：使用真实公开网站完成资格申请。
 
 范围：
@@ -128,6 +130,8 @@
 验收：至少提交一份真实申请，并保存可追踪的申请状态。
 
 ### Part 7：根据真实权限冻结 MVP
+
+状态：等待 Provider 正式回复，尚未开始实现。
 
 目标：将 Provider 的实际能力转换为明确的产品范围。
 
@@ -227,6 +231,6 @@
 
 ## 4. 当前只执行的下一部分
 
-下一次只执行 **Part 6：提交 Provider 申请**。
+下一次只执行 **Part 7：根据真实权限冻结 MVP**，但必须等待至少一个 Provider 返回可测试的正式权限。
 
-Part 1–4 已完成并通过 lint、format、组件测试、production build 和 Playwright 浏览器测试。Part 5 已通过 Vercel 部署到 <https://attraction-booking-intelligence.vercel.app/>，GitHub commit status 显示部署成功。Codex 当前网络访问 `vercel.app` 超时，因此线上首页、深层路由刷新和控制台 smoke test 仍需从独立网络补充验证。详细配置与验证记录见 [`deployment.md`](deployment.md)。Part 6 只提交并记录 Provider 申请，不提前实现依赖 API 的业务功能。
+Part 1–4 已完成并通过 lint、format、组件测试、production build 和 Playwright 浏览器测试。Part 5 已通过 Vercel 部署到 <https://attraction-booking-intelligence.vercel.app/>，GitHub commit status 显示部署成功。Codex 当前网络访问 `vercel.app` 超时，因此线上首页、深层路由刷新和控制台 smoke test 仍需从独立网络补充验证。详细配置与验证记录见 [`deployment.md`](deployment.md)。Part 6 已提交 Viator 和 Tiqets 申请。等待期间只整理申请回复和权限证据，不提前实现依赖 API 的业务功能。
