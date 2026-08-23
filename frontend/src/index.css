@@ -29,6 +29,9 @@
   --partner-surface: #f0ebf6;
   --warning-ink: #744a00;
   --warning-surface: #fff1cf;
+  --can-wait-ink: #24546b;
+  --can-wait-surface: #e5f1f6;
+  --can-wait-accent: #5d93aa;
   --danger-ink: #8d321f;
   --danger-surface: #fcebe5;
   --focus: #0d6f58;
@@ -903,8 +906,8 @@ p {
 }
 
 .priority-can-wait {
-  color: #435049;
-  background: #e4e8e5;
+  color: var(--can-wait-ink);
+  background: var(--can-wait-surface);
 }
 
 .priority-unknown,
@@ -1002,7 +1005,7 @@ p {
 }
 
 .result-card-priority-can-wait {
-  border-top-color: #6f7b74;
+  border-top-color: var(--can-wait-accent);
 }
 
 .result-card-priority-unknown,
