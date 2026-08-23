@@ -43,7 +43,21 @@ class RomePlaceQueryService {
             new VerifiedPlaceMapping(
                     "capitoline-museums",
                     "capitoline-museums",
-                    "ChIJ8-wGeU9gLxMR--zJtnpGod4"));
+                    "ChIJ8-wGeU9gLxMR--zJtnpGod4"),
+            new VerifiedPlaceMapping(
+                    "st-peters-basilica",
+                    "st-peters-basilica",
+                    "ChIJWZsUt2FgLxMRg1KHzXfwS3I"),
+            new VerifiedPlaceMapping(
+                    "castel-sant-angelo",
+                    "castel-sant-angelo",
+                    "ChIJ0aTnEYeKJRMRiUF95xwRbDY"),
+            new VerifiedPlaceMapping(
+                    "domus-aurea", "domus-aurea", "ChIJp-3oaLdhLxMRS_bYIp1GB8w"),
+            new VerifiedPlaceMapping(
+                    "trevi-fountain",
+                    "trevi-fountain",
+                    "ChIJ1UCDJ1NgLxMRtrsCzOHxdvY"));
 
     private final Optional<GooglePlacesClient> client;
     private final Clock clock;

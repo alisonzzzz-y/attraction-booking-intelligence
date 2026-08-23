@@ -332,6 +332,50 @@ const placeResponse = {
       businessStatus: 'OPERATIONAL',
       retrievedAt: '2026-08-21T08:31:00Z',
     },
+    {
+      attractionId: 'st-peters-basilica',
+      componentId: 'st-peters-basilica',
+      placeId: 'ChIJWZsUt2FgLxMRg1KHzXfwS3I',
+      name: "Saint Peter's Basilica",
+      formattedAddress: 'Piazza San Pietro, 00120 Citta del Vaticano',
+      location: { latitude: 41.902_166_7, longitude: 12.453_936_7 },
+      googleMapsUri: 'https://maps.google.com/?cid=st-peters-basilica',
+      businessStatus: 'OPERATIONAL',
+      retrievedAt: '2026-08-21T08:31:00Z',
+    },
+    {
+      attractionId: 'castel-sant-angelo',
+      componentId: 'castel-sant-angelo',
+      placeId: 'ChIJ0aTnEYeKJRMRiUF95xwRbDY',
+      name: "Castel Sant'Angelo",
+      formattedAddress: 'Lungotevere Castello, 50, 00193 Roma RM, Italy',
+      location: { latitude: 41.903_063_2, longitude: 12.466_276 },
+      googleMapsUri: 'https://maps.google.com/?cid=castel-sant-angelo',
+      businessStatus: 'OPERATIONAL',
+      retrievedAt: '2026-08-21T08:31:00Z',
+    },
+    {
+      attractionId: 'domus-aurea',
+      componentId: 'domus-aurea',
+      placeId: 'ChIJp-3oaLdhLxMRS_bYIp1GB8w',
+      name: 'Domus Aurea',
+      formattedAddress: 'Via della Domus Aurea, 1, 00184 Roma RM, Italy',
+      location: { latitude: 41.891_076, longitude: 12.495_715 },
+      googleMapsUri: 'https://maps.google.com/?cid=domus-aurea',
+      businessStatus: 'OPERATIONAL',
+      retrievedAt: '2026-08-21T08:31:00Z',
+    },
+    {
+      attractionId: 'trevi-fountain',
+      componentId: 'trevi-fountain',
+      placeId: 'ChIJ1UCDJ1NgLxMRtrsCzOHxdvY',
+      name: 'Trevi Fountain',
+      formattedAddress: 'Piazza di Trevi, 00187 Roma RM, Italy',
+      location: { latitude: 41.900_932_5, longitude: 12.483_313 },
+      googleMapsUri: 'https://maps.google.com/?cid=trevi-fountain',
+      businessStatus: 'OPERATIONAL',
+      retrievedAt: '2026-08-21T08:31:00Z',
+    },
   ],
 }
 
@@ -531,6 +575,19 @@ describe('ResultsPage', () => {
     )
 
     renderResults()
+
+    for (const priority of priorityResponse.priorities) {
+      const heading = await screen.findByRole('heading', {
+        name: priority.attractionName,
+      })
+      const card = heading.closest('article')
+      expect(card).not.toBeNull()
+      expect(
+        within(card as HTMLElement).getByRole('button', {
+          name: 'Show on map',
+        }),
+      ).toBeInTheDocument()
+    }
 
     const borgheseHeading = await screen.findByRole('heading', {
       name: 'Borghese Gallery',

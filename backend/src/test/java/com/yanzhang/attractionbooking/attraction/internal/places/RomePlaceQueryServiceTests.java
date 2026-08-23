@@ -97,6 +97,38 @@ class RomePlaceQueryServiceTests {
                         "Piazza del Campidoglio, 1, 00186 Roma RM, Italy",
                         41.8929428,
                         12.4825577)));
+        server.createContext(
+                "/v1/places/ChIJWZsUt2FgLxMRg1KHzXfwS3I",
+                exchange -> respond(exchange, placeJson(
+                        "ChIJWZsUt2FgLxMRg1KHzXfwS3I",
+                        "Saint Peter's Basilica",
+                        "Piazza San Pietro, 00120 Citta del Vaticano",
+                        41.9021667,
+                        12.4539367)));
+        server.createContext(
+                "/v1/places/ChIJ0aTnEYeKJRMRiUF95xwRbDY",
+                exchange -> respond(exchange, placeJson(
+                        "ChIJ0aTnEYeKJRMRiUF95xwRbDY",
+                        "Castel Sant'Angelo",
+                        "Lungotevere Castello, 50, 00193 Roma RM, Italy",
+                        41.9030632,
+                        12.466276)));
+        server.createContext(
+                "/v1/places/ChIJp-3oaLdhLxMRS_bYIp1GB8w",
+                exchange -> respond(exchange, placeJson(
+                        "ChIJp-3oaLdhLxMRS_bYIp1GB8w",
+                        "Domus Aurea",
+                        "Via della Domus Aurea, 1, 00184 Roma RM, Italy",
+                        41.891076,
+                        12.495715)));
+        server.createContext(
+                "/v1/places/ChIJ1UCDJ1NgLxMRtrsCzOHxdvY",
+                exchange -> respond(exchange, placeJson(
+                        "ChIJ1UCDJ1NgLxMRtrsCzOHxdvY",
+                        "Trevi Fountain",
+                        "Piazza di Trevi, 00187 Roma RM, Italy",
+                        41.9009325,
+                        12.483313)));
         server.start();
 
         try {
@@ -111,7 +143,7 @@ class RomePlaceQueryServiceTests {
             List<RomePlaceQueryService.RomePlaceEvidence> evidence =
                     service.fetchVerifiedPlaces();
 
-            assertEquals(9, evidence.size());
+            assertEquals(13, evidence.size());
             assertEquals("pantheon", evidence.get(0).attractionId());
             assertEquals("pantheon", evidence.get(0).componentId());
             assertEquals("ChIJqUCGZ09gLxMRLM42IPpl0co", evidence.get(0).placeId());
@@ -134,6 +166,10 @@ class RomePlaceQueryServiceTests {
             assertEquals("capitoline-museums", evidence.get(8).attractionId());
             assertEquals("capitoline-museums", evidence.get(8).componentId());
             assertEquals("ChIJ8-wGeU9gLxMR--zJtnpGod4", evidence.get(8).placeId());
+            assertEquals("st-peters-basilica", evidence.get(9).attractionId());
+            assertEquals("castel-sant-angelo", evidence.get(10).attractionId());
+            assertEquals("domus-aurea", evidence.get(11).attractionId());
+            assertEquals("trevi-fountain", evidence.get(12).attractionId());
         } finally {
             server.stop(0);
         }
