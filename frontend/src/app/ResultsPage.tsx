@@ -583,22 +583,6 @@ export function ResultsPage() {
         </div>
       ) : null}
 
-      {ticketQuery.isError ? (
-        <div className="result-state result-state-error" role="alert">
-          <strong>
-            Third-party ticket evidence is temporarily unavailable.
-          </strong>
-          <p>{ticketQuery.error.message}</p>
-          <p>This is not treated as sold out.</p>
-          <button
-            className="button button-secondary"
-            onClick={() => ticketQuery.refetch()}
-          >
-            Retry third-party evidence
-          </button>
-        </div>
-      ) : null}
-
       {placeQuery.isError ? (
         <div className="result-state result-state-error" role="alert">
           <strong>Location evidence is temporarily unavailable.</strong>
@@ -610,15 +594,6 @@ export function ResultsPage() {
           >
             Retry location evidence
           </button>
-        </div>
-      ) : null}
-
-      {ticketQuery.data?.partialFailure ? (
-        <div className="result-state result-state-warning" role="status">
-          <strong>Some third-party evidence could not be loaded.</strong>
-          {ticketQuery.data.errors.map((error) => (
-            <p key={`${error.type}-${error.code}`}>{error.message}</p>
-          ))}
         </div>
       ) : null}
 

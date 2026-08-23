@@ -605,7 +605,7 @@ describe('ResultsPage', () => {
     expect(mapButton).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('keeps location evidence when the ticket provider fails', async () => {
+  it('keeps ticket provider failures out of the result summary', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
       'fetch',
@@ -623,11 +623,12 @@ describe('ResultsPage', () => {
 
     renderResults()
 
+    await screen.findByRole('heading', { name: 'Pantheon' })
     expect(
-      await screen.findByText(
+      screen.queryByText(
         'Third-party ticket evidence is temporarily unavailable.',
       ),
-    ).toBeInTheDocument()
+    ).not.toBeInTheDocument()
     await user.click(
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
