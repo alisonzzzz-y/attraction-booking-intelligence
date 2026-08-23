@@ -1,11 +1,15 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
+const backendTarget =
+  process.env.BACKEND_PROXY_TARGET ?? 'http://localhost:8080'
+
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/actuator': 'http://localhost:8080',
+      '/actuator': backendTarget,
+      '/api': backendTarget,
     },
   },
   test: {

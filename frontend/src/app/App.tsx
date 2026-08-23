@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 
 const navigationItems = [
   { label: 'Home', to: '/' },
+  { label: 'Plan Rome', to: '/plan' },
   { label: 'Methodology', to: '/methodology' },
 ]
 
@@ -49,8 +50,10 @@ export function App() {
           <p>An independent portfolio project, starting with Rome.</p>
         </div>
         <div className="footer-note">
-          <span>Public preview</span>
-          <p>No live prices or availability are published yet.</p>
+          <p>
+            Booking priority uses official sources. Third-party Sandbox evidence
+            is separate and is not live availability.
+          </p>
         </div>
       </footer>
     </div>

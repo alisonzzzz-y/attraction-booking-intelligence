@@ -16,11 +16,11 @@ Phase 0 只有在以下条件全部满足后才算完成：
 - [x] 后端 Testcontainers 集成测试已经实际运行并通过。
 - [x] GitHub Actions CI 已经运行并通过。
 - [x] 公开前端已经部署，并获得稳定 HTTPS 地址：<https://attraction-booking-intelligence.vercel.app/>。
-- [x] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。目前仅确认 Viator Basic Access 的公开资格和能力边界，尚未完成账号验证。
-- [ ] 已记录 provider 的字段、配额、缓存、归因和购买跳转限制。
-- [ ] 已确定 MVP 使用的 provider 范围。
-- [ ] 已确定 MVP 可以展示和不能展示的数据。
-- [ ] 已批准 MVP 数据真实性声明。
+- [x] 至少一个 provider 的接入资格和数据能力已经通过正式资料或账号权限确认。Viator Basic Access Sandbox key 已验证可用，Rome 目录与产品候选覆盖已记录；production 权限仍未取得。
+- [x] 已记录 provider 的字段、配额、缓存、归因和购买跳转限制；production 待确认项保持显式阻塞。
+- [x] 已确定 MVP 开发范围：Google Places 提供地点信息，Viator Basic Access Sandbox 作为首个票务 Provider，Tiqets 保留为待授权候选。
+- [x] 已确定 MVP 可以展示和不能展示的数据。
+- [x] 已批准 [`mvp-data-truth-statement.md`](mvp-data-truth-statement.md) 作为第一版开发范围的数据真实性声明。
 
 如果没有 provider 能提供所需的核心数据，应在本阶段调整产品范围，而不是用 fixture、sandbox 或 AI 生成内容填补缺口。
 
@@ -201,13 +201,13 @@ Phase 0 结束时应交付：
 
 1. 通过完整测试的基础工程。
 2. 更新后的 `docs/api-access-notes.md`。
-3. Provider 决策记录或 ADR。
+3. Provider 决策记录：[`decisions/0003-first-mvp-providers.md`](decisions/0003-first-mvp-providers.md)。
 4. MVP 功能和不做功能清单。
 5. 标准化字段清单。
 6. 缓存、归因和数据刷新规则。
-7. MVP 数据真实性声明。
+7. MVP 数据真实性声明：[`mvp-data-truth-statement.md`](mvp-data-truth-statement.md)。
 8. 第一个 provider 纵向功能切片的实施任务。
 
 ## 10. 当前下一项任务
 
-等待 Viator 身份验证和 Tiqets 资格审核结果。收到正式回复后执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 7，验证 Sandbox 或 test environment、Rome 产品覆盖、字段含义、缓存限制和 attribution 要求，并根据真实权限冻结 MVP。未获得可测试的正式权限前，不开始 provider 业务实现。
+Phase 0 的 MVP 开发范围已经冻结。Provider 选择见 [`decisions/0003-first-mvp-providers.md`](decisions/0003-first-mvp-providers.md)，展示和推导边界见 [`mvp-data-truth-statement.md`](mvp-data-truth-statement.md)。下一步执行 [`coding-roadmap.md`](coding-roadmap.md) 的 Part 8，定义 Provider 无关领域契约和 contract test 基础。Production 票务展示仍是独立 release gate，必须等待 production key 和最终使用规则验证。

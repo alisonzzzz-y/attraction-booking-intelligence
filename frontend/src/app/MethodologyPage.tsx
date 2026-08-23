@@ -115,7 +115,7 @@ export function MethodologyPage() {
       >
         <div>
           <p className="eyebrow eyebrow-light">Current status</p>
-          <h2>Foundation tested. Provider access not yet connected.</h2>
+          <h2>Foundation tested. Sandbox providers connected.</h2>
         </div>
         <Link className="button button-primary" to="/#build-status">
           Return to current build

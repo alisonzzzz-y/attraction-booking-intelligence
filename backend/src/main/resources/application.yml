@@ -29,3 +29,13 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+providers:
+  google-places:
+    enabled: ${GOOGLE_PLACES_API_ENABLED:false}
+    base-url: ${GOOGLE_PLACES_API_BASE_URL:https://places.googleapis.com}
+    api-key: ${GOOGLE_PLACES_API_KEY:}
+  viator:
+    enabled: ${VIATOR_API_ENABLED:false}
+    base-url: ${VIATOR_API_BASE_URL:https://api.sandbox.viator.com/partner}
+    api-key: ${VIATOR_API_KEY:}

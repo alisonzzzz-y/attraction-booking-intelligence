@@ -1,6 +1,6 @@
 # Coding 路线图
 
-最后更新：2026-08-18
+最后更新：2026-08-19
 
 ## 1. 路线目标
 
@@ -115,7 +115,7 @@
 
 ### Part 6：提交 Provider 申请
 
-状态：已完成（2026-08-18）。Viator 正在等待身份验证，Tiqets 正在等待资格审核。
+状态：表单步骤已完成。Viator Basic Access Sandbox key 已于 2026-08-19 验证可用；Tiqets 于 2026-08-19 通知申请资料不完整或不正确，已邮件询问具体修改要求。
 
 目标：使用真实公开网站完成资格申请。
 
@@ -131,33 +131,68 @@
 
 ### Part 7：根据真实权限冻结 MVP
 
-状态：等待 Provider 正式回复，尚未开始实现。
+状态：已完成（2026-08-19）。MVP 开发范围、首个 Provider、production 阻塞项和数据真实性规则已经冻结。
 
 目标：将 Provider 的实际能力转换为明确的产品范围。
+
+产品需求讨论稿见 [`product-requirements.md`](product-requirements.md)。本 Part 需要根据真实权限确认其中的等待项，不能把讨论稿中的候选状态或页面字段直接视为已经获批的功能。
 
 范围：
 
 - 核对 Rome 覆盖、字段、环境、rate limit、缓存、attribution 和跳转要求。
+- 核对 Google Maps Platform billing、EEA 条款、key restrictions、Places 字段和约 10 个景点的 Place ID。
 - 明确哪些数据可显示、不可显示或只能标为非实时。
 - 决定首个 Provider、备选 Provider 和暂不接入的来源。
 - 新增 Provider 选择 ADR 和 MVP 数据真实性声明。
 
-停止条件：如果尚未获得可测试的正式权限，本 Part 不进入“完成”，也不开始票务结果页面。
+停止条件：如果尚未获得可测试的票务 Provider 权限，本 Part 不进入“完成”，也不开始票务结果页面。Google Maps 与 Places 的账号和数据可行性验证可以独立进行。
+
+已验证的 Google 范围：
+
+- Maps JavaScript API 使用受 HTTP referrer 限制的浏览器 key，本地 `/map-preview` 已成功渲染固定的 Colosseum 测试坐标。
+- Places API (New) 使用独立的 server key，本地 Text Search 已返回 Colosseum 的 Place ID、英文名称和格式化地址。
+- 浏览器 key 与 server key 已分离；server key 不进入前端 bundle。当前测试结果只证明连接和字段可用，不代表已经建立 Rome 景点目录，也不属于票务数据。
+- Rome MVP 的 10 项景点清单和 13 个 Google Place ID 已完成初次核对，并记录在 [`rome-attraction-catalogue.md`](rome-attraction-catalogue.md)。两个规划组合保留了组件级映射，没有把多个 Google 实体合并成一个 Place。
+
+已验证的 Viator Sandbox 范围：
+
+- Basic Access key 已成功调用 `/destinations`，Rome `destinationId = 511`。
+- Rome 产品搜索、完整景点目录分页和 10 项 MVP 景点的 free-text 候选搜索均返回成功。
+- 13 个地点组件都能在 Viator attraction directory 中找到；目录 `productCount` 只代表关联产品，不代表直接门票。
+- 候选产品与搜索误匹配记录在 [`viator-rome-coverage.md`](viator-rome-coverage.md)，不能在产品详情核对前自动建立正式映射。
+- Pantheon 候选产品 `5569822P4` 的产品详情和单产品 schedule 均返回 HTTP 200。响应证实 option、season、timed entry、价格结构、明确 unavailable date 和 Sandbox affiliate URL 可读取，但不能据此声明实时余票或预约紧迫度。
+- Provider 选择记录在 [`decisions/0003-first-mvp-providers.md`](decisions/0003-first-mvp-providers.md)。
+- 展示、环境隔离、事实状态和禁止推导规则记录在 [`mvp-data-truth-statement.md`](mvp-data-truth-statement.md)。
 
 ### Part 8：Provider 无关的领域契约
+
+状态：已完成（2026-08-19）。
 
 目标：在已知真实字段后建立稳定边界。
 
 范围：
 
 - 定义统一 Provider adapter 接口。
-- 定义标准化 attraction、availability、price、source、freshness 和 error 类型。
+- 定义标准化 attraction、location、opening hours、booking urgency evidence、availability、price、source、freshness 和 error 类型。
+- 将 Google Place ID 作为外部映射，不让 Google DTO 进入业务模块。
 - 明确 unknown、unavailable、stale 和 request failed 的区别。
 - 添加模块边界测试和 adapter contract test 基础。
 
 验收：契约只表达已确认能力，不泄漏某个 Provider 的原始 DTO。
 
+已完成：
+
+- 新增统一 `ProviderAdapter`、最小查询输入和标准化返回结果。
+- 定义 attraction、external reference、location、opening hours、booking urgency evidence、availability、price、source、freshness 和 error 类型。
+- 将 `UNKNOWN`、明确 `UNAVAILABLE`、`REQUEST_FAILED` 和 `STALE` 分开表达；`SCHEDULED` 不代表实时库存。
+- Google Place ID 只作为普通外部引用保存，不引入 Google DTO。
+- `ProviderSearchResult` 保留 partial failure 和 complete failure 的区别。
+- 新增可供未来 adapter 测试继承的 `ProviderAdapterContract`，并使用测试 stub 验证基础契约。
+- 领域契约说明记录在 [`provider-domain-contract.md`](provider-domain-contract.md)。
+
 ### Part 9：首个 Provider adapter
+
+状态：已完成（2026-08-19）。已实现默认关闭的 Viator Basic Access Sandbox adapter，并使用本地 HTTP stub 完成 contract tests。
 
 目标：完成第一条经过授权的数据访问链路。
 
@@ -171,19 +206,118 @@
 
 验收：可以对一个已确认的 Rome 产品执行可重复查询，并保留来源和获取时间。
 
+已完成：
+
+- 环境变量提供 `enabled`、Sandbox base URL 和 API key；仓库没有保存真实 key。
+- Viator 原始 DTO、HTTP client、配置和 adapter 均位于 Provider 模块的 `internal.viator` 范围。
+- 已实现 `/products/{product-code}` 和 `/availability/schedules/{product-code}` 两个只读请求。
+- 已映射产品状态、product code、schedule summary `fromPrice`、币种、booking cutoff、Sandbox environment、来源 URL 和获取时间。
+- `SCHEDULED` 只表示 Provider 返回了销售排期，不表示实时库存。单个 option 或 timed entry 的 `unavailableDates` 不会被提升为整个产品不可用。
+- 401/403、404、408/504、429、其他 HTTP 错误、不可读响应和缺少产品映射均转换为稳定的领域错误。
+- HTTP client 不记录 API key、请求头或原始错误响应；contract test 验证认证错误不会暴露测试 key。
+- Contract tests 使用本地 stub 和明确的 Sandbox 测试样本，不调用 production，也不把 fixture 描述为实时数据。
+
+实现和运行边界见 [`viator-sandbox-adapter.md`](viator-sandbox-adapter.md)。
+
 ### Part 10：Rome 第一条纵向功能切片
+
+状态：进行中。10A 至 10G 已完成五个 Rome 景点结果组，其中包含 Colosseum Archaeological Park 和 Vatican Museums and Sistine Chapel 两个组合景点模型。
 
 目标：把真实 Provider 结果从后端送到前端。
 
 范围：
 
 - 支持一个城市 Rome 和少量经过来源核对的景点。
-- 用户选择日期并查询。
-- 后端返回标准化结果和明确状态。
-- 前端展示 Provider、价格或状态、freshness、错误和允许的购买跳转。
+- 用户选择城市停留日期范围并查询。
+- 后端返回标准化景点、位置、开放信息、票务排期、预约紧迫度证据和明确状态。
+- 前端实现景点列表与 Google Map marker 联动，并在地图失败时保留列表。
+- 前端展示 Provider、价格或状态、预约紧迫度、freshness、错误和允许的购买跳转。
 - 不支持的字段显示 unavailable 或 unknown，不猜测内容。
 
 验收：一条真实查询可以端到端完成，失败状态和无数据状态有自动化测试。
+
+#### Part 10A 已完成
+
+- 新增 `/plan`，只开放 Rome，并校验必填日期、日期顺序和最长 14 天范围。
+- 查询条件写入 `/results?city=rome&stayStartDate=...&stayEndDate=...`，不包含 secret。
+- 首页主入口和 build status 已更新为当前真实阶段。
+- 新增公开只读 `GET /api/v1/rome/attractions` 端点，输入为 `stayStartDate` 和 `stayEndDate`。
+- 端点只调用已人工核对的 Pantheon Viator Sandbox 产品 `5569822P4`，并返回 provider、environment、source time、freshness、状态、价格和错误边界。
+- Provider 未配置时返回服务不可用，不回退到 fixture，也不把失败解释为无票。
+- 10A 结束时前端尚未调用该端点，Sandbox purchase URL 不会显示在公开 UI。
+
+#### Part 10B 已完成
+
+- `/results` 通过 React Query 调用 Rome 端点，并在浏览器边界验证响应结构。
+- 第一张 Pantheon 卡片展示 provider、Sandbox 环境、获取时间、freshness、排期状态、价格类型和预约证据状态。
+- `SCHEDULED` 明确解释为 Provider 发布了排期，而不是实时库存保证；Sandbox `FROM` 价格明确标记为非实时报价。
+- Provider 未配置、响应错误或部署端没有后端时显示独立失败状态，不解释为售罄。
+- 空结果与 partial failure 都有独立界面；Sandbox purchase URL 继续不显示。
+- 前端单元测试覆盖成功、Provider 失败和缺少查询条件三种状态。
+
+#### Part 10C 已完成
+
+- 新增服务端 Google Place Details 客户端，只请求已人工核对的 Pantheon Place ID。
+- `GET /api/v1/rome/places` 返回地址、坐标、Google Maps URI、business status 和获取时间，不返回任何票务推断。
+- 浏览器通过 Zod 校验地点响应，服务端 key 不进入前端 bundle。
+- Pantheon 卡片把 Google Places 地点事实与 Viator Sandbox 票务事实分区展示，并分别标记来源和获取时间。
+- 两个 Provider 使用独立 React Query。地点失败时保留票务证据，票务失败时保留地点证据。
+- 结果页以列表为主，地图使用经过核对的坐标；缺少浏览器 key 或地图加载失败时，列表仍然完整可读。
+- 自动化测试覆盖 Google 客户端 contract、未配置状态、两类独立失败、地图降级、生产构建和浏览器流程。
+
+#### Part 10D 已完成
+
+- 第二个景点使用已人工核对的内部 ID `borghese-gallery`、Google Place ID `ChIJq-bXVgRhLxMRv3vgOXaktBs` 和 Viator Sandbox 产品 `403837P1`。
+- Rome 地点端点现在返回 Pantheon 与 Galleria Borghese 两条独立 Google Places 事实记录。
+- Rome 票务端点把 Pantheon 与 Borghese Gallery 作为两个独立映射交给统一 Viator adapter，仍不把 Sandbox 排期或价格描述为 production 实时数据。
+- 结果页按内部 attraction ID 合并两个来源。某个 Provider 整体失败时，另一来源的两张景点卡片仍然保留。
+- 每张有地点证据的卡片都可以选择对应地图位置；选择状态有可见样式和 `aria-pressed` 语义，地图不可用时地点列表仍然完整。
+- 自动化测试覆盖两个固定外部映射、双景点渲染、Provider 独立失败和地图选择交互。
+
+#### Part 10E 已完成
+
+- 新增组合景点内部 ID `colosseum-archaeological-park`。Colosseum、Roman Forum 和 Palatine Hill 保留各自的 `componentId` 和 Google Place ID，但共享同一个 attraction ID。
+- 新增 Provider 无关的 `OfferingType`。Viator 产品 `15932P15` 明确映射为 `GUIDED_TOUR`，不能与官方 €18 基础入场票混为一谈。
+- Sandbox 产品详情与 schedule 于 2026-08-19 再次返回 HTTP 200。产品状态为 `ACTIVE`，标题明确包含三个地点，schedule 摘要为 `EUR 49 FROM`；这些仍是 Sandbox 集成证据，不是 production 实时报价。
+- 结果页把组合景点显示为一张卡片，卡片内列出三个分别核对的地点，并在地图选择时聚焦整个地点组。
+- 自动化测试覆盖三项外部地点映射、组合关系、导览产品类型、三地点渲染和组合地图选择文案。
+
+#### Part 10F 已完成
+
+- 新增组合景点内部 ID `vatican-museums-sistine-chapel`，并保留 Vatican Museums 与 Sistine Chapel 两个独立 Google Place component。
+- 两个固定 Place ID 于 2026-08-20 再次返回 HTTP 200，名称、地址、坐标和 `OPERATIONAL` 状态均通过校验。
+- Viator Sandbox 产品 `144387P2` 的详情与 schedule 于 2026-08-20 返回 HTTP 200。产品状态为 `ACTIVE`，标题为 `Vatican Museums and Sistine Chapel Tickets`，唯一 option 为 `Tickets Only`，因此映射为 `TICKET_PRODUCT`。
+- Sandbox schedule 的 `EUR 69 FROM` 只用于验证字段映射，页面继续明确标记为 Sandbox 摘要价格，不把它描述为官方价格、实时价格或 production 可用性。
+- 梵蒂冈博物馆官方规则确认同日门票包含西斯廷教堂；官方来源、Google 地点事实和 Viator Sandbox 产品事实仍然分开记录。
+- 结果页将两个地点显示为一个组合景点组，并保留 Provider 独立失败、地图降级和组合地点聚焦能力。
+- 自动化测试覆盖第四项外部产品映射、两个地点 component、组合渲染、Sandbox 标签和浏览器流程。
+
+#### Part 10G 已完成
+
+- 新增 `baths-of-caracalla` 结果组，并使用此前通过 Google Places Text Search 核对的固定 Place ID `ChIJ1YU-M85hLxMR3Jhb6gZAK2o`。运行时仍通过 Place Details 校验名称、地址、坐标和状态。
+- Viator Sandbox 产品 `247354P40` 的详情与 schedule 于 2026-08-21 返回 HTTP 200。产品状态为 `ACTIVE`，唯一 option 明确包含入场票和数字语音导览，schedule 摘要为 `EUR 15 FROM`。
+- 新增 `TICKET_WITH_AUDIO_GUIDE` 产品类型，并同时修正 Borghese Gallery 的现有分类。前端明确说明这类产品是 affiliate bundle，不是官方基础入场票。
+- 意大利文化部官方页于 2026-08-21 复核：普通参观全价 €8、18 至 25 岁优惠票 €2、预约非必需，临时展览可能另收 €5。官方快照和 Viator Sandbox 组合价继续作为不同来源处理。
+- 自动化测试覆盖第五项外部产品映射、第八条地点记录、语音导览组合标签、Provider 独立失败和浏览器流程。
+
+#### Part 10H 已完成
+
+- 新增 `capitoline-museums` 结果组，使用固定 Google Place ID `ChIJ8-wGeU9gLxMR--zJtnpGod4`，运行时继续通过 Place Details 校验地点事实。
+- Viator Sandbox 产品 `14982P113` 的详情与 schedule 于 2026-08-21 返回 HTTP 200。产品状态为 `ACTIVE`，唯一 option 和 inclusions 都只声明博物馆入场，因此映射为 `TICKET_PRODUCT`。
+- Sandbox schedule 摘要为 `EUR 30 FROM`，且换票说明表示用户所选时段不可用时可能改为最近可用时段。页面不会把 €30 描述为官方价，也不会把选择的时段描述为已保证。
+- Capitoline Museums 官方页同期显示，无临时展览时成人基础票 €15，线上预购另收 €1，展览期间价格会变化。官方价格快照和 Viator Sandbox 产品继续分开。
+- 自动化测试覆盖第六项外部产品映射、第九条地点记录、Sandbox 标签、Provider 独立失败和浏览器流程。
+
+#### Part 10I 已完成
+
+- 新增独立的 `bookingpriority` 业务模块，为 10 个 Rome MVP 景点返回版本化、可解释的预约优先级。
+- 第一版标签为 `Book first`、`Book soon`、`Can wait` 和 `Check official source`，全部来自人工核对的官方预约政策和确定性规则。
+- 每条结果返回置信度、时间建议、官方事实依据、来源 URL、核对日期、规则版本和计算时间。
+- 官方预约建议不依赖 Viator Sandbox 是否返回产品、排期或价格；Google Places 和第三方票务请求失败也不会清空官方优先级。
+- 当前证据不足以支持“提前 7 天”或“提前 14 天”等精确时间，因此第一版明确不生成这类数字。
+- 后端规则和服务测试、前端来源隔离测试、生产构建和 lint 均已通过。
+
+下一步 10J：在条款允许的前提下设计历史可用性观察模型，用于以后校准提前购买时间范围。该模型不得把 Sandbox 排期描述为 production 实时余票。
 
 ### Part 11：韧性、缓存与 partial failure
 
@@ -223,14 +357,14 @@
 
 以下能力分别规划为独立 Part，不在首个真实查询切片稳定前开发：
 
-- 预约优先级规则。
 - 行程保存和基础身份功能。
+- Routes API、景点间通行时间和图形化行程安排。
 - 提醒、通知和去重。
 - AI 对结构化事实的解释与模板 fallback。
 - 更完整的可观测性、性能测量和作品集证据整理。
 
 ## 4. 当前只执行的下一部分
 
-下一次只执行 **Part 7：根据真实权限冻结 MVP**，但必须等待至少一个 Provider 返回可测试的正式权限。
+下一次只执行 **Part 11：Provider 韧性与缓存边界**。先为外部调用补充明确的 timeout、有限 retry 和来源独立失败测试，再按已确认的 Provider 条款决定是否加入短期缓存。不得用缓存掩盖数据来源、环境或 freshness。
 
-Part 1–4 已完成并通过 lint、format、组件测试、production build 和 Playwright 浏览器测试。Part 5 已通过 Vercel 部署到 <https://attraction-booking-intelligence.vercel.app/>，GitHub commit status 显示部署成功。Codex 当前网络访问 `vercel.app` 超时，因此线上首页、深层路由刷新和控制台 smoke test 仍需从独立网络补充验证。详细配置与验证记录见 [`deployment.md`](deployment.md)。Part 6 已提交 Viator 和 Tiqets 申请。等待期间只整理申请回复和权限证据，不提前实现依赖 API 的业务功能。
+Part 1–9 和 Part 10A 至 10J 已完成。Part 10J 只完成历史观察模型和实施闸门设计，没有创建采集器、历史业务表或精确提前购买天数。原因是当前 Viator 权限仍为 Sandbox Basic Access，不能提供合规且可验证的 production 历史余票。详细决定见 [`decisions/0004-historical-availability-observations.md`](decisions/0004-historical-availability-observations.md)。Part 10A 至 10I 已实现本地 Rome 日期查询、10 个景点的 Booking Priority、9 条 Google Places 组件记录和 6 条 Viator Sandbox 产品映射。官方预约建议、地点事实和第三方 Sandbox 票务证据分别存储和展示。这些前端改动随本次提交推送到 `main` 后，将由 Vercel 自动触发 production 部署；后端仍未部署。详细部署配置与验证记录见 [`deployment.md`](deployment.md)。

@@ -59,15 +59,40 @@ class InfrastructureIntegrationTests {
 
     @Test
     void exposesPublicHealthEndpoint() throws Exception {
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/actuator/health"))
-                .GET()
-                .build();
-
-        var response = HttpClient.newHttpClient()
-                .send(request, HttpResponse.BodyHandlers.ofString());
+        var response = get("/actuator/health");
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).contains("\"status\":\"UP\"");
+    }
+
+    @Test
+    void returnsProviderConfigurationErrorWithoutRequestingLogin() throws Exception {
+        var ticketResponse = get(
+                "/api/v1/rome/attractions"
+                        + "?stayStartDate=2026-09-10&stayEndDate=2026-09-12");
+        var locationResponse = get("/api/v1/rome/places");
+
+        assertThat(ticketResponse.statusCode()).isEqualTo(503);
+        assertThat(ticketResponse.headers().firstValue("www-authenticate")).isEmpty();
+        assertThat(locationResponse.statusCode()).isEqualTo(503);
+        assertThat(locationResponse.headers().firstValue("www-authenticate")).isEmpty();
+    }
+
+    @Test
+    void doesNotAdvertiseBrowserLoginForAnUnknownPublicRoute() throws Exception {
+        var response = get("/api/v1/rome/not-a-route");
+
+        assertThat(response.statusCode()).isEqualTo(404);
+        assertThat(response.headers().firstValue("www-authenticate")).isEmpty();
+    }
+
+    private HttpResponse<String> get(String path) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + path))
+                .GET()
+                .build();
+
+        return HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
     }
 }

@@ -6,9 +6,9 @@
 
 前端是独立的 Vite + React 应用，通过 REST API 与后端通信。开发服务器将 `/actuator` 代理到本机后端，用于最小 health 连接验证。当前 UI 只有应用壳和范围说明。
 
-## 计划中的 provider adapter
+## Provider adapter 边界
 
-`provider` 模块后续定义统一 adapter 契约。各授权 provider 的 HTTP client、认证和原始 DTO 留在各自的 `internal/infrastructure` 范围内。原始 provider 响应不会直接暴露给其他模块，跨模块只传递标准化结果和明确的来源元数据。
+`provider` 模块已经定义统一的 `ProviderAdapter` 契约、标准化事实、来源与环境元数据、freshness、错误和 partial failure 类型。第一版 Viator Basic Access Sandbox 实现位于 `provider.internal.viator`，其中包含认证配置、HTTP client、原始 DTO、字段映射和错误转换。原始 Provider 响应不会直接暴露给其他模块，跨模块只传递标准化结果和明确的来源元数据。详细语义见 [`provider-domain-contract.md`](provider-domain-contract.md)，第一版实现边界见 [`viator-sandbox-adapter.md`](viator-sandbox-adapter.md)。
 
 ## 计划中的数据流
 
@@ -22,4 +22,4 @@
 
 ## 尚未实现
 
-领域实体和业务表、provider adapter 契约、生产 API 调用、Redis 业务缓存、韧性策略、完整认证、提醒通知、LLM 调用和复杂页面均未实现。
+完整领域实体和业务表、Provider 聚合服务、REST 查询入口、production API 调用、Redis 业务缓存、韧性策略、完整认证、提醒通知、LLM 调用和复杂页面均未实现。当前唯一的具体 adapter 是默认关闭的 Viator Sandbox 只读实现。

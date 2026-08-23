@@ -40,12 +40,12 @@ export function HomePage() {
             supports.
           </p>
           <div className="hero-actions">
-            <Link className="button button-primary" to="/methodology">
+            <Link className="button button-primary" to="/plan">
+              Plan a Rome stay
+            </Link>
+            <Link className="button button-secondary" to="/methodology">
               See how the data works
             </Link>
-            <a className="button button-secondary" href="#build-status">
-              View current build
-            </a>
           </div>
         </div>
 
@@ -121,23 +121,25 @@ export function HomePage() {
         <div className="build-status-card">
           <div>
             <p className="eyebrow">Current build</p>
-            <h2 id="build-title">The public product preview is in progress.</h2>
+            <h2 id="build-title">
+              The Rome planning flow is ready for local testing.
+            </h2>
           </div>
-          <span className="status-badge">Pre-API phase</span>
+          <span className="status-badge">Sandbox connected</span>
         </div>
         <div className="build-columns">
           <div>
             <h3>Available now</h3>
             <p>
-              A tested full-stack foundation, public product explanation, and a
-              documented approach to provider data.
+              A tested full-stack foundation, a Rome date input flow, verified
+              Google Places access, and an authorised Viator Sandbox adapter.
             </p>
           </div>
           <div>
             <h3>Not published yet</h3>
             <p>
-              Attraction search, prices, availability, booking links, and AI
-              explanations remain unavailable until authorised access is tested.
+              Live prices, real-time availability, production booking links, and
+              AI explanations are not published yet.
             </p>
           </div>
         </div>

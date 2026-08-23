@@ -16,12 +16,12 @@ describe('HomePage', () => {
         name: 'Plan the attractions that cannot wait.',
       }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Pre-API phase')).toBeInTheDocument()
+    expect(screen.getByText('Sandbox connected')).toBeInTheDocument()
     expect(
       screen.getByText('Workflow preview only. No ticket data is shown.'),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: 'See how the data works' }),
-    ).toHaveAttribute('href', '/methodology')
+      screen.getByRole('link', { name: 'Plan a Rome stay' }),
+    ).toHaveAttribute('href', '/plan')
   })
 })

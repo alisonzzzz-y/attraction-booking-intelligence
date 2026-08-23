@@ -14,16 +14,7 @@ class SecurityConfiguration {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                "/actuator/health/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .build();
     }
 }
