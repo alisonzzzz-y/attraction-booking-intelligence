@@ -35,6 +35,11 @@
   --danger-ink: #8d321f;
   --danger-surface: #fcebe5;
   --focus: #0d6f58;
+  --booking-blue: #006ce4;
+  --booking-blue-dark: #0057b8;
+  --booking-blue-soft: #eaf3ff;
+  --booking-page: #f5f7fa;
+  --booking-line: #d9dee5;
   --radius-small: 0.65rem;
   --radius-large: 1rem;
   --shadow: 0 12px 34px rgb(23 63 50 / 9%);
@@ -804,12 +809,13 @@ p {
 
 .results-section {
   min-height: 34rem;
-  padding-block: 1rem 2rem;
+  padding-block: 0.85rem 2rem;
 }
 
 .results-section h1 {
-  margin: 0.18rem 0 0;
-  font-size: clamp(2rem, 3.4vw, 3rem);
+  margin: 0.12rem 0 0;
+  font-size: clamp(1.8rem, 2.8vw, 2.35rem);
+  letter-spacing: -0.035em;
 }
 
 .results-section .intro {
@@ -825,8 +831,11 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--booking-line);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.2rem 0.7rem rgb(28 45 66 / 5%);
 }
 
 .results-header .button {
@@ -838,6 +847,53 @@ p {
   margin: 0.3rem 0 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.results-section > .results-header .eyebrow {
+  margin-bottom: 0.3rem;
+  color: var(--booking-blue-dark);
+  letter-spacing: 0.1em;
+}
+
+.results-change-dates {
+  min-height: 2.55rem;
+  padding: 0.62rem 1rem;
+  border-color: var(--booking-blue);
+  border-radius: 0.45rem;
+  color: var(--booking-blue-dark);
+}
+
+.results-change-dates:hover {
+  border-color: var(--booking-blue-dark);
+  background: var(--booking-blue-soft);
+}
+
+body:has(.results-section) {
+  background: var(--booking-page);
+}
+
+.app-shell:has(.results-section) .site-header {
+  width: 100%;
+  min-height: 3.8rem;
+  padding-inline: max(1.25rem, calc((100% - 1380px) / 2));
+  border-bottom-color: var(--booking-line);
+  background: #fff;
+  box-shadow: 0 0.15rem 0.6rem rgb(28 45 66 / 5%);
+}
+
+.app-shell:has(.results-section) .brand-mark {
+  background: var(--booking-blue);
+}
+
+.app-shell:has(.results-section) .nav-link:hover,
+.app-shell:has(.results-section) .nav-link-active {
+  border-color: transparent;
+  color: var(--booking-blue-dark);
+  background: var(--booking-blue-soft);
+}
+
+.app-shell:has(.results-section) .site-footer {
+  border-top-color: var(--booking-line);
 }
 
 .result-state,
@@ -977,7 +1033,7 @@ p {
 }
 
 .results-layout {
-  margin-top: 0.75rem;
+  margin-top: 0.65rem;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(26rem, 0.85fr);
   align-items: start;
@@ -989,11 +1045,11 @@ p {
   margin-top: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-large);
-  border-top-width: 0.28rem;
+  border: 1px solid var(--booking-line);
+  border-radius: 0.65rem;
+  border-top-width: 0.22rem;
   background: #fff;
-  box-shadow: 0 0.45rem 1.25rem rgb(25 40 35 / 6%);
+  box-shadow: 0 0.2rem 0.7rem rgb(28 45 66 / 5%);
 }
 
 .result-card-priority-book-first {
@@ -1014,11 +1070,11 @@ p {
 }
 
 .result-card-selected {
-  border-right-color: var(--location-ink);
-  border-bottom-color: var(--location-ink);
-  border-left-color: var(--location-ink);
-  background: var(--location-surface);
-  box-shadow: inset 0 0 0 1px var(--location-ink);
+  border-right-color: var(--booking-blue);
+  border-bottom-color: var(--booking-blue);
+  border-left-color: var(--booking-blue);
+  background: var(--booking-blue-soft);
+  box-shadow: inset 0 0 0 1px var(--booking-blue);
 }
 
 .result-card-heading {
@@ -1033,7 +1089,7 @@ p {
   min-height: 2.4em;
   overflow: hidden;
   margin: 0;
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-size: clamp(1.18rem, 1.75vw, 1.45rem);
   line-height: 1.2;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -1041,8 +1097,8 @@ p {
 
 .result-card-summary {
   display: flex;
-  height: 13rem;
-  padding: 1rem;
+  min-height: 15rem;
+  padding: 0.85rem;
   flex-direction: column;
 }
 
@@ -1051,7 +1107,7 @@ p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   margin-top: auto;
-  padding-top: 1rem;
+  padding-top: 0.75rem;
 }
 
 .result-card-glance > span {
@@ -1066,8 +1122,8 @@ p {
 
 .result-card-glance > span:last-child {
   grid-column: 1 / -1;
-  margin-top: 0.7rem;
-  padding: 0.7rem 0 0;
+  margin-top: 0.55rem;
+  padding: 0.55rem 0 0;
   border-top: 1px solid var(--line);
   border-left: 0;
 }
@@ -1098,9 +1154,9 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  margin-top: 0.9rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--booking-line);
 }
 
 .result-details-button,
@@ -1117,18 +1173,21 @@ p {
 .result-details-button {
   display: inline-flex;
   align-items: center;
+  min-height: 2.5rem;
   gap: 0.45rem;
-  padding: 0.55rem 0;
+  padding: 0.58rem 0.85rem;
+  border-radius: 0.4rem;
+  color: #fff;
+  background: var(--booking-blue);
 }
 
 .result-details-button span {
-  display: grid;
-  width: 1.55rem;
-  height: 1.55rem;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.result-details-button:hover {
+  background: var(--booking-blue-dark);
 }
 
 .result-card-body {
@@ -1322,10 +1381,11 @@ p {
 
 .result-map-focus {
   margin-top: 0;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid var(--location-ink);
-  border-radius: 999px;
-  color: var(--location-ink);
+  min-height: 2.5rem;
+  padding: 0.58rem 0.8rem;
+  border: 1px solid var(--booking-blue);
+  border-radius: 0.4rem;
+  color: var(--booking-blue-dark);
   background: #fff;
   font: inherit;
   font-size: 0.78rem;
@@ -1393,11 +1453,11 @@ p {
 
 .result-map-focus[aria-pressed='true'] {
   color: #fff;
-  background: var(--location-ink);
+  background: var(--booking-blue);
 }
 
 .result-map-focus:focus-visible {
-  outline: 3px solid rgb(21 86 109 / 26%);
+  outline: 3px solid rgb(0 108 228 / 24%);
   outline-offset: 3px;
 }
 
@@ -1418,10 +1478,10 @@ p {
   min-height: 38rem;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-large);
-  background: var(--paper-light);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--booking-line);
+  border-radius: 0.65rem;
+  background: #fff;
+  box-shadow: 0 0.2rem 0.7rem rgb(28 45 66 / 5%);
 }
 
 .results-map-heading {

@@ -58,8 +58,10 @@ test('keeps Rome stay dates in the results URL', async ({ page }) => {
   )
   await expect(
     page.getByText('Third-party ticket evidence is temporarily unavailable.'),
-  ).toBeVisible()
-  await expect(page.getByText('This is not treated as sold out.')).toBeVisible()
+  ).toHaveCount(0)
+  await expect(page.getByText('This is not treated as sold out.')).toHaveCount(
+    0,
+  )
 })
 
 test('renders the verified Colosseum group without treating a guided tour as basic admission', async ({
@@ -128,6 +130,13 @@ test('renders the verified Colosseum group without treating a guided tour as bas
   await expect(
     page.getByRole('heading', { name: 'Colosseum Archaeological Park' }),
   ).toBeVisible()
+  const colosseumCard = page.locator('.result-card').first()
+  await expect(colosseumCard.getByText('Third-party option')).toBeVisible()
+  const detailsButton = colosseumCard.getByRole('button', {
+    name: 'View details for Colosseum Archaeological Park',
+  })
+  await expect(detailsButton).toBeVisible()
+  await expect(detailsButton).toHaveCSS('background-color', 'rgb(0, 108, 228)')
   await page
     .getByRole('button', {
       name: 'View details for Colosseum Archaeological Park',

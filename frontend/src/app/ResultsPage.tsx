@@ -205,7 +205,7 @@ function AttractionEvidenceCard({
             type="button"
           >
             View details
-            <span aria-hidden="true">+</span>
+            <span aria-hidden="true">→</span>
           </button>
           {places.length > 0 ? (
             <button
@@ -555,7 +555,10 @@ export function ResultsPage() {
             <strong>{startDate}</strong> to <strong>{endDate}</strong>
           </p>
         </div>
-        <Link className="button button-secondary" to="/plan">
+        <Link
+          className="button button-secondary results-change-dates"
+          to="/plan"
+        >
           Change dates
         </Link>
       </header>
