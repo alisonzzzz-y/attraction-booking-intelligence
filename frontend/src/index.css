@@ -50,6 +50,7 @@
 }
 
 html {
+  background: var(--booking-page);
   scroll-behavior: smooth;
 }
 
@@ -893,7 +894,7 @@ body:has(.results-section) {
 }
 
 .app-shell:has(.results-section) .site-footer {
-  border-top-color: var(--booking-line);
+  border-top-color: #101312;
 }
 
 .result-state,
@@ -1047,32 +1048,12 @@ body:has(.results-section) {
   overflow: hidden;
   border: 1px solid var(--booking-line);
   border-radius: 0.65rem;
-  border-top-width: 0.22rem;
   background: #fff;
   box-shadow: 0 0.2rem 0.7rem rgb(28 45 66 / 5%);
 }
 
-.result-card-priority-book-first {
-  border-top-color: #a63e26;
-}
-
-.result-card-priority-book-soon {
-  border-top-color: #c58a19;
-}
-
-.result-card-priority-can-wait {
-  border-top-color: var(--can-wait-accent);
-}
-
-.result-card-priority-unknown,
-.result-card-priority-unavailable {
-  border-top-color: #869189;
-}
-
 .result-card-selected {
-  border-right-color: var(--booking-blue);
-  border-bottom-color: var(--booking-blue);
-  border-left-color: var(--booking-blue);
+  border-color: var(--booking-blue);
   background: var(--booking-blue-soft);
   box-shadow: inset 0 0 0 1px var(--booking-blue);
 }
@@ -1178,7 +1159,7 @@ body:has(.results-section) {
   padding: 0.58rem 0.85rem;
   border-radius: 0.4rem;
   color: #fff;
-  background: var(--booking-blue);
+  background: #111;
 }
 
 .result-details-button span {
@@ -1187,7 +1168,7 @@ body:has(.results-section) {
 }
 
 .result-details-button:hover {
-  background: var(--booking-blue-dark);
+  background: #333;
 }
 
 .result-card-body {
@@ -1521,24 +1502,32 @@ body:has(.results-section) {
 }
 
 .site-footer {
-  padding-block: 1.25rem;
+  width: 100%;
+  min-height: 14rem;
+  margin-inline: 0;
+  padding: 2.75rem max(1.25rem, calc((100% - 1380px) / 2));
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 2rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid #101312;
+  color: #fff;
+  background: #101312;
 }
 
-.site-footer strong,
-.site-footer p {
-  font-size: 0.8rem;
+.site-footer strong {
+  font-size: 1rem;
 }
 
 .site-footer p {
-  margin: 0.35rem 0 0;
+  margin: 0.65rem 0 0;
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 
 .footer-note {
-  max-width: 25rem;
+  max-width: 32rem;
   text-align: right;
 }
 
@@ -1623,7 +1612,6 @@ body:has(.results-section) {
 
 @media (max-width: 620px) {
   .site-header,
-  .site-footer,
   .page-section {
     width: min(100% - 1.5rem, 1380px);
   }

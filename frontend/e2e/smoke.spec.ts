@@ -136,7 +136,7 @@ test('renders the verified Colosseum group without treating a guided tour as bas
     name: 'View details for Colosseum Archaeological Park',
   })
   await expect(detailsButton).toBeVisible()
-  await expect(detailsButton).toHaveCSS('background-color', 'rgb(0, 108, 228)')
+  await expect(detailsButton).toHaveCSS('background-color', 'rgb(17, 17, 17)')
   await page
     .getByRole('button', {
       name: 'View details for Colosseum Archaeological Park',
