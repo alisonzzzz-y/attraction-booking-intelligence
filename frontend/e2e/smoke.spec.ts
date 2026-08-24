@@ -21,6 +21,14 @@ test('loads the public preview and opens the methodology page', async ({
   await page.goto('/')
 
   await expect(
+    page.getByRole('link', { name: 'Attraction Booking Intelligence home' }),
+  ).toContainText('Attraction Booking Intelligence')
+  await expect(page.locator('.brand-mark')).toHaveCount(0)
+  await expect(page.locator('.site-header')).toHaveCSS(
+    'background-image',
+    /linear-gradient/,
+  )
+  await expect(
     page.getByRole('heading', {
       name: 'Plan the attractions that cannot wait.',
     }),

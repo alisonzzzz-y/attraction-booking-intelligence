@@ -18,10 +18,10 @@ export function App() {
           to="/"
           aria-label="Attraction Booking Intelligence home"
         >
-          <span className="brand-mark" aria-hidden="true">
-            ABI
-          </span>
           <span className="brand-name">Attraction Booking Intelligence</span>
+          <span className="brand-name-compact" aria-hidden="true">
+            Attraction BI
+          </span>
         </Link>
 
         <nav className="site-nav" aria-label="Primary navigation">
