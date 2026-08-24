@@ -53,6 +53,14 @@ test('keeps Rome stay dates in the results URL', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'What should I book first?' }),
   ).toBeVisible()
+  await expect(page.locator('.results-header')).toHaveCSS(
+    'background-color',
+    'rgba(0, 0, 0, 0)',
+  )
+  await expect(page.locator('.results-header')).toHaveCSS(
+    'border-bottom-style',
+    'solid',
+  )
   await expect(page).toHaveURL(
     /\/results\?city=rome&stayStartDate=2026-09-10&stayEndDate=2026-09-12$/,
   )

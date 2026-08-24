@@ -832,11 +832,8 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--booking-line);
-  border-radius: 0.75rem;
-  background: #fff;
-  box-shadow: 0 0.2rem 0.7rem rgb(28 45 66 / 5%);
+  padding: 0.45rem 0 1rem;
+  border-bottom: 1px solid var(--booking-line);
 }
 
 .results-header .button {
@@ -1034,7 +1031,7 @@ body:has(.results-section) {
 }
 
 .results-layout {
-  margin-top: 0.65rem;
+  margin-top: 0.85rem;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(26rem, 0.85fr);
   align-items: start;
