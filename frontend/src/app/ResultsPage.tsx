@@ -237,48 +237,35 @@ function AttractionEvidenceDetails({
     : null
   const offering = attraction ? offeringTypeCopy(attraction.offeringType) : null
   const price = attraction ? formatPrice(attraction) : null
+  const primaryPlace = places[0]
 
   return (
-    <div className="result-card-body">
+    <div className="result-card-body result-details-body">
       <section
-        className="result-evidence-section result-priority-section"
-        aria-label="Official booking priority"
+        className="result-decision-overview"
+        aria-label="Booking decision"
       >
         <div className="result-evidence-heading">
-          <h3>Official booking guidance</h3>
+          <h3>Booking decision</h3>
           <span className="official-source-badge">Official source</span>
         </div>
         {priority ? (
           <>
-            <div className="priority-guidance">
+            <div className="result-decision-grid">
               <div>
-                <small>Recommended action</small>
+                <small>What to do</small>
                 <strong>{priority.action}</strong>
               </div>
               <div>
-                <small>Planning timing</small>
+                <small>When to act</small>
                 <strong>{timingCopy(priority.timing)}</strong>
+              </div>
+              <div>
+                <small>Official confidence</small>
+                <strong>{confidenceCopy(priority.confidence)}</strong>
               </div>
             </div>
             <p className="priority-explanation">{priority.explanation}</p>
-            <p className="official-factual-basis">
-              {priority.officialEvidence.factualBasis}
-            </p>
-            <p className="result-source">
-              Official operator evidence
-              {' · '}Checked {priority.officialEvidence.checkedOn}
-              {' · '}
-              {confidenceCopy(priority.confidence)}
-              {' · '}Rule {priority.ruleVersion}
-              {' · '}
-              <a
-                href={priority.officialEvidence.sourceUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                Open official source
-              </a>
-            </p>
           </>
         ) : (
           <p className="result-provider-fallback">
@@ -288,134 +275,189 @@ function AttractionEvidenceDetails({
         )}
       </section>
 
-      <section
-        className="result-evidence-section result-location-section"
-        aria-label="Location evidence"
-      >
-        <div className="result-evidence-heading">
-          <h3>Location evidence</h3>
-          <span className="source-badge source-badge-location">
-            Google Places
-          </span>
-        </div>
-        {places.length > 0 ? (
-          <>
-            {places.length > 1 ? (
-              <p className="result-group-summary">
-                This attraction group contains {places.length} separately
-                verified locations.
-              </p>
-            ) : null}
-            <div className="result-place-list">
-              {places.map((place) => (
-                <div className="result-place" key={place.componentId}>
-                  {places.length > 1 ? <h4>{place.name}</h4> : null}
-                  <dl className="result-facts result-location-facts">
-                    <div>
-                      <dt>Address</dt>
-                      <dd>
-                        <strong>{place.formattedAddress}</strong>
-                        <span>Returned for the verified Google Place ID.</span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Place status</dt>
-                      <dd>
-                        <strong>
-                          {businessStatusCopy(place.businessStatus)}
-                        </strong>
-                        <span>This is not a ticket or live crowd status.</span>
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="result-source">
-                    Location source: Google Places
-                    {' · '}Retrieved {formatRetrievedAt(place.retrievedAt)} UTC
-                    {place.googleMapsUri ? (
-                      <>
-                        {' · '}
-                        <a
-                          href={place.googleMapsUri}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          Open {place.name} in Google Maps
-                        </a>
-                      </>
-                    ) : null}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="result-provider-fallback">
-            Verified location evidence is temporarily unavailable. No location
-            or closure conclusion is inferred.
-          </p>
-        )}
+      <section className="result-key-facts" aria-label="Useful at a glance">
+        <h3>Useful at a glance</h3>
+        <dl>
+          <div>
+            <dt>Location</dt>
+            <dd>
+              {places.length > 1
+                ? `${places.length} verified locations`
+                : (primaryPlace?.formattedAddress ?? 'Location unavailable')}
+            </dd>
+          </div>
+          <div>
+            <dt>Place status</dt>
+            <dd>
+              {places.length > 1
+                ? 'See each location below'
+                : businessStatusCopy(primaryPlace?.businessStatus ?? null)}
+            </dd>
+          </div>
+          <div>
+            <dt>Third-party option</dt>
+            <dd>{price ? `${price}, Sandbox` : 'No mapped Sandbox option'}</dd>
+          </div>
+        </dl>
       </section>
 
       <section
-        className="result-evidence-section result-third-party-section"
-        aria-label="Third-party ticket evidence"
+        className="result-supporting-evidence"
+        aria-label="Supporting evidence"
       >
-        <div className="result-evidence-heading">
-          <h3>Third-party ticket option</h3>
-          <span className="source-badge source-badge-third-party">
-            Viator Sandbox
-          </span>
-        </div>
-        {attraction && availability ? (
-          <>
-            <dl className="result-facts">
-              <div>
-                <dt>Provider product type</dt>
-                <dd>
-                  <strong>{offering?.label}</strong>
-                  <span>{offering?.detail}</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Provider schedule</dt>
-                <dd>
-                  <strong>{availability.title}</strong>
-                  <span>{availability.detail}</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Price evidence</dt>
-                <dd>
-                  <strong>{price ?? 'No summary price returned'}</strong>
-                  <span>Sandbox summary price, not a live quote.</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Provider reservation evidence</dt>
-                <dd>
-                  <strong>{attraction.reservationRequirement}</strong>
-                  <span>
-                    This provider field does not set the official booking
-                    priority.
-                  </span>
-                </dd>
-              </div>
-            </dl>
-            <p className="result-source">
-              Third-party source: {attraction.source.provider}{' '}
-              {attraction.source.environment}
-              {' · '}Retrieved{' '}
-              {formatRetrievedAt(attraction.source.retrievedAt)} UTC
-              {' · '}
-              {attraction.source.freshness.toLowerCase()}
-            </p>
-          </>
-        ) : (
-          <p className="result-provider-fallback">
-            No Viator Sandbox option is mapped for this attraction. This is not
-            treated as sold out.
-          </p>
-        )}
+        <h3>Supporting evidence</h3>
+
+        <details className="result-evidence-disclosure">
+          <summary>
+            <span>Official evidence</span>
+            <small>Why this recommendation</small>
+          </summary>
+          <div className="result-evidence-disclosure-body">
+            {priority ? (
+              <>
+                <p className="official-factual-basis">
+                  {priority.officialEvidence.factualBasis}
+                </p>
+                <p className="result-source">
+                  Official operator evidence
+                  {' · '}Checked {priority.officialEvidence.checkedOn}
+                  {' · '}Rule {priority.ruleVersion}
+                  {' · '}
+                  <a
+                    href={priority.officialEvidence.sourceUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Open official source
+                  </a>
+                </p>
+              </>
+            ) : (
+              <p className="result-provider-fallback">
+                Official booking evidence is temporarily unavailable.
+              </p>
+            )}
+          </div>
+        </details>
+
+        <details className="result-evidence-disclosure">
+          <summary>
+            <span>Locations and map links</span>
+            <small>Google Places</small>
+          </summary>
+          <div className="result-evidence-disclosure-body">
+            {places.length > 0 ? (
+              <>
+                {places.length > 1 ? (
+                  <p className="result-group-summary">
+                    This attraction group contains {places.length} separately
+                    verified locations.
+                  </p>
+                ) : null}
+                <div className="result-place-list">
+                  {places.map((place) => (
+                    <div className="result-place" key={place.componentId}>
+                      {places.length > 1 ? <h4>{place.name}</h4> : null}
+                      <dl className="result-facts result-location-facts">
+                        <div>
+                          <dt>Address</dt>
+                          <dd>
+                            <strong>{place.formattedAddress}</strong>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Place status</dt>
+                          <dd>
+                            <strong>
+                              {businessStatusCopy(place.businessStatus)}
+                            </strong>
+                          </dd>
+                        </div>
+                      </dl>
+                      <p className="result-source">
+                        Retrieved {formatRetrievedAt(place.retrievedAt)} UTC
+                        {place.googleMapsUri ? (
+                          <>
+                            {' · '}
+                            <a
+                              href={place.googleMapsUri}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              Open {place.name} in Google Maps
+                            </a>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="result-provider-fallback">
+                Verified location evidence is temporarily unavailable.
+              </p>
+            )}
+          </div>
+        </details>
+
+        <details className="result-evidence-disclosure">
+          <summary>
+            <span>Third-party Sandbox details</span>
+            <small>Separate from official guidance</small>
+          </summary>
+          <div className="result-evidence-disclosure-body">
+            {attraction && availability ? (
+              <>
+                <dl className="result-facts result-third-party-facts">
+                  <div>
+                    <dt>Product type</dt>
+                    <dd>
+                      <strong>{offering?.label}</strong>
+                      <span>{offering?.detail}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Provider schedule</dt>
+                    <dd>
+                      <strong>{availability.title}</strong>
+                      <span>{availability.detail}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Price evidence</dt>
+                    <dd>
+                      <strong>{price ?? 'No summary price returned'}</strong>
+                      <span>Sandbox summary price, not a live quote.</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Reservation field</dt>
+                    <dd>
+                      <strong>{attraction.reservationRequirement}</strong>
+                      <span>
+                        This does not set the official booking priority.
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+                <p className="result-source">
+                  Third-party source: {attraction.source.provider}{' '}
+                  {attraction.source.environment}
+                  {' · '}Retrieved{' '}
+                  {formatRetrievedAt(attraction.source.retrievedAt)} UTC
+                  {' · '}
+                  {attraction.source.freshness.toLowerCase()}
+                </p>
+              </>
+            ) : (
+              <p className="result-provider-fallback">
+                No Viator Sandbox option is mapped for this attraction. This is
+                not treated as sold out.
+              </p>
+            )}
+          </div>
+        </details>
       </section>
     </div>
   )

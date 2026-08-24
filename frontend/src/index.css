@@ -1422,6 +1422,175 @@ body:has(.results-section) {
 .attraction-dialog .result-card-body {
   padding: 0 1.2rem 1.2rem;
   border-top: 0;
+  background: #fff;
+}
+
+.result-details-body {
+  display: block;
+}
+
+.result-decision-overview {
+  margin-inline: -1.2rem;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--booking-line);
+  background: #f5f8fc;
+}
+
+.result-decision-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.75fr;
+  gap: 0;
+  margin-top: 0.9rem;
+  overflow: hidden;
+  border: 1px solid var(--booking-line);
+  border-radius: 0.55rem;
+  background: #fff;
+}
+
+.result-decision-grid > div {
+  min-width: 0;
+  padding: 0.8rem 0.9rem;
+}
+
+.result-decision-grid > div + div {
+  border-left: 1px solid var(--booking-line);
+}
+
+.result-decision-grid small,
+.result-decision-grid strong {
+  display: block;
+}
+
+.result-decision-grid small,
+.result-key-facts dt {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 780;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.result-decision-grid strong {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.result-decision-overview .priority-explanation {
+  max-width: 48rem;
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 560;
+  line-height: 1.5;
+}
+
+.result-key-facts {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--booking-line);
+}
+
+.result-key-facts h3,
+.result-supporting-evidence > h3 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.result-key-facts dl {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.9fr;
+  gap: 0;
+  margin: 0.75rem 0 0;
+}
+
+.result-key-facts dl > div {
+  min-width: 0;
+  padding-right: 0.9rem;
+}
+
+.result-key-facts dl > div + div {
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--booking-line);
+}
+
+.result-key-facts dd {
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-supporting-evidence {
+  padding-top: 1rem;
+}
+
+.result-evidence-disclosure {
+  border-bottom: 1px solid var(--booking-line);
+}
+
+.result-evidence-disclosure:first-of-type {
+  margin-top: 0.55rem;
+  border-top: 1px solid var(--booking-line);
+}
+
+.result-evidence-disclosure summary {
+  position: relative;
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 2rem 0.7rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.result-evidence-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.result-evidence-disclosure summary::after {
+  position: absolute;
+  right: 0.2rem;
+  color: var(--booking-blue);
+  content: '+';
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.result-evidence-disclosure[open] summary::after {
+  content: '−';
+}
+
+.result-evidence-disclosure summary > span {
+  font-size: 0.82rem;
+  font-weight: 740;
+}
+
+.result-evidence-disclosure summary > small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-evidence-disclosure-body {
+  padding: 0.15rem 0 1rem;
+}
+
+.result-evidence-disclosure-body .official-factual-basis {
+  margin-top: 0;
+}
+
+.result-evidence-disclosure-body .result-facts {
+  margin-top: 0.35rem;
+}
+
+.result-third-party-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .result-map-focus[aria-pressed='true'] {
@@ -1720,6 +1889,36 @@ body:has(.results-section) {
 
   .attraction-dialog .result-card-body {
     padding-inline: 0.9rem;
+  }
+
+  .result-decision-overview {
+    margin-inline: -0.9rem;
+    padding-inline: 0.9rem;
+  }
+
+  .result-decision-grid,
+  .result-key-facts dl {
+    grid-template-columns: 1fr;
+  }
+
+  .result-decision-grid > div + div,
+  .result-key-facts dl > div + div {
+    border-top: 1px solid var(--booking-line);
+    border-left: 0;
+  }
+
+  .result-key-facts dl > div {
+    padding: 0.55rem 0;
+  }
+
+  .result-key-facts dl > div + div {
+    padding-left: 0;
+  }
+
+  .result-evidence-disclosure summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
   }
 
   .priority-guidance {

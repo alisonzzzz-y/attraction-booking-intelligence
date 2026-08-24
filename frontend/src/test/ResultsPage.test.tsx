@@ -468,33 +468,69 @@ describe('ResultsPage', () => {
     })
     expect(
       within(pantheonDialog).getByRole('heading', {
-        name: 'Official booking guidance',
+        name: 'Booking decision',
       }),
     ).toBeInTheDocument()
+    expect(within(pantheonDialog).getByText('What to do')).toBeInTheDocument()
+    expect(within(pantheonDialog).getByText('When to act')).toBeInTheDocument()
+    expect(
+      within(pantheonDialog).getByText('Official confidence'),
+    ).toBeInTheDocument()
+    expect(
+      within(pantheonDialog).getByRole('heading', {
+        name: 'Useful at a glance',
+      }),
+    ).toBeInTheDocument()
+
+    const officialDisclosure = within(pantheonDialog)
+      .getByText('Official evidence')
+      .closest('details')
+    const locationDisclosure = within(pantheonDialog)
+      .getByText('Locations and map links')
+      .closest('details')
+    const thirdPartyDisclosure = within(pantheonDialog)
+      .getByText('Third-party Sandbox details')
+      .closest('details')
+    expect(officialDisclosure).not.toHaveAttribute('open')
+    expect(locationDisclosure).not.toHaveAttribute('open')
+    expect(thirdPartyDisclosure).not.toHaveAttribute('open')
+
+    await user.click(within(pantheonDialog).getByText('Official evidence'))
+    expect(officialDisclosure).toHaveAttribute('open')
     expect(
       within(pantheonDialog).getByRole('link', {
         name: 'Open official source',
       }),
     ).toHaveAttribute('href', 'https://official.example/pantheon')
+
+    await user.click(
+      within(pantheonDialog).getByText('Locations and map links'),
+    )
+    expect(locationDisclosure).toHaveAttribute('open')
     expect(
-      within(pantheonDialog).getByText(
+      within(pantheonDialog).getAllByText(
         'Piazza della Rotonda, 00186 Roma RM, Italy',
       ),
-    ).toBeInTheDocument()
+    ).toHaveLength(2)
     expect(
-      within(pantheonDialog).getByText('Operational in Google Places'),
-    ).toBeInTheDocument()
+      within(pantheonDialog).getAllByText('Operational in Google Places'),
+    ).toHaveLength(2)
     expect(
       within(pantheonDialog).getByRole('link', {
         name: 'Open Pantheon in Google Maps',
       }),
     ).toHaveAttribute('href', 'https://maps.google.com/?cid=example')
+
+    await user.click(
+      within(pantheonDialog).getByText('Third-party Sandbox details'),
+    )
+    expect(thirdPartyDisclosure).toHaveAttribute('open')
     expect(
       within(pantheonDialog).getByText('Published schedule found'),
     ).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByText(/From\s+€17\.00/),
-    ).toBeInTheDocument()
+      within(pantheonDialog).getAllByText(/From\s+€17\.00/),
+    ).toHaveLength(2)
     expect(
       within(pantheonDialog).getByText(
         'Sandbox summary price, not a live quote.',
@@ -519,11 +555,17 @@ describe('ResultsPage', () => {
     const colosseumDialog = await screen.findByRole('dialog', {
       name: 'Colosseum, Roman Forum and Palatine Hill',
     })
+    await user.click(
+      within(colosseumDialog).getByText('Locations and map links'),
+    )
     expect(
       within(colosseumDialog).getByText(
         'This attraction group contains 3 separately verified locations.',
       ),
     ).toBeInTheDocument()
+    await user.click(
+      within(colosseumDialog).getByText('Third-party Sandbox details'),
+    )
     expect(within(colosseumDialog).getByText('Guided tour')).toBeInTheDocument()
     await user.click(
       within(colosseumDialog).getByRole('button', {
@@ -539,11 +581,15 @@ describe('ResultsPage', () => {
     const vaticanDialog = await screen.findByRole('dialog', {
       name: 'Vatican Museums and Sistine Chapel',
     })
+    await user.click(within(vaticanDialog).getByText('Locations and map links'))
     expect(
       within(vaticanDialog).getByText(
         'This attraction group contains 2 separately verified locations.',
       ),
     ).toBeInTheDocument()
+    await user.click(
+      within(vaticanDialog).getByText('Third-party Sandbox details'),
+    )
     expect(
       within(vaticanDialog).getByText('Affiliate ticket product'),
     ).toBeInTheDocument()
@@ -633,9 +679,11 @@ describe('ResultsPage', () => {
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
     const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    await user.click(within(dialog).getByText('Locations and map links'))
     expect(
-      within(dialog).getByText('Piazza della Rotonda, 00186 Roma RM, Italy'),
-    ).toBeInTheDocument()
+      within(dialog).getAllByText('Piazza della Rotonda, 00186 Roma RM, Italy'),
+    ).toHaveLength(2)
+    await user.click(within(dialog).getByText('Third-party Sandbox details'))
     expect(
       within(dialog).getByText(
         'No Viator Sandbox option is mapped for this attraction. This is not treated as sold out.',
@@ -668,9 +716,11 @@ describe('ResultsPage', () => {
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
     const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    await user.click(within(dialog).getByText('Third-party Sandbox details'))
     expect(
       within(dialog).getByText('Published schedule found'),
     ).toBeInTheDocument()
+    await user.click(within(dialog).getByText('Locations and map links'))
     expect(
       within(dialog).getByText(
         /Verified location evidence is temporarily unavailable/,

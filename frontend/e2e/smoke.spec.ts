@@ -161,11 +161,13 @@ test('renders the verified Colosseum group without treating a guided tour as bas
   const dialog = page.getByRole('dialog', {
     name: 'Colosseum Archaeological Park',
   })
+  await dialog.getByText('Locations and map links').click()
   await expect(
     dialog.getByText(
       'This attraction group contains 3 separately verified locations.',
     ),
   ).toBeVisible()
+  await dialog.getByText('Third-party Sandbox details').click()
   await expect(dialog.getByText('Guided tour')).toBeVisible()
   await expect(
     dialog.getByText(
@@ -263,6 +265,7 @@ test('renders the Vatican Museums and Sistine Chapel as one verified ticket grou
   const dialog = page.getByRole('dialog', {
     name: 'Vatican Museums and Sistine Chapel',
   })
+  await dialog.getByText('Locations and map links').click()
   await expect(
     dialog.getByText(
       'This attraction group contains 2 separately verified locations.',
@@ -274,8 +277,9 @@ test('renders the Vatican Museums and Sistine Chapel as one verified ticket grou
   await expect(
     dialog.getByText('Sistine Chapel', { exact: true }),
   ).toBeVisible()
+  await dialog.getByText('Third-party Sandbox details').click()
   await expect(dialog.getByText('Affiliate ticket product')).toBeVisible()
-  await expect(dialog.getByText(/From\s+€69\.00/)).toBeVisible()
+  await expect(dialog.getByText('From €69.00', { exact: true })).toBeVisible()
   await expect(
     dialog.getByText('Sandbox summary price, not a live quote.'),
   ).toBeVisible()
@@ -348,13 +352,14 @@ test('labels the Baths of Caracalla affiliate bundle separately from official ba
     .getByRole('button', { name: 'View details for Baths of Caracalla' })
     .click()
   const dialog = page.getByRole('dialog', { name: 'Baths of Caracalla' })
+  await dialog.getByText('Third-party Sandbox details').click()
   await expect(dialog.getByText('Ticket with audio guide')).toBeVisible()
   await expect(
     dialog.getByText(
       'This affiliate bundle includes admission and a digital audio guide. It is not the official basic admission ticket.',
     ),
   ).toBeVisible()
-  await expect(dialog.getByText(/From\s+€15\.00/)).toBeVisible()
+  await expect(dialog.getByText('From €15.00', { exact: true })).toBeVisible()
   await expect(
     dialog.getByText('Sandbox summary price, not a live quote.'),
   ).toBeVisible()
@@ -426,8 +431,9 @@ test('shows the Capitoline Museums Sandbox ticket without presenting it as the o
     .getByRole('button', { name: 'View details for Capitoline Museums' })
     .click()
   const dialog = page.getByRole('dialog', { name: 'Capitoline Museums' })
+  await dialog.getByText('Third-party Sandbox details').click()
   await expect(dialog.getByText('Affiliate ticket product')).toBeVisible()
-  await expect(dialog.getByText(/From\s+€30\.00/)).toBeVisible()
+  await expect(dialog.getByText('From €30.00', { exact: true })).toBeVisible()
   await expect(
     dialog.getByText('Sandbox summary price, not a live quote.'),
   ).toBeVisible()
