@@ -44,6 +44,7 @@ function priority(
       policy,
       factualBasis: `Verified official booking rule for ${attractionName}.`,
       sourceUrl: `https://official.example/${attractionId}`,
+      bookingUrl: `https://booking.example/${attractionId}`,
       checkedOn: '2026-08-21',
     },
     ruleVersion: 'rome-official-policy-v1',
@@ -411,12 +412,100 @@ function successfulResponseFor(input: RequestInfo | URL) {
   return jsonResponse(ticketResponse)
 }
 
+function responseWithAdditionalAttractions(input: RequestInfo | URL) {
+  const url = String(input)
+
+  if (url.includes('/booking-priorities?')) {
+    return jsonResponse({
+      ...priorityResponse,
+      priorities: [
+        ...priorityResponse.priorities,
+        priority(
+          'trajan-markets',
+          "Trajan's Markets",
+          'CAN_WAIT',
+          'AFTER_HIGHER_PRIORITY_TICKETS',
+          'NO_ADVANCE_RESERVATION_REQUIRED',
+        ),
+        priority(
+          'villa-doria-pamphilj',
+          'Villa Doria Pamphilj',
+          'CAN_WAIT',
+          'AFTER_HIGHER_PRIORITY_TICKETS',
+          'NO_ADVANCE_RESERVATION_REQUIRED',
+        ),
+      ],
+    })
+  }
+
+  return successfulResponseFor(input)
+}
+
 afterEach(() => {
   cleanup()
+  window.localStorage.clear()
   vi.unstubAllGlobals()
 })
 
 describe('ResultsPage', () => {
+  it('saves favourite attractions and the current trip in this browser', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+
+    renderResults(
+      `${resultsRoute}&dateMode=flexible&travelMonth=2026-09&tripLengthDays=3&lengthFlexDays=1`,
+    )
+
+    expect(
+      await screen.findByText(
+        'Around 3 days in September 2026, trip length flexible by ±1 day',
+      ),
+    ).toBeInTheDocument()
+
+    const pantheonHeading = await screen.findByRole('heading', {
+      name: 'Pantheon',
+    })
+    const pantheonCard = pantheonHeading.closest('article')
+    expect(pantheonCard).not.toBeNull()
+
+    await user.click(
+      within(pantheonCard as HTMLElement).getByRole('button', {
+        name: 'Save Pantheon',
+      }),
+    )
+
+    expect(
+      within(pantheonCard as HTMLElement).getByRole('button', {
+        name: 'Remove Pantheon',
+      }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('1 saved in this browser')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Save trip' }))
+    expect(
+      screen.getByText('Trip saved in this browser with 1 attraction.'),
+    ).toBeInTheDocument()
+
+    expect(
+      JSON.parse(window.localStorage.getItem('abi.saved-trip.v1') ?? 'null'),
+    ).toMatchObject({
+      version: 1,
+      city: 'rome',
+      dateMode: 'flexible',
+      stayStartDate: '2026-09-10',
+      stayEndDate: '2026-09-12',
+      travelMonth: '2026-09',
+      tripLengthDays: 3,
+      lengthFlexDays: 1,
+      attractionIds: ['pantheon'],
+    })
+  })
+
   it('keeps the card grid stable and opens evidence in a separate dialog', async () => {
     const user = userEvent.setup()
     const fetchMock = vi.fn((input: RequestInfo | URL) =>
@@ -471,74 +560,83 @@ describe('ResultsPage', () => {
         name: 'Booking decision',
       }),
     ).toBeInTheDocument()
-    expect(within(pantheonDialog).getByText('What to do')).toBeInTheDocument()
-    expect(within(pantheonDialog).getByText('When to act')).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByText('Official confidence'),
+      within(pantheonDialog).getByText('Recommended booking action'),
     ).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByRole('heading', {
+      within(pantheonDialog).getByText('Check today, 22 Aug 2026'),
+    ).toBeInTheDocument()
+    expect(
+      within(pantheonDialog).queryByText('What to do'),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).queryByText('When to act'),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).queryByText('Official confidence'),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).getByRole('link', {
+        name: 'Open official booking',
+      }),
+    ).toHaveAttribute('href', 'https://booking.example/pantheon')
+    expect(
+      within(pantheonDialog).queryByRole('heading', {
         name: 'Useful at a glance',
+      }),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).queryByText('3 verified locations'),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).queryByText('See each location below'),
+    ).not.toBeInTheDocument()
+    expect(
+      within(pantheonDialog).getByRole('heading', {
+        name: 'Third-party booking options',
       }),
     ).toBeInTheDocument()
 
-    const officialDisclosure = within(pantheonDialog)
-      .getByText('Official evidence')
+    const supportingEvidence = within(pantheonDialog)
+      .getByText('Supporting evidence')
       .closest('details')
-    const locationDisclosure = within(pantheonDialog)
-      .getByText('Locations and map links')
-      .closest('details')
-    const thirdPartyDisclosure = within(pantheonDialog)
-      .getByText('Third-party Sandbox details')
-      .closest('details')
-    expect(officialDisclosure).not.toHaveAttribute('open')
-    expect(locationDisclosure).not.toHaveAttribute('open')
-    expect(thirdPartyDisclosure).not.toHaveAttribute('open')
+    expect(supportingEvidence).not.toHaveAttribute('open')
 
-    await user.click(within(pantheonDialog).getByText('Official evidence'))
-    expect(officialDisclosure).toHaveAttribute('open')
+    await user.click(within(pantheonDialog).getByText('Supporting evidence'))
+    expect(supportingEvidence).toHaveAttribute('open')
     expect(
       within(pantheonDialog).getByRole('link', {
         name: 'Open official source',
       }),
     ).toHaveAttribute('href', 'https://official.example/pantheon')
 
-    await user.click(
-      within(pantheonDialog).getByText('Locations and map links'),
-    )
-    expect(locationDisclosure).toHaveAttribute('open')
     expect(
       within(pantheonDialog).getAllByText(
         'Piazza della Rotonda, 00186 Roma RM, Italy',
       ),
-    ).toHaveLength(2)
+    ).toHaveLength(1)
     expect(
-      within(pantheonDialog).getAllByText('Operational in Google Places'),
-    ).toHaveLength(2)
+      within(pantheonDialog).queryByText('Operational in Google Places'),
+    ).not.toBeInTheDocument()
     expect(
       within(pantheonDialog).getByRole('link', {
         name: 'Open Pantheon in Google Maps',
       }),
     ).toHaveAttribute('href', 'https://maps.google.com/?cid=example')
 
-    await user.click(
-      within(pantheonDialog).getByText('Third-party Sandbox details'),
-    )
-    expect(thirdPartyDisclosure).toHaveAttribute('open')
     expect(
       within(pantheonDialog).getByText('Published schedule found'),
     ).toBeInTheDocument()
-    expect(
-      within(pantheonDialog).getAllByText(/From\s+€17\.00/),
-    ).toHaveLength(2)
+    expect(within(pantheonDialog).getAllByText(/From\s+€17\.00/)).toHaveLength(
+      1,
+    )
     expect(
       within(pantheonDialog).getByText(
-        'Sandbox summary price, not a live quote.',
+        /Sandbox evidence, not live availability\./,
       ),
     ).toBeInTheDocument()
-    expect(
-      within(pantheonDialog).getByText(/Third-party source: viator SANDBOX/),
-    ).toBeInTheDocument()
+    expect(within(pantheonDialog).getByText('viator')).toBeInTheDocument()
+    expect(within(pantheonDialog).getByText('SANDBOX')).toBeInTheDocument()
 
     await user.click(
       within(pantheonDialog).getByRole('button', {
@@ -555,17 +653,12 @@ describe('ResultsPage', () => {
     const colosseumDialog = await screen.findByRole('dialog', {
       name: 'Colosseum, Roman Forum and Palatine Hill',
     })
-    await user.click(
-      within(colosseumDialog).getByText('Locations and map links'),
-    )
+    await user.click(within(colosseumDialog).getByText('Supporting evidence'))
     expect(
       within(colosseumDialog).getByText(
         'This attraction group contains 3 separately verified locations.',
       ),
     ).toBeInTheDocument()
-    await user.click(
-      within(colosseumDialog).getByText('Third-party Sandbox details'),
-    )
     expect(within(colosseumDialog).getByText('Guided tour')).toBeInTheDocument()
     await user.click(
       within(colosseumDialog).getByRole('button', {
@@ -581,22 +674,17 @@ describe('ResultsPage', () => {
     const vaticanDialog = await screen.findByRole('dialog', {
       name: 'Vatican Museums and Sistine Chapel',
     })
-    await user.click(within(vaticanDialog).getByText('Locations and map links'))
+    await user.click(within(vaticanDialog).getByText('Supporting evidence'))
     expect(
       within(vaticanDialog).getByText(
         'This attraction group contains 2 separately verified locations.',
       ),
     ).toBeInTheDocument()
-    await user.click(
-      within(vaticanDialog).getByText('Third-party Sandbox details'),
-    )
     expect(
       within(vaticanDialog).getByText('Affiliate ticket product'),
     ).toBeInTheDocument()
     expect(
-      within(vaticanDialog).getByText(
-        'The available options must be checked on the provider page before booking.',
-      ),
+      within(vaticanDialog).getByText('Published schedule found'),
     ).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/rome/places', {
       headers: { Accept: 'application/json' },
@@ -611,6 +699,79 @@ describe('ResultsPage', () => {
     )
   })
 
+  it('turns low-urgency official rules into practical same-day guidance', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+
+    renderResults()
+
+    const stPetersCard = (await screen.findByRole('heading', {
+      name: "St. Peter's Basilica",
+    })).closest('article')
+    const caracallaCard = screen
+      .getByRole('heading', { name: 'Baths of Caracalla' })
+      .closest('article')
+    const treviCard = screen
+      .getByRole('heading', { name: 'Trevi Fountain' })
+      .closest('article')
+
+    expect(stPetersCard).not.toBeNull()
+    expect(caracallaCard).not.toBeNull()
+    expect(treviCard).not.toBeNull()
+    expect(
+      within(stPetersCard as HTMLElement).getByText(
+        'Walk in for ordinary entry',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(caracallaCard as HTMLElement).getByText(
+        'A same-day visit is a practical option',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(treviCard as HTMLElement).getByText(
+        'Walk in for the free exterior view',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('No advance booking deadline')).not.toBeInTheDocument()
+  })
+
+  it('keeps the ten-attraction MVP complete and expands future catalogues in batches', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn((input: RequestInfo | URL) =>
+      Promise.resolve(responseWithAdditionalAttractions(input)),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderResults()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Pantheon' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getAllByRole('button', { name: /View details for/ }),
+    ).toHaveLength(10)
+    expect(
+      screen.getByRole('button', { name: 'Show more attractions' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Showing 10 of 12 attractions')).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: 'Show more attractions' }),
+    )
+
+    expect(
+      screen.getAllByRole('button', { name: /View details for/ }),
+    ).toHaveLength(12)
+    expect(
+      screen.queryByRole('button', { name: 'Show more attractions' }),
+    ).not.toBeInTheDocument()
+  })
+
   it('lets the user focus a verified attraction on the map', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
@@ -622,33 +783,50 @@ describe('ResultsPage', () => {
 
     renderResults()
 
-    for (const priority of priorityResponse.priorities) {
-      const heading = await screen.findByRole('heading', {
-        name: priority.attractionName,
-      })
-      const card = heading.closest('article')
-      expect(card).not.toBeNull()
-      expect(
-        within(card as HTMLElement).getByRole('button', {
-          name: 'Show on map',
-        }),
-      ).toBeInTheDocument()
-    }
-
     const borgheseHeading = await screen.findByRole('heading', {
       name: 'Borghese Gallery',
     })
     const borgheseCard = borgheseHeading.closest('article')
     expect(borgheseCard).not.toBeNull()
-    const mapButton = within(borgheseCard as HTMLElement).getByRole('button', {
-      name: 'Show on map',
-    })
-    await user.click(mapButton)
+    expect(
+      screen.queryByRole('button', { name: /Show(?:n)? on map/ }),
+    ).not.toBeInTheDocument()
+    await user.click(borgheseCard as HTMLElement)
 
-    expect(screen.getByText(/Focused location:/)).toHaveTextContent(
-      'Focused location: Galleria Borghese',
+    expect(screen.getByLabelText('Selected map location')).toHaveTextContent(
+      'Galleria Borghese',
     )
-    expect(mapButton).toHaveAttribute('aria-pressed', 'true')
+    expect(borgheseCard).toHaveAttribute('aria-current', 'true')
+  })
+
+  it('lets every booking card focus its verified map reference when live places fail', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url.includes('/booking-priorities?')) {
+          return Promise.resolve(jsonResponse(priorityResponse))
+        }
+        if (url.endsWith('/places')) {
+          return Promise.resolve(jsonResponse({}, 503))
+        }
+        return Promise.resolve(jsonResponse(ticketResponse))
+      }),
+    )
+
+    renderResults()
+
+    await screen.findByText('Location evidence is temporarily unavailable.')
+
+    for (const bookingPriority of priorityResponse.priorities) {
+      const card = screen.getByLabelText(
+        `Focus ${bookingPriority.attractionName} on map`,
+      )
+      await user.click(card)
+      expect(card).toHaveAttribute('aria-current', 'true')
+      expect(screen.getByLabelText('Selected map location')).toBeInTheDocument()
+    }
   })
 
   it('keeps ticket provider failures out of the result summary', async () => {
@@ -679,14 +857,13 @@ describe('ResultsPage', () => {
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
     const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
-    await user.click(within(dialog).getByText('Locations and map links'))
+    await user.click(within(dialog).getByText('Supporting evidence'))
     expect(
       within(dialog).getAllByText('Piazza della Rotonda, 00186 Roma RM, Italy'),
-    ).toHaveLength(2)
-    await user.click(within(dialog).getByText('Third-party Sandbox details'))
+    ).toHaveLength(1)
     expect(
       within(dialog).getByText(
-        'No Viator Sandbox option is mapped for this attraction. This is not treated as sold out.',
+        'No third-party booking option is connected for this attraction. This does not mean it is sold out.',
       ),
     ).toBeInTheDocument()
   })
@@ -716,11 +893,10 @@ describe('ResultsPage', () => {
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
     const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
-    await user.click(within(dialog).getByText('Third-party Sandbox details'))
     expect(
       within(dialog).getByText('Published schedule found'),
     ).toBeInTheDocument()
-    await user.click(within(dialog).getByText('Locations and map links'))
+    await user.click(within(dialog).getByText('Supporting evidence'))
     expect(
       within(dialog).getByText(
         /Verified location evidence is temporarily unavailable/,

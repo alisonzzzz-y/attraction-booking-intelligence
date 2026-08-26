@@ -1,6 +1,7 @@
 package com.yanzhang.attractionbooking.bookingpriority.internal;
 
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriorityAssessment;
+import com.yanzhang.attractionbooking.bookingpriority.OfficialAttractionDetails;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingEvidence;
 import java.net.URI;
 import java.time.Instant;
@@ -72,7 +73,9 @@ class RomeBookingPriorityController {
             String sourceType,
             String policy,
             String factualBasis,
+            OfficialAttractionDetailsView details,
             URI sourceUrl,
+            URI bookingUrl,
             LocalDate checkedOn) {
 
         static OfficialEvidenceView from(OfficialBookingEvidence evidence) {
@@ -80,8 +83,27 @@ class RomeBookingPriorityController {
                     "OFFICIAL_OPERATOR",
                     evidence.policy().name(),
                     evidence.factualBasis(),
+                    OfficialAttractionDetailsView.from(evidence.details()),
                     evidence.sourceUrl(),
+                    evidence.bookingUrl(),
                     evidence.checkedOn());
+        }
+    }
+
+    record OfficialAttractionDetailsView(
+            String overview,
+            String ticketName,
+            List<String> includedItems,
+            String recommendationLabel,
+            String recommendationReason) {
+
+        static OfficialAttractionDetailsView from(OfficialAttractionDetails details) {
+            return new OfficialAttractionDetailsView(
+                    details.overview(),
+                    details.ticketName(),
+                    details.includedItems(),
+                    details.recommendationLabel(),
+                    details.recommendationReason());
         }
     }
 }

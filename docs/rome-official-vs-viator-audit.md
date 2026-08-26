@@ -1,7 +1,7 @@
 # Rome Official Ticket Audit / 罗马官方票务核对
 
-状态：官方来源与 Viator Sandbox 候选核对 v0.4
-核对日期：2026-08-21
+状态：官方来源、购票入口与 Viator Sandbox 候选核对 v0.5
+核对日期：2026-08-25
 范围：Rome MVP 首批 10 项景点
 
 ## 1. 核对目的
@@ -18,12 +18,35 @@
 | Vatican Museums and Sistine Chapel / 梵蒂冈博物馆和西斯廷教堂 | [梵蒂冈博物馆官方页](https://www.museivaticani.va/content/museivaticani/en/organizza-visita/tariffe-e-biglietti.html)说明同日门票包含博物馆与西斯廷教堂。成人基础票为 €20，官方在线预约另收 €5；官方还警告只有其票务门户是官方在线购票站。 | `144387P2` 的详情与 schedule 已验证，产品只有一个 `Tickets Only` option；Sandbox `fromPrice` 为 €69。 | 产品范围与官方组合方式相符，但第三方 Sandbox 价格和服务不能当成官方价格或实时事实。正式购买入口仍应区分官方票务门户与未来获准使用的第三方 production 链接。 |
 | St. Peter's Basilica / 圣彼得大教堂 | [圣彼得大教堂官方 FAQ](https://www.basilicasanpietro.va/en/faq/is-it-possible-to-book-entrance-to-st-peter-s-basilica)明确说明普通入场免费。付费在线预约只是保证特定时段，并包含数字语音导览。 | `55341P19` 包含导览、穹顶和墓窟。 | 存在明显的产品范围差异。该 Viator 产品不能显示为普通入场票，也不能让用户误以为进入大教堂必须付费。 |
 | Pantheon / 万神殿 | [罗马国家博物馆管理局官方页](https://direzionemuseiroma.cultura.gov.it/en/pantheon/)公布官方门票和预约规则，并明确写明不存在 skip-the-line entry。 | `5569822P4` 是入场票候选，Sandbox `fromPrice` 为 €17，并含多个 option。 | Viator 候选不是官方基础票的直接等价物。任何“免排队”文案都会与官方规则冲突；Sandbox 价格也不能作为公开实时价格。 |
-| Borghese Gallery / 博尔盖塞美术馆 | [官方票务页](https://galleriaborghese.beniculturali.it/en/visita/info-biglietti/)要求预约时段，基础票与预约费分开计算，并采用两小时参观时段。 | `403837P1` 是入场票加语音导览 App。 | 预约要求一致，但 Viator 候选是打包产品，不应与官方基础票直接比价。 |
+| Borghese Gallery / 博尔盖塞美术馆 | [官方参观指南](https://galleriaborghese.beniculturali.it/en/wp-content/uploads/Guidelines-on-the-new-procedures-for-visits.pdf)明确要求通过官网预约，并采用两小时参观时段。 | `403837P1` 是入场票加语音导览 App。 | 预约要求一致，但 Viator 候选是打包产品，不应与官方基础票直接比价。 |
 | Castel Sant'Angelo / 圣天使堡 | [官方页面](https://direzionemuseiroma.cultura.gov.it/en/museo-nazionale-di-castel-santangelo/)公布命名票、证件核验和官方购票规则。2026 年 7 月 1 日起成人全价为 €18。 | `15932P79` 使用 “Skip-the-Line Entry Tickets” 标题。 | 需要进一步读取 production 产品详情验证具体权益。不能仅凭 Sandbox 标题承诺独立快速通道。 |
 | Capitoline Museums / 卡比托利欧博物馆 | [官方票务页](https://www.museicapitolini.org/en/biglietti-e-prenotazioni/tickets-and-videoguides)显示无展览时成人基础票 €15，线上预购另收 €1；展览和访客资格会改变价格。个人访客可同日现场购票，官网建议提前网购，但没有把个人预约写成绝对强制。 | `14982P113` 的详情与 schedule 已验证，唯一 option 为博物馆入场；成人 Sandbox 摘要价为 €30。若用户所选时段不可用，供应商说明会确认最近的可用时段。 | 可作为 `TICKET_PRODUCT` 测试证据，但 €30 不是官方价，所选时段也不能描述为保证入场时段。官方基础价、展览价和第三方 Sandbox 产品必须分开。 |
 | Baths of Caracalla / 卡拉卡拉浴场 | [意大利文化部官方页](https://cultura.gov.it/luogo/terme-di-caracalla)说明普通参观全价 €8、18 至 25 岁优惠票 €2、预约非必需；临时展览可能另收 €5。 | `247354P40` 的详情与 schedule 已验证，唯一 option 包含入场票和数字语音导览；成人 Sandbox 摘要价为 €15。 | Viator 候选是不可退款的语音导览组合产品。官方信息不支持把它标成“必须提前预约”，也不支持用 €15 组合价代替官方 €8 基础票。 |
 | Domus Aurea / 尼禄金宫 | [斗兽场考古公园官方页](https://colosseo.it/en/tickets/domus-aurea/)同时提供教育导览加 VR，以及限定时段的 “only ticket, no educational tour and no VR”。后者成人全价 €18。 | `131680P34` 是 skip-the-line guided tour。 | 之前“没有明显普通独立门票”的结论需要纠正。Viator 目前只找到导览候选，但官方确实存在限定时段的纯门票。 |
 | Trevi Fountain / 特莱维喷泉（许愿池） | [罗马市政府公告](https://www.comune.roma.it/web/it/notizia/biglietto-dingresso-fontana-di-trevi.page)说明自 2026 年 2 月 2 日起，游客和非居民进入喷泉内部围合区域需购买 €2 门票；外围观看仍免费，开放结束后也可从外围观看。 | 没有找到与 €2 内部区域门票等价的普通票候选，结果主要是导览、地下遗址或周边体验。 | 之前“许愿池本体无需普通门票”的表述不准确。正确模型是“外围免费，内部区域收费”；Viator 的缺失属于 Provider 覆盖缺口。 |
+
+## 2.1 Official booking link review / 官方购票链接复核（2026-08-25）
+
+The application now keeps an official evidence page separate from the booking button. The evidence page supports the rule shown in the app. The booking button opens the official, or officially linked, purchase route that a visitor should use.
+
+应用现在将官方依据页面和购票按钮分开。依据页面用于支撑应用中的规则，购票按钮则打开用户应使用的官方或官方授权购票入口。
+
+| Attraction / 景点 | Booking entry used by the app / 应用中的购票入口 | Check result / 核验说明 |
+| --- | --- | --- |
+| Colosseum, Roman Forum and Palatine / 斗兽场、古罗马广场和帕拉蒂尼山 | [ticketing.colosseo.it](https://ticketing.colosseo.it/en) | 斗兽场运营方将此入口明确标为 “official online booking”。此前的说明页不再被用作购票按钮。 |
+| Borghese Gallery / 博尔盖塞美术馆 | [galleriaborghese.it](https://www.galleriaborghese.it/) | 官方指南要求在此官网完成预约并选择 “BUY”。此前失效的旧文化部路径已移除。 |
+| Domus Aurea / 尼禄金宫 | [ticketing.colosseo.it](https://ticketing.colosseo.it/en) | 由斗兽场考古公园运营的官方售票门户；用户需要在门户中选择 Domus Aurea。 |
+| Capitoline Museums / 卡比托利欧博物馆 | [museiincomuneroma.vivaticket.it](https://museiincomuneroma.vivaticket.it/) | 博物馆官方购票页直接引导至此 Vivaticket 结账入口，因此它是官方机构链接的购票渠道，而不是普通第三方推荐链接。 |
+| St. Peter's Basilica / 圣彼得大教堂 | [booking.basilicasanpietro.va](https://booking.basilicasanpietro.va/en/) | 大教堂官方预约入口。普通入场仍免费，这个入口只用于可选的付费预约服务。 |
+| Baths of Caracalla / 卡拉卡拉浴场 | [museiitaliani.it](https://www.museiitaliani.it/) | 意大利文化部页面说明线上售票由 Musei Italiani 运营。用户需要在官方门户中选择该景点。 |
+| Trevi Fountain / 特莱维喷泉 | [fontanaditrevi.vivaticket.it](https://fontanaditrevi.vivaticket.it/) | 罗马市政府的官方许愿池门户引导至此结账入口。它对应收费的内部围合区域，不是外围免费参观。 |
+| Vatican Museums and Sistine Chapel / 梵蒂冈博物馆和西斯廷教堂 | [tickets.museivaticani.va](https://tickets.museivaticani.va/home) | 梵蒂冈博物馆明确说明这是唯一官方在线售票网站。 |
+| Pantheon / 万神殿 | [portale.museiitaliani.it](https://portale.museiitaliani.it/) | 罗马国家博物馆管理局的官方页面将用户引导至 Musei Italiani 官方售票门户。 |
+| Castel Sant'Angelo / 圣天使堡 | [portale.museiitaliani.it](https://portale.museiitaliani.it/) | 圣天使堡官方页面将用户引导至 Musei Italiani 官方售票门户。 |
+
+Some official systems use a shared portal rather than a page for one attraction. For those entries, the button opens the verified official ticket system, and the visitor still selects the attraction there.
+
+部分官方系统使用的是共享售票门户，而不是单个景点的固定页面。对于这些入口，按钮会打开已核验的官方票务系统，用户仍需在门户内选择对应景点。
 
 ## 3. 发现的主要差异
 
@@ -56,7 +79,7 @@
 
 ## 5. 使用边界
 
-- 本文档中的价格是 2026-08-19 至 2026-08-21 的官方页面核对快照，不是运行时实时价格。
+- 本文档中的价格是 2026-08-19 至 2026-08-25 的官方页面核对快照，不是运行时实时价格。
 - 临时关闭、施工和特殊开放时间仍需在用户查询或购买前重新检查官方通知。
 - Viator 证据来自 Basic Access Sandbox，只能证明开发环境中的候选覆盖。
 - 本轮没有声称 Viator production key、实时库存或真实 production 可预订状态已经可用。

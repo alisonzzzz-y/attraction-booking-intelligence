@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class RomeBookingPriorityServiceTests {
@@ -33,8 +35,31 @@ class RomeBookingPriorityServiceTests {
         assertTrue(assessments.stream()
                 .allMatch(assessment -> assessment.officialEvidence().sourceUrl().isAbsolute()));
         assertTrue(assessments.stream()
+                .allMatch(assessment -> assessment.officialEvidence().bookingUrl().isAbsolute()));
+        assertTrue(assessments.stream()
                 .allMatch(assessment -> assessment.officialEvidence().checkedOn()
-                        .equals(LocalDate.of(2026, 8, 21))));
+                        .equals(LocalDate.of(2026, 8, 25))));
+    }
+
+    @Test
+    void exposesVerifiedOfficialBookingRoutesForEveryRomeAttraction() {
+        Map<String, String> bookingUrls = service.assess(
+                        LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15))
+                .stream()
+                .collect(Collectors.toMap(
+                        BookingPriorityAssessment::attractionId,
+                        assessment -> assessment.officialEvidence().bookingUrl().toString()));
+
+        assertEquals("https://ticketing.colosseo.it/en", bookingUrls.get("colosseum-archaeological-park"));
+        assertEquals("https://www.galleriaborghese.it/", bookingUrls.get("borghese-gallery"));
+        assertEquals("https://ticketing.colosseo.it/en", bookingUrls.get("domus-aurea"));
+        assertEquals("https://museiincomuneroma.vivaticket.it/", bookingUrls.get("capitoline-museums"));
+        assertEquals("https://booking.basilicasanpietro.va/en/", bookingUrls.get("st-peters-basilica"));
+        assertEquals("https://www.museiitaliani.it/", bookingUrls.get("baths-of-caracalla"));
+        assertEquals("https://fontanaditrevi.vivaticket.it/", bookingUrls.get("trevi-fountain"));
+        assertEquals("https://tickets.museivaticani.va/home", bookingUrls.get("vatican-museums-sistine-chapel"));
+        assertEquals("https://portale.museiitaliani.it/", bookingUrls.get("pantheon"));
+        assertEquals("https://portale.museiitaliani.it/", bookingUrls.get("castel-sant-angelo"));
     }
 
     @Test

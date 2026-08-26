@@ -1,6 +1,50 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RomeResultsMap } from '../features/attractions/RomeResultsMap'
+
+const { createdMarkers, createdPins, mapConstructor, panTo } = vi.hoisted(
+  () => ({
+    createdMarkers: [] as Array<{ zIndex?: number | null }>,
+    createdPins: [] as Array<{ scale?: number | null }>,
+    mapConstructor: vi.fn(),
+    panTo: vi.fn(),
+  }),
+)
+
+vi.mock('../shared/googleMaps/loadGoogleMaps', () => ({
+  loadGoogleMaps: vi.fn(() =>
+    Promise.resolve({
+      maps: {
+        Map: class {
+          panTo = panTo
+
+          constructor(element: HTMLElement, options: unknown) {
+            mapConstructor(element, options)
+          }
+        },
+      },
+      marker: {
+        PinElement: class {
+          scale?: number | null
+
+          constructor(options: { scale?: number | null }) {
+            this.scale = options.scale
+            createdPins.push(this)
+          }
+        },
+        AdvancedMarkerElement: class {
+          map: unknown
+          zIndex?: number | null
+
+          constructor(options: { map: unknown }) {
+            this.map = options.map
+            createdMarkers.push(this)
+          }
+        },
+      },
+    }),
+  ),
+}))
 
 const pantheon = {
   attractionId: 'pantheon',
@@ -15,6 +59,13 @@ const pantheon = {
 }
 
 describe('RomeResultsMap', () => {
+  beforeEach(() => {
+    mapConstructor.mockClear()
+    panTo.mockClear()
+    createdMarkers.length = 0
+    createdPins.length = 0
+  })
+
   it('preserves a list-first fallback when the browser key is unavailable', () => {
     render(
       <RomeResultsMap
@@ -24,7 +75,9 @@ describe('RomeResultsMap', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Map' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Map' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.getByText('Map view is not configured here.'),
     ).toBeInTheDocument()
@@ -33,8 +86,8 @@ describe('RomeResultsMap', () => {
         'The verified location facts remain available in the list.',
       ),
     ).toBeInTheDocument()
-    expect(screen.getByText(/Focused location:/)).toHaveTextContent(
-      'Focused location: Pantheon',
+    expect(screen.getByLabelText('Selected map location')).toHaveTextContent(
+      'Pantheon',
     )
   })
 
@@ -62,8 +115,74 @@ describe('RomeResultsMap', () => {
       />,
     )
 
-    expect(screen.getByText(/Focused group:/)).toHaveTextContent(
-      'Focused group: Roman Forum, Palatine Hill',
+    expect(screen.getByText('Roman Forum · Palatine Hill')).toBeInTheDocument()
+  })
+
+  it('smoothly pans to a selected attraction without changing the overview zoom', async () => {
+    const places = [pantheon]
+    const { rerender } = render(
+      <RomeResultsMap apiKey="browser-key" places={places} />,
     )
+
+    await waitFor(() => expect(mapConstructor).toHaveBeenCalledOnce())
+    expect(mapConstructor.mock.calls[0]?.[1]).toMatchObject({ zoom: 13 })
+
+    rerender(
+      <RomeResultsMap
+        apiKey="browser-key"
+        places={places}
+        selectedAttractionId="pantheon"
+      />,
+    )
+
+    await waitFor(() =>
+      expect(panTo).toHaveBeenCalledWith({
+        lat: pantheon.location.latitude,
+        lng: pantheon.location.longitude,
+      }),
+    )
+    expect(mapConstructor).toHaveBeenCalledOnce()
+  })
+
+  it('enlarges only the selected attraction pin', async () => {
+    const borgheseGallery = {
+      ...pantheon,
+      attractionId: 'borghese-gallery',
+      componentId: 'borghese-gallery',
+      placeId: 'ChIJdZbTjKZhLxMRc2lBskMArXA',
+      name: 'Borghese Gallery',
+      location: { latitude: 41.914_217, longitude: 12.492_143 },
+    }
+    const places = [pantheon, borgheseGallery]
+    const { rerender } = render(
+      <RomeResultsMap apiKey="browser-key" places={places} />,
+    )
+
+    await waitFor(() => expect(createdPins).toHaveLength(2))
+    expect(createdPins.map((pin) => pin.scale)).toEqual([0.8, 0.8])
+
+    rerender(
+      <RomeResultsMap
+        apiKey="browser-key"
+        places={places}
+        selectedAttractionId="pantheon"
+      />,
+    )
+
+    await waitFor(() => expect(createdPins[0]?.scale).toBe(1.3))
+    expect(createdPins[1]?.scale).toBe(0.8)
+    expect(createdMarkers[0]?.zIndex).toBe(10)
+    expect(createdMarkers[1]?.zIndex).toBe(1)
+
+    rerender(
+      <RomeResultsMap
+        apiKey="browser-key"
+        places={places}
+        selectedAttractionId="borghese-gallery"
+      />,
+    )
+
+    await waitFor(() => expect(createdPins[1]?.scale).toBe(1.3))
+    expect(createdPins[0]?.scale).toBe(0.8)
   })
 })

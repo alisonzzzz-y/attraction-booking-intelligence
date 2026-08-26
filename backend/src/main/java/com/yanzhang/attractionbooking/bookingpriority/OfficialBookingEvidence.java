@@ -9,7 +9,9 @@ public record OfficialBookingEvidence(
         String attractionName,
         OfficialBookingPolicy policy,
         String factualBasis,
+        OfficialAttractionDetails details,
         URI sourceUrl,
+        URI bookingUrl,
         LocalDate checkedOn) {
 
     public OfficialBookingEvidence {
@@ -23,7 +25,9 @@ public record OfficialBookingEvidence(
         if (factualBasis == null || factualBasis.isBlank()) {
             throw new IllegalArgumentException("A factual basis is required");
         }
+        Objects.requireNonNull(details, "Official attraction details are required");
         Objects.requireNonNull(sourceUrl, "Official source URL is required");
+        Objects.requireNonNull(bookingUrl, "Official booking URL is required");
         Objects.requireNonNull(checkedOn, "Evidence check date is required");
     }
 }

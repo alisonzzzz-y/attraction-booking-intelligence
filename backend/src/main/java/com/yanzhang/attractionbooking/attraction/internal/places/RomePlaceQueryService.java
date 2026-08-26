@@ -1,9 +1,13 @@
 package com.yanzhang.attractionbooking.attraction.internal.places;
 
+import java.net.URI;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 class RomePlaceQueryService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RomePlaceQueryService.class);
+    private static final Pattern PHOTO_REFERENCE = Pattern.compile("[A-Za-z0-9_-]+");
 
     private static final List<VerifiedPlaceMapping> VERIFIED_PLACES = List.of(
             new VerifiedPlaceMapping("pantheon", "pantheon", "ChIJqUCGZ09gLxMRLM42IPpl0co"),
@@ -78,15 +85,48 @@ class RomePlaceQueryService {
                         HttpStatus.SERVICE_UNAVAILABLE,
                         "Google Places location evidence is not configured"));
 
+        List<RomePlaceEvidence> evidence = VERIFIED_PLACES.stream()
+                .map(mapping -> fetchSafely(configuredClient, mapping))
+                .flatMap(Optional::stream)
+                .toList();
+
+        if (evidence.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Google Places could not provide location evidence");
+        }
+
+        return evidence;
+    }
+
+    URI resolvePhotoMediaUri(String placeId, String photoReference, int maxWidthPx) {
+        if (VERIFIED_PLACES.stream().noneMatch(mapping -> mapping.placeId().equals(placeId))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Rome place is not verified");
+        }
+
+        GooglePlacesClient configuredClient = client.orElseThrow(() ->
+                new ResponseStatusException(
+                        HttpStatus.SERVICE_UNAVAILABLE,
+                        "Google Places location evidence is not configured"));
+
         try {
-            return VERIFIED_PLACES.stream()
-                    .map(mapping -> fetch(configuredClient, mapping))
-                    .toList();
+            return configuredClient.fetchPhotoMediaUri(placeId, photoReference, maxWidthPx);
         } catch (GooglePlacesClientException exception) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
-                    "Google Places could not provide location evidence",
-                    exception);
+                    "Google Places could not provide attraction imagery");
+        }
+    }
+
+    private Optional<RomePlaceEvidence> fetchSafely(
+            GooglePlacesClient configuredClient, VerifiedPlaceMapping mapping) {
+        try {
+            return Optional.of(fetch(configuredClient, mapping));
+        } catch (GooglePlacesClientException exception) {
+            LOGGER.warn(
+                    "Google Places evidence was unavailable for Rome component {}",
+                    mapping.componentId());
+            return Optional.empty();
         }
     }
 
@@ -104,7 +144,44 @@ class RomePlaceQueryService {
                 place.location().longitude(),
                 place.googleMapsUri(),
                 place.businessStatus(),
+                place.rating(),
+                place.userRatingCount(),
+                photosFor(place),
                 clock.instant());
+    }
+
+    private static List<PlacePhoto> photosFor(GooglePlaceDtos.Place place) {
+        if (place.photos() == null) {
+            return List.of();
+        }
+
+        String expectedPrefix = "places/" + place.id() + "/photos/";
+        return place.photos().stream()
+                .filter(photo -> photo != null && photo.name() != null)
+                .map(photo -> toPlacePhoto(photo, expectedPrefix))
+                .flatMap(Optional::stream)
+                .limit(6)
+                .toList();
+    }
+
+    private static Optional<PlacePhoto> toPlacePhoto(
+            GooglePlaceDtos.Photo photo, String expectedPrefix) {
+        if (!photo.name().startsWith(expectedPrefix)) {
+            return Optional.empty();
+        }
+        String reference = photo.name().substring(expectedPrefix.length());
+        if (!PHOTO_REFERENCE.matcher(reference).matches()) {
+            return Optional.empty();
+        }
+
+        List<PhotoAttribution> attributions = photo.authorAttributions() == null
+                ? List.of()
+                : photo.authorAttributions().stream()
+                        .filter(attribution -> attribution != null)
+                        .map(attribution -> new PhotoAttribution(
+                                attribution.displayName(), attribution.uri(), attribution.photoUri()))
+                        .toList();
+        return Optional.of(new PlacePhoto(reference, photo.widthPx(), photo.heightPx(), attributions));
     }
 
     private static void validate(VerifiedPlaceMapping mapping, GooglePlaceDtos.Place place) {
@@ -137,5 +214,55 @@ class RomePlaceQueryService {
             double longitude,
             String googleMapsUri,
             String businessStatus,
-            Instant retrievedAt) {}
+            Double rating,
+            Integer userRatingCount,
+            List<PlacePhoto> photos,
+            Instant retrievedAt) {
+
+        RomePlaceEvidence {
+            photos = photos == null ? List.of() : List.copyOf(photos);
+        }
+
+        RomePlaceEvidence(
+                String attractionId,
+                String componentId,
+                String placeId,
+                String name,
+                String formattedAddress,
+                double latitude,
+                double longitude,
+                String googleMapsUri,
+                String businessStatus,
+                Double rating,
+                Integer userRatingCount,
+                Instant retrievedAt) {
+            this(
+                    attractionId,
+                    componentId,
+                    placeId,
+                    name,
+                    formattedAddress,
+                    latitude,
+                    longitude,
+                    googleMapsUri,
+                    businessStatus,
+                    rating,
+                    userRatingCount,
+                    List.of(),
+                    retrievedAt);
+        }
+    }
+
+    record PlacePhoto(
+            String reference,
+            Integer widthPx,
+            Integer heightPx,
+            List<PhotoAttribution> authorAttributions) {
+
+        PlacePhoto {
+            authorAttributions = authorAttributions == null ? List.of() : List.copyOf(authorAttributions);
+        }
+    }
+
+    record PhotoAttribution(String displayName, String uri, String photoUri) {}
 }

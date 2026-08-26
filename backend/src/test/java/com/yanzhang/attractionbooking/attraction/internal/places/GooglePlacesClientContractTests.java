@@ -53,12 +53,16 @@ class GooglePlacesClientContractTests {
 
         assertEquals(TEST_API_KEY, receivedApiKey.get());
         assertEquals(
-                "id,displayName,formattedAddress,location,googleMapsUri,businessStatus",
+                "id,displayName,formattedAddress,location,googleMapsUri,businessStatus,rating,userRatingCount,photos",
                 receivedFieldMask.get());
         assertEquals(PLACE_ID, place.id());
         assertEquals("Pantheon", place.displayName().text());
         assertEquals(41.8986108, place.location().latitude());
         assertEquals(12.4768729, place.location().longitude());
+        assertEquals(1, place.photos().size());
+        assertEquals(
+                "places/ChIJqUCGZ09gLxMRLM42IPpl0co/photos/Aaw_FcKlyExample",
+                place.photos().getFirst().name());
     }
 
     @Test
@@ -91,7 +95,14 @@ class GooglePlacesClientContractTests {
                   "formattedAddress": "Piazza della Rotonda, 00186 Roma RM, Italy",
                   "location": {"latitude": 41.8986108, "longitude": 12.4768729},
                   "googleMapsUri": "https://maps.google.com/?cid=123",
-                  "businessStatus": "OPERATIONAL"
+                  "businessStatus": "OPERATIONAL",
+                  "photos": [
+                    {
+                      "name": "places/ChIJqUCGZ09gLxMRLM42IPpl0co/photos/Aaw_FcKlyExample",
+                      "widthPx": 1280,
+                      "heightPx": 960
+                    }
+                  ]
                 }
                 """;
     }

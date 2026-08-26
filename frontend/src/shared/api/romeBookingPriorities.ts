@@ -12,6 +12,7 @@ const officialEvidenceSchema = z.object({
   ]),
   factualBasis: z.string().min(1),
   sourceUrl: z.url(),
+  bookingUrl: z.url(),
   checkedOn: z.iso.date(),
 })
 

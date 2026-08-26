@@ -179,7 +179,15 @@ test('renders the verified Colosseum group without treating a guided tour as bas
       name: 'Close details for Colosseum Archaeological Park',
     })
     .click()
-  await expect(page.getByRole('button', { name: 'Show on map' })).toHaveCount(1)
+  await expect(colosseumCard).not.toHaveAttribute('aria-current', 'true')
+  await expect(
+    page.getByRole('button', { name: /Show(?:n)? on map/ }),
+  ).toHaveCount(0)
+  await colosseumCard.click()
+  await expect(colosseumCard).toHaveAttribute('aria-current', 'true')
+  await expect(page.getByLabel('Selected map location')).toContainText(
+    'Colosseum · Roman Forum · Palatine Hill',
+  )
 })
 
 test('renders the Vatican Museums and Sistine Chapel as one verified ticket group', async ({

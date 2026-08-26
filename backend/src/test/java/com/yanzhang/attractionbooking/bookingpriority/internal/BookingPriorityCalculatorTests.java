@@ -6,6 +6,7 @@ import com.yanzhang.attractionbooking.bookingpriority.BookingConfidence;
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriority;
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriorityAssessment;
 import com.yanzhang.attractionbooking.bookingpriority.BookingTiming;
+import com.yanzhang.attractionbooking.bookingpriority.OfficialAttractionDetails;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingEvidence;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingPolicy;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class BookingPriorityCalculatorTests {
@@ -73,7 +75,14 @@ class BookingPriorityCalculatorTests {
                 "Test attraction",
                 policy,
                 "Verified official basis.",
+                new OfficialAttractionDetails(
+                        "A test attraction.",
+                        "Official test ticket",
+                        List.of("Test admission"),
+                        "Official test ticket",
+                        "This is a test recommendation."),
                 URI.create("https://example.org/official-ticket-page"),
+                URI.create("https://example.org/official-booking-page"),
                 LocalDate.of(2026, 8, 21));
     }
 }

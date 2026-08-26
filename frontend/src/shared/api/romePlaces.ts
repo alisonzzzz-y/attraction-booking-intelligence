@@ -5,6 +5,19 @@ const locationSchema = z.object({
   longitude: z.number().min(-180).max(180),
 })
 
+const photoAttributionSchema = z.object({
+  displayName: z.string().min(1).nullable(),
+  uri: z.url().nullable(),
+  photoUri: z.url().nullable(),
+})
+
+const placePhotoSchema = z.object({
+  reference: z.string().min(1),
+  widthPx: z.number().int().positive().nullable(),
+  heightPx: z.number().int().positive().nullable(),
+  authorAttributions: z.array(photoAttributionSchema).default([]),
+})
+
 const placeSchema = z.object({
   attractionId: z.string().min(1),
   componentId: z.string().min(1),
@@ -14,6 +27,7 @@ const placeSchema = z.object({
   location: locationSchema,
   googleMapsUri: z.url().nullable(),
   businessStatus: z.string().min(1).nullable(),
+  photos: z.array(placePhotoSchema).default([]),
   retrievedAt: z.iso.datetime(),
 })
 
@@ -23,8 +37,18 @@ const romePlacesResponseSchema = z.object({
   attractions: z.array(placeSchema),
 })
 
-export type RomePlace = z.infer<typeof placeSchema>
-export type RomePlacesResponse = z.infer<typeof romePlacesResponseSchema>
+export type RomePlacePhoto = z.infer<typeof placePhotoSchema>
+
+// Static map references and older test fixtures predate the optional imagery
+// enrichment. Treat an omitted field as an empty gallery while the API parser
+// still normalises live responses to an array.
+export type RomePlace = Omit<z.input<typeof placeSchema>, 'photos'> & {
+  photos?: RomePlacePhoto[]
+}
+
+export type RomePlacesResponse = Omit<z.infer<typeof romePlacesResponseSchema>, 'attractions'> & {
+  attractions: RomePlace[]
+}
 
 export class RomePlacesApiError extends Error {
   constructor(message: string) {

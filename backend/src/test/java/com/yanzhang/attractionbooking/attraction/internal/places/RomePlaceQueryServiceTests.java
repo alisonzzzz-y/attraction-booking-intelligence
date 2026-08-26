@@ -175,10 +175,46 @@ class RomePlaceQueryServiceTests {
         }
     }
 
+    @Test
+    void retainsSuccessfulMappingsWhenAnotherGooglePlaceFails() throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/v1/places", exchange -> {
+            if (exchange.getRequestURI().getPath().endsWith("ChIJqUCGZ09gLxMRLM42IPpl0co")) {
+                respond(exchange, pantheonJson());
+                return;
+            }
+            respond(exchange, "{\"error\":\"unavailable\"}", 502);
+        });
+        server.start();
+
+        try {
+            URI baseUrl = URI.create("http://localhost:" + server.getAddress().getPort());
+            GooglePlacesClient client = new GooglePlacesClient(
+                    RestClient.builder(),
+                    new GooglePlacesProperties(true, baseUrl, "places-test-secret"));
+            RomePlaceQueryService service = new RomePlaceQueryService(
+                    Optional.of(client),
+                    Clock.fixed(Instant.parse("2026-08-19T08:01:00Z"), ZoneOffset.UTC));
+
+            List<RomePlaceQueryService.RomePlaceEvidence> evidence =
+                    service.fetchVerifiedPlaces();
+
+            assertEquals(1, evidence.size());
+            assertEquals("pantheon", evidence.getFirst().attractionId());
+        } finally {
+            server.stop(0);
+        }
+    }
+
     private static void respond(HttpExchange exchange, String responseBody) throws IOException {
+        respond(exchange, responseBody, 200);
+    }
+
+    private static void respond(HttpExchange exchange, String responseBody, int status)
+            throws IOException {
         byte[] body = responseBody.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, body.length);
+        exchange.sendResponseHeaders(status, body.length);
         exchange.getResponseBody().write(body);
         exchange.close();
     }
