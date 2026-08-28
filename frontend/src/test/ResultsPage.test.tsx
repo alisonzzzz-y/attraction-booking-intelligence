@@ -709,9 +709,11 @@ describe('ResultsPage', () => {
 
     renderResults()
 
-    const stPetersCard = (await screen.findByRole('heading', {
-      name: "St. Peter's Basilica",
-    })).closest('article')
+    const stPetersCard = (
+      await screen.findByRole('heading', {
+        name: "St. Peter's Basilica",
+      })
+    ).closest('article')
     const caracallaCard = screen
       .getByRole('heading', { name: 'Baths of Caracalla' })
       .closest('article')
@@ -737,7 +739,9 @@ describe('ResultsPage', () => {
         'Walk in for the free exterior view',
       ),
     ).toBeInTheDocument()
-    expect(screen.queryByText('No advance booking deadline')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('No advance booking deadline'),
+    ).not.toBeInTheDocument()
   })
 
   it('keeps the ten-attraction MVP complete and expands future catalogues in batches', async () => {
@@ -817,7 +821,10 @@ describe('ResultsPage', () => {
 
     renderResults()
 
-    await screen.findByText('Location evidence is temporarily unavailable.')
+    await screen.findByRole('heading', { name: 'Pantheon' })
+    expect(
+      screen.queryByText('Location evidence is temporarily unavailable.'),
+    ).not.toBeInTheDocument()
 
     for (const bookingPriority of priorityResponse.priorities) {
       const card = screen.getByLabelText(
@@ -886,9 +893,10 @@ describe('ResultsPage', () => {
 
     renderResults()
 
+    await screen.findByRole('heading', { name: 'Pantheon' })
     expect(
-      await screen.findByText('Location evidence is temporarily unavailable.'),
-    ).toBeInTheDocument()
+      screen.queryByText('Location evidence is temporarily unavailable.'),
+    ).not.toBeInTheDocument()
     await user.click(
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )

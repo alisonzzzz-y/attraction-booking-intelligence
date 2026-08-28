@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
+import { apiUrl } from './apiUrl'
 
 const healthSchema = z.object({
   status: z.string(),
@@ -8,7 +9,7 @@ const healthSchema = z.object({
 export type Health = z.infer<typeof healthSchema>
 
 export async function getHealth(): Promise<Health> {
-  const response = await fetch('/actuator/health')
+  const response = await fetch(apiUrl('/actuator/health'))
 
   if (!response.ok) {
     throw new Error(`Health request failed with status ${response.status}`)

@@ -1,21 +1,9 @@
 import { z } from 'zod'
+import { apiUrl } from './apiUrl'
 
 const locationSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-})
-
-const photoAttributionSchema = z.object({
-  displayName: z.string().min(1).nullable(),
-  uri: z.url().nullable(),
-  photoUri: z.url().nullable(),
-})
-
-const placePhotoSchema = z.object({
-  reference: z.string().min(1),
-  widthPx: z.number().int().positive().nullable(),
-  heightPx: z.number().int().positive().nullable(),
-  authorAttributions: z.array(photoAttributionSchema).default([]),
 })
 
 const placeSchema = z.object({
@@ -27,7 +15,6 @@ const placeSchema = z.object({
   location: locationSchema,
   googleMapsUri: z.url().nullable(),
   businessStatus: z.string().min(1).nullable(),
-  photos: z.array(placePhotoSchema).default([]),
   retrievedAt: z.iso.datetime(),
 })
 
@@ -37,16 +24,12 @@ const romePlacesResponseSchema = z.object({
   attractions: z.array(placeSchema),
 })
 
-export type RomePlacePhoto = z.infer<typeof placePhotoSchema>
+export type RomePlace = z.infer<typeof placeSchema>
 
-// Static map references and older test fixtures predate the optional imagery
-// enrichment. Treat an omitted field as an empty gallery while the API parser
-// still normalises live responses to an array.
-export type RomePlace = Omit<z.input<typeof placeSchema>, 'photos'> & {
-  photos?: RomePlacePhoto[]
-}
-
-export type RomePlacesResponse = Omit<z.infer<typeof romePlacesResponseSchema>, 'attractions'> & {
+export type RomePlacesResponse = Omit<
+  z.infer<typeof romePlacesResponseSchema>,
+  'attractions'
+> & {
   attractions: RomePlace[]
 }
 
@@ -58,7 +41,7 @@ export class RomePlacesApiError extends Error {
 }
 
 export async function fetchRomePlaces(): Promise<RomePlacesResponse> {
-  const response = await fetch('/api/v1/rome/places', {
+  const response = await fetch(apiUrl('/api/v1/rome/places'), {
     headers: { Accept: 'application/json' },
   })
 

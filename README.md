@@ -89,20 +89,15 @@ The example password is for local development only. Do not use it in a deployed 
 
 ## Start the backend
 
-After PostgreSQL and Redis are healthy, run:
+The recommended local command loads the root `.env`, starts PostgreSQL and Redis, then starts Spring Boot:
 
 ```bash
-set -a
-source .env
-set +a
-cd backend
-./mvnw spring-boot:run
+./scripts/run-local-backend.sh
 ```
 
-Loading the root `.env` into the current terminal is required because Spring
-Boot does not read that file automatically.
+If Docker Desktop is closed, the script explains that it must be opened before the backend can start. It also avoids the fragile manual step of forgetting to load `.env` before starting Spring Boot.
 
-中文说明：启动后端前需要先把根目录 `.env` 加载到当前 terminal。Spring Boot 不会自动读取这个文件。
+中文说明：推荐直接运行 `./scripts/run-local-backend.sh`。它会自动加载根目录 `.env`、启动 PostgreSQL 与 Redis，再启动 Spring Boot。如果 Docker Desktop 没有打开，脚本会给出明确提示，避免因为忘记加载 `.env` 导致 Google Places 未配置。
 
 The following endpoints will be available:
 
@@ -133,6 +128,12 @@ GOOGLE_PLACES_API_KEY=your_local_server_key
 ```
 
 中文说明：Google Places 服务端客户端默认关闭。只有配置受 Places API (New) 限制的服务端 key 后才启用。这个 key 只能放在根目录 `.env` 或部署平台 secret 中，不能放进前端，也不能提交到 Git。
+
+## Deploy the backend
+
+The repository includes a Dockerfile and a manual Render deployment guide. See [backend-deployment.md](docs/backend-deployment.md). The frontend can point to the public API by setting `VITE_API_BASE_URL` in Vercel, while provider keys remain on the backend only.
+
+中文说明：仓库已经包含后端 Dockerfile 和 Render 手动部署指南，见 [backend-deployment.md](docs/backend-deployment.md)。Vercel 只需要配置公开的 `VITE_API_BASE_URL`，Provider key 只保留在后端平台。
 
 ## Start the frontend
 

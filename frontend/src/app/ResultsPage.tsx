@@ -17,15 +17,14 @@ import {
   fetchRomeBookingPriorities,
   type RomeBookingPriority,
 } from '../shared/api/romeBookingPriorities'
+import { fetchRomePlaces, type RomePlace } from '../shared/api/romePlaces'
 import {
-  fetchRomePlaces,
-  type RomePlace,
-  type RomePlacePhoto,
-} from '../shared/api/romePlaces'
+  localPhotosForAttraction,
+  type LocalAttractionPhoto,
+} from '../features/attractions/romeLocalPhotos'
 
 const INITIAL_VISIBLE_ATTRACTION_COUNT = 10
 const LOAD_MORE_ATTRACTION_COUNT = 8
-const DETAIL_PHOTO_MAX_WIDTH = 960
 
 function formatPrice(attraction: RomeAttraction) {
   const price = attraction.prices[0]
@@ -235,60 +234,27 @@ function attractionName(
   )
 }
 
-type AttractionPhoto = {
-  authorAttributions: RomePlacePhoto['authorAttributions']
-  placeId: string
-  placeName: string
-  reference: string
-}
-
-function attractionPhotos(places: RomePlace[]): AttractionPhoto[] {
-  return places
-    .flatMap((place) =>
-      (place.photos ?? []).map((photo) => ({
-        authorAttributions: photo.authorAttributions,
-        placeId: place.placeId,
-        placeName: place.name,
-        reference: photo.reference,
-      })),
-    )
-    .slice(0, 8)
-}
-
-function placePhotoUrl(
-  placeId: string,
-  photoReference: string,
-  maxWidth: number,
-) {
-  return `/api/v1/rome/places/${encodeURIComponent(placeId)}/photos/${encodeURIComponent(photoReference)}?maxWidth=${maxWidth}`
-}
-
-function PlacePhotoAttribution({ photo }: { photo: AttractionPhoto }) {
-  const attribution = photo.authorAttributions.find(
-    (item) => item.displayName,
-  )
-
+function LocalPhotoAttribution({ photo }: { photo: LocalAttractionPhoto }) {
   return (
     <span className="place-photo-attribution">
-      Google Places
-      {attribution?.displayName ? (
-        <>
-          {' '}
-          by{' '}
-          {attribution.uri ? (
+      Photo credit:{' '}
       <a
-        href={attribution.uri}
+        href={photo.sourceUrl}
         onClick={(event) => event.stopPropagation()}
         rel="noreferrer"
         target="_blank"
       >
-              {attribution.displayName}
-            </a>
-          ) : (
-            attribution.displayName
-          )}
-        </>
-      ) : null}
+        {photo.author}
+      </a>
+      {' · '}
+      <a
+        href={photo.licenseUrl}
+        onClick={(event) => event.stopPropagation()}
+        rel="noreferrer"
+        target="_blank"
+      >
+        {photo.license}
+      </a>
     </span>
   )
 }
@@ -315,7 +281,8 @@ function AttractionEvidenceCard({
   stayStartDate: string
 }) {
   const name = attractionName(attraction, places, priority)
-  const previewPhoto = attractionPhotos(places)[0]
+  const attractionId = attraction?.id ?? priority?.attractionId
+  const previewPhoto = localPhotosForAttraction(attractionId)[0]
   const price = attraction ? formatPrice(attraction) : null
   const priorityLabel = priority
     ? priorityCopy(priority.priority)
@@ -348,17 +315,9 @@ function AttractionEvidenceCard({
     >
       {previewPhoto ? (
         <figure className="result-card-photo">
-          <img
-            alt={`${name}, photo from Google Places`}
-            loading="lazy"
-            src={placePhotoUrl(
-              previewPhoto.placeId,
-              previewPhoto.reference,
-              760,
-            )}
-          />
+          <img alt={previewPhoto.alt} loading="lazy" src={previewPhoto.src} />
           <figcaption>
-            <PlacePhotoAttribution photo={previewPhoto} />
+            <LocalPhotoAttribution photo={previewPhoto} />
           </figcaption>
         </figure>
       ) : (
@@ -428,35 +387,14 @@ function AttractionEvidenceCard({
 }
 
 function AttractionPhotoGallery({
+  attractionId,
   name,
-  places,
 }: {
+  attractionId?: string
   name: string
-  places: RomePlace[]
 }) {
-  const photos = useMemo(() => attractionPhotos(places), [places])
+  const photos = localPhotosForAttraction(attractionId)
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
-
-  useEffect(() => {
-    if (photos.length < 2) return
-
-    const preloadPhoto = (index: number) => {
-      const photo = photos[index]
-      const image = new Image()
-
-      image.decoding = 'async'
-      image.src = placePhotoUrl(
-        photo.placeId,
-        photo.reference,
-        DETAIL_PHOTO_MAX_WIDTH,
-      )
-    }
-
-    preloadPhoto((selectedPhotoIndex + 1) % photos.length)
-    preloadPhoto(
-      selectedPhotoIndex === 0 ? photos.length - 1 : selectedPhotoIndex - 1,
-    )
-  }, [photos, selectedPhotoIndex])
 
   if (photos.length === 0) {
     return (
@@ -464,7 +402,7 @@ function AttractionPhotoGallery({
         aria-label={`${name} photos`}
         className="result-photo-gallery result-photo-gallery-empty"
       >
-        <p>Attraction imagery is not available from the current location source.</p>
+        <p>Attraction imagery is not available yet.</p>
       </section>
     )
   }
@@ -483,17 +421,9 @@ function AttractionPhotoGallery({
   return (
     <section aria-label={`${name} photos`} className="result-photo-gallery">
       <div className="result-photo-main">
-        <img
-          alt={`${selectedPhoto.placeName}, photo ${selectedPhotoIndex + 1} from Google Places`}
-          decoding="async"
-          src={placePhotoUrl(
-            selectedPhoto.placeId,
-            selectedPhoto.reference,
-            DETAIL_PHOTO_MAX_WIDTH,
-          )}
-        />
+        <img alt={selectedPhoto.alt} decoding="async" src={selectedPhoto.src} />
         <div className="result-photo-credit">
-          <PlacePhotoAttribution photo={selectedPhoto} />
+          <LocalPhotoAttribution photo={selectedPhoto} />
         </div>
         {hasMultiplePhotos ? (
           <>
@@ -532,15 +462,11 @@ function AttractionPhotoGallery({
                   ? 'result-photo-thumbnail selected'
                   : 'result-photo-thumbnail'
               }
-              key={`${photo.placeId}-${photo.reference}`}
+              key={photo.src}
               onClick={() => setSelectedPhotoIndex(index)}
               type="button"
             >
-              <img
-                alt=""
-                loading="lazy"
-                src={placePhotoUrl(photo.placeId, photo.reference, 220)}
-              />
+              <img alt="" loading="lazy" src={photo.src} />
             </button>
           ))}
         </div>
@@ -561,6 +487,7 @@ function AttractionEvidenceDetails({
   stayStartDate: string
 }) {
   const name = attractionName(attraction, places, priority)
+  const attractionId = attraction?.id ?? priority?.attractionId
   const availability = attraction
     ? availabilityCopy(attraction.availabilityStatus)
     : null
@@ -574,42 +501,46 @@ function AttractionEvidenceDetails({
     <div className="result-card-body result-details-body">
       <div className="result-details-layout">
         <aside className="result-details-media" aria-label={`${name} photos`}>
-          <AttractionPhotoGallery name={name} places={places} />
+          <AttractionPhotoGallery
+            attractionId={attractionId}
+            key={attractionId ?? 'unknown-attraction'}
+            name={name}
+          />
         </aside>
 
         <div className="result-details-content">
-        <section
-          className="result-decision-overview"
-          aria-label="Booking decision"
-        >
-          <div className="result-evidence-heading">
-            <h3>Booking decision</h3>
-            <span className="official-source-badge">Official source</span>
-          </div>
-          {priority ? (
-            <>
-              <div className="result-booking-deadline">
-                <small>Recommended booking action</small>
-                <strong>{deadline?.summary}</strong>
-                <p>{deadline?.note}</p>
-              </div>
-              <a
-                className="official-booking-button"
-                href={priority.officialEvidence.bookingUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                Open official booking
-                <span aria-hidden="true">↗</span>
-              </a>
-            </>
-          ) : (
-            <p className="result-provider-fallback">
-              Booking priority is temporarily unavailable. No urgency is inferred
-              from third-party ticket data.
-            </p>
-          )}
-        </section>
+          <section
+            className="result-decision-overview"
+            aria-label="Booking decision"
+          >
+            <div className="result-evidence-heading">
+              <h3>Booking decision</h3>
+              <span className="official-source-badge">Official source</span>
+            </div>
+            {priority ? (
+              <>
+                <div className="result-booking-deadline">
+                  <small>Recommended booking action</small>
+                  <strong>{deadline?.summary}</strong>
+                  <p>{deadline?.note}</p>
+                </div>
+                <a
+                  className="official-booking-button"
+                  href={priority.officialEvidence.bookingUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Open official booking
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </>
+            ) : (
+              <p className="result-provider-fallback">
+                Booking priority is temporarily unavailable. No urgency is
+                inferred from third-party ticket data.
+              </p>
+            )}
+          </section>
 
           <section
             className="result-third-party-options"
@@ -670,7 +601,10 @@ function AttractionEvidenceDetails({
                 <small>Official sources and verified locations</small>
               </summary>
               <div className="result-evidence-disclosure-body">
-                <section className="result-evidence-section" aria-label="Official evidence">
+                <section
+                  className="result-evidence-section"
+                  aria-label="Official evidence"
+                >
                   <h4>Official evidence</h4>
                   {priority ? (
                     <>
@@ -704,44 +638,45 @@ function AttractionEvidenceDetails({
                 >
                   <h4>Locations and map links</h4>
                   {places.length > 0 ? (
-              <>
-                {places.length > 1 ? (
-                  <p className="result-group-summary">
-                    This attraction group contains {places.length} separately
-                    verified locations.
-                  </p>
-                ) : null}
-                <div className="result-place-list">
-                  {places.map((place) => (
-                    <div className="result-place" key={place.componentId}>
-                      {places.length > 1 ? <h4>{place.name}</h4> : null}
-                      <dl className="result-facts result-location-facts">
-                        <div>
-                          <dt>Address</dt>
-                          <dd>
-                            <strong>{place.formattedAddress}</strong>
-                          </dd>
-                        </div>
-                      </dl>
-                      <p className="result-source">
-                        Retrieved {formatRetrievedAt(place.retrievedAt)} UTC
-                        {place.googleMapsUri ? (
-                          <>
-                            {' · '}
-                            <a
-                              href={place.googleMapsUri}
-                              rel="noreferrer"
-                              target="_blank"
-                            >
-                              Open {place.name} in Google Maps
-                            </a>
-                          </>
-                        ) : null}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </>
+                    <>
+                      {places.length > 1 ? (
+                        <p className="result-group-summary">
+                          This attraction group contains {places.length}{' '}
+                          separately verified locations.
+                        </p>
+                      ) : null}
+                      <div className="result-place-list">
+                        {places.map((place) => (
+                          <div className="result-place" key={place.componentId}>
+                            {places.length > 1 ? <h4>{place.name}</h4> : null}
+                            <dl className="result-facts result-location-facts">
+                              <div>
+                                <dt>Address</dt>
+                                <dd>
+                                  <strong>{place.formattedAddress}</strong>
+                                </dd>
+                              </div>
+                            </dl>
+                            <p className="result-source">
+                              Retrieved {formatRetrievedAt(place.retrievedAt)}{' '}
+                              UTC
+                              {place.googleMapsUri ? (
+                                <>
+                                  {' · '}
+                                  <a
+                                    href={place.googleMapsUri}
+                                    rel="noreferrer"
+                                    target="_blank"
+                                  >
+                                    Open {place.name} in Google Maps
+                                  </a>
+                                </>
+                              ) : null}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   ) : (
                     <p className="result-provider-fallback">
                       Verified location evidence is temporarily unavailable.
@@ -837,9 +772,6 @@ export function ResultsPage() {
     loadFavouriteAttractionIds,
   )
   const [saveFeedback, setSaveFeedback] = useState('')
-  const [visibleAttractionCount, setVisibleAttractionCount] = useState(
-    INITIAL_VISIBLE_ATTRACTION_COUNT,
-  )
   const [searchParams] = useSearchParams()
   const city = searchParams.get('city')
   const startDate = searchParams.get('stayStartDate')
@@ -855,6 +787,11 @@ export function ResultsPage() {
     lengthFlexDays,
   )
   const hasValidQuery = city === 'rome' && Boolean(startDate && endDate)
+  const resultSetKey = `${startDate ?? ''}:${endDate ?? ''}`
+  const [pagination, setPagination] = useState({
+    resultSetKey,
+    visibleAttractionCount: INITIAL_VISIBLE_ATTRACTION_COUNT,
+  })
 
   function toggleFavourite(attractionId: string) {
     setFavouriteAttractionIds((current) => {
@@ -934,16 +871,14 @@ export function ResultsPage() {
   ].filter((id, index, ids) => ids.indexOf(id) === index)
   const visibleAttractionIds = orderedAttractionIds.slice(
     0,
-    visibleAttractionCount,
+    pagination.resultSetKey === resultSetKey
+      ? pagination.visibleAttractionCount
+      : INITIAL_VISIBLE_ATTRACTION_COUNT,
   )
   const hasMoreAttractions =
     visibleAttractionIds.length < orderedAttractionIds.length
   const isLoading =
     priorityQuery.isPending || ticketQuery.isPending || placeQuery.isPending
-
-  useEffect(() => {
-    setVisibleAttractionCount(INITIAL_VISIBLE_ATTRACTION_COUNT)
-  }, [startDate, endDate])
 
   return (
     <section className="page-section results-section" aria-live="polite">
@@ -993,20 +928,6 @@ export function ResultsPage() {
             onClick={() => priorityQuery.refetch()}
           >
             Retry booking priority
-          </button>
-        </div>
-      ) : null}
-
-      {placeQuery.isError ? (
-        <div className="result-state result-state-error" role="alert">
-          <strong>Location evidence is temporarily unavailable.</strong>
-          <p>{placeQuery.error.message}</p>
-          <p>No location or closure conclusion is inferred.</p>
-          <button
-            className="button button-secondary"
-            onClick={() => placeQuery.refetch()}
-          >
-            Retry location evidence
           </button>
         </div>
       ) : null}
@@ -1062,9 +983,14 @@ export function ResultsPage() {
                 <button
                   className="button button-secondary"
                   onClick={() =>
-                    setVisibleAttractionCount(
-                      (current) => current + LOAD_MORE_ATTRACTION_COUNT,
-                    )
+                    setPagination((current) => ({
+                      resultSetKey,
+                      visibleAttractionCount:
+                        (current.resultSetKey === resultSetKey
+                          ? current.visibleAttractionCount
+                          : INITIAL_VISIBLE_ATTRACTION_COUNT) +
+                        LOAD_MORE_ATTRACTION_COUNT,
+                    }))
                   }
                   type="button"
                 >

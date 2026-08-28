@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { apiUrl } from './apiUrl'
 
 const officialEvidenceSchema = z.object({
   sourceType: z.literal('OFFICIAL_OPERATOR'),
@@ -58,9 +59,12 @@ export async function fetchRomeBookingPriorities(
   stayEndDate: string,
 ): Promise<RomeBookingPrioritiesResponse> {
   const query = new URLSearchParams({ stayStartDate, stayEndDate })
-  const response = await fetch(`/api/v1/rome/booking-priorities?${query}`, {
-    headers: { Accept: 'application/json' },
-  })
+  const response = await fetch(
+    apiUrl(`/api/v1/rome/booking-priorities?${query}`),
+    {
+      headers: { Accept: 'application/json' },
+    },
+  )
 
   if (!response.ok) {
     throw new RomeBookingPrioritiesApiError(

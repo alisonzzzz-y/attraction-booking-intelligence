@@ -66,6 +66,23 @@ class InfrastructureIntegrationTests {
     }
 
     @Test
+    void permitsTheConfiguredFrontendOriginToReadPublicEndpoints() throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/rome/booking-priorities"))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://localhost:5173")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var response = HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.headers().firstValue("access-control-allow-origin"))
+                .contains("http://localhost:5173");
+    }
+
+    @Test
     void returnsProviderConfigurationErrorWithoutRequestingLogin() throws Exception {
         var ticketResponse = get(
                 "/api/v1/rome/attractions"

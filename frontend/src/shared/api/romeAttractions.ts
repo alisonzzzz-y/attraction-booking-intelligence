@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { apiUrl } from './apiUrl'
 
 const priceSchema = z.object({
   amount: z.number().nonnegative(),
@@ -72,7 +73,7 @@ export async function fetchRomeAttractions(
   stayEndDate: string,
 ): Promise<RomeAttractionsResponse> {
   const query = new URLSearchParams({ stayStartDate, stayEndDate })
-  const response = await fetch(`/api/v1/rome/attractions?${query}`, {
+  const response = await fetch(apiUrl(`/api/v1/rome/attractions?${query}`), {
     headers: { Accept: 'application/json' },
   })
 
