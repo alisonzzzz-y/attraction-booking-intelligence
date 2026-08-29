@@ -94,7 +94,7 @@ Spring Modulith 是加入 Spring Boot 项目中的架构和测试支持。它不
 - 前后端分离
 - 后端采用 modular monolith
 - REST API
-- PostgreSQL 持久化
+- MySQL 持久化
 - Redis 缓存
 - Docker Compose 本地开发
 - GitHub Actions 持续集成
@@ -110,7 +110,7 @@ Spring Modulith 是加入 Spring Boot 项目中的架构和测试支持。它不
 - Spring Validation
 - Spring Security
 - Spring Data JPA
-- PostgreSQL Driver
+- MySQL Driver
 - Flyway Migration
 - Spring Data Redis
 - Spring Boot Actuator
@@ -141,7 +141,7 @@ Resilience4j 在开始实现 provider integration 时加入。不要为了看起
 
 ### 本地基础设施
 
-- PostgreSQL
+- MySQL
 - Redis
 - Docker Compose
 
@@ -258,7 +258,7 @@ class ModularityTests {
 
 需要完成：
 
-- 应用可以连接 Docker Compose 中的 PostgreSQL。
+- 应用可以连接 Docker Compose 中的 MySQL。
 - Flyway 创建初始 schema history，但第一轮不创建完整业务表。
 - Redis 连接配置存在，并通过简单集成测试或启动检查验证。
 - Actuator health endpoint 可用。
@@ -308,7 +308,7 @@ frontend/src/
 
 生成的 Docker Compose 至少包括：
 
-- PostgreSQL
+- MySQL
 - Redis
 - named volumes
 - health checks
@@ -348,7 +348,7 @@ Playwright 可以先在本地运行。如果 CI 中加入浏览器测试导致�
 - 当前完成范围
 - 技术栈和准确版本
 - 本地运行前提
-- 启动 PostgreSQL 和 Redis 的命令
+- 启动 MySQL 和 Redis 的命令
 - 启动后端的命令
 - 启动前端的命令
 - 测试命令
@@ -432,8 +432,8 @@ Playwright 可以先在本地运行。如果 CI 中加入浏览器测试导致�
 1. 后端可以编译并启动。
 2. 后端测试通过。
 3. Spring Modulith 验证通过。
-4. PostgreSQL 和 Redis 可以通过 Docker Compose 启动并通过 health check。
-5. 后端可以连接 PostgreSQL。
+4. MySQL 和 Redis 可以通过 Docker Compose 启动并通过 health check。
+5. 后端可以连接 MySQL。
 6. Redis 配置已得到基本验证。
 7. Actuator health endpoint 可访问。
 8. 前端可以安装、启动和构建。

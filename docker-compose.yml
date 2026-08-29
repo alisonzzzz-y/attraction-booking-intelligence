@@ -1,20 +1,21 @@
 services:
-  postgres:
-    image: postgres:17.10-alpine
+  mysql:
+    image: mysql:8.0
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-attraction_booking}
-      POSTGRES_USER: ${POSTGRES_USER:-attraction}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-attraction_dev}
+      MYSQL_DATABASE: ${APP_MYSQL_DATABASE:-attraction_booking}
+      MYSQL_USER: ${APP_MYSQL_USER:-attraction}
+      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD:-attraction_dev}
+      MYSQL_ROOT_PASSWORD: ${APP_MYSQL_ROOT_PASSWORD:-attraction_root_dev}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${APP_MYSQL_PORT:-3307}:3306"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mysql-data-v2:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 30s
 
   redis:
     image: redis:8.8.0-alpine
@@ -31,5 +32,5 @@ services:
       start_period: 5s
 
 volumes:
-  postgres-data:
+  mysql-data-v2:
   redis-data:

@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本文件记录 Apple Silicon Mac 上的 Docker Desktop 安装步骤，以及项目 PostgreSQL、Redis 和 Testcontainers 的后续验证方法。
+本文件记录 Apple Silicon Mac 上的 Docker Desktop 安装步骤，以及项目 MySQL、Redis 和 Testcontainers 的后续验证方法。
 
 Docker Desktop 是本项目运行本地容器和后端集成测试的前提。
 
@@ -102,11 +102,11 @@ Docker Engine 正常后，在项目根目录运行：
 
 ```bash
 docker compose config
-docker compose up -d postgres redis
+docker compose up -d mysql redis
 docker compose ps
 ```
 
-PostgreSQL 和 Redis 都显示 healthy 后，再运行：
+MySQL 和 Redis 都显示 healthy 后，再运行：
 
 ```bash
 cd backend
@@ -118,7 +118,7 @@ cd backend
 2026-08-17 的实际验证结果：
 
 - `docker compose config`：通过
-- PostgreSQL 17.10：healthy
+- MySQL 17.10：healthy
 - Redis 8.8.0：healthy
 - Testcontainers：成功连接 Docker Desktop
 - Flyway：成功验证并应用 v1 migration
@@ -139,7 +139,7 @@ docker compose down
 
 本次验证完成后已执行 `docker compose down`。两个验证容器和项目网络已移除，以下命名数据卷仍保留：
 
-- `attraction-booking-intelligence_postgres-data`
+- `attraction-booking-intelligence_mysql-data`
 - `attraction-booking-intelligence_redis-data`
 
 ## 10. 当前下一项操作

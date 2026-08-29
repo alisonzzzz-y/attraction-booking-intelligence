@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers(disabledWithoutDocker = true)
@@ -25,8 +25,8 @@ class InfrastructureIntegrationTests {
 
     @Container
     @ServiceConnection
-    static final PostgreSQLContainer POSTGRES =
-            new PostgreSQLContainer(DockerImageName.parse("postgres:17.10-alpine"));
+    static final MySQLContainer<?> MYSQL =
+            new MySQLContainer<>(DockerImageName.parse("mysql:8.0"));
 
     @Container
     @ServiceConnection(name = "redis")
@@ -44,7 +44,7 @@ class InfrastructureIntegrationTests {
     int port;
 
     @Test
-    void connectsToPostgresAndAppliesFlywayMigration() {
+    void connectsToMySqlAndAppliesFlywayMigration() {
         var migrationCount = jdbcTemplate.queryForObject(
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);

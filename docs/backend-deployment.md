@@ -1,25 +1,25 @@
 # Backend deployment guide
 
-This guide deploys the Spring Boot API to Render while the React frontend remains on Vercel. It does not publish a provider key in the frontend or repository.
+This guide deploys the Spring Boot API to Render, MySQL to Railway, and the React frontend to Vercel. It does not publish a provider key or database password in the frontend or repository.
 
-中文说明：本指南把 Spring Boot API 部署到 Render，React 前端继续使用 Vercel。任何 Google Places 或 Viator key 只放在后端环境变量中，不会进入前端或 Git 仓库。
+中文说明：本指南把 Spring Boot API 部署到 Render，MySQL 数据库部署到 Railway，React 前端继续使用 Vercel。任何 Google Places、Viator key 或数据库密码只放在平台环境变量中，不会进入前端或 Git 仓库。
 
 ## 1. What this deployment contains
 
 - A Render Docker Web Service built from `backend/Dockerfile`.
-- A Render PostgreSQL database for Spring Boot, JPA, and Flyway startup checks.
+- A Railway MySQL database for Spring Boot, JPA, and Flyway startup checks.
 - A Render Key Value instance for Redis-compatible connectivity.
 - The existing Vercel frontend, configured with the public backend URL only.
 
-中文说明：部署由一个 Docker Web Service、一个 PostgreSQL 数据库和一个 Redis-compatible Key Value 实例组成。Vercel 只接收公开的后端 URL，不接收服务端 key。
+中文说明：部署由一个 Render Docker Web Service、一个 Railway MySQL 数据库和一个 Render Redis-compatible Key Value 实例组成。Vercel 只接收公开的后端 URL，不接收服务端 key。
 
 ## 2. Create the Render resources
 
-In Render, create these resources in the same workspace:
+Create these resources:
 
-1. Create a PostgreSQL database named `attraction-booking-db`.
-2. Create a Key Value instance named `attraction-booking-redis`.
-3. Create a Web Service from `alisonzzzz-y/attraction-booking-intelligence`.
+1. In Railway, create a MySQL database named `attraction-booking-db`.
+2. In Render, create a Key Value instance named `attraction-booking-redis` in the same region as the backend.
+3. In Render, create a Web Service from `alisonzzzz-y/attraction-booking-intelligence`.
 
 For the Web Service, use:
 
@@ -33,17 +33,17 @@ For the Web Service, use:
 
 Choose a service name such as `attraction-booking-api`. Render will then give it a public URL such as `https://attraction-booking-api.onrender.com`.
 
-中文说明：在 Render 的同一个 workspace 中先创建 PostgreSQL、Key Value 和 Web Service。Web Service 选择 Docker，根目录填写 `backend`，健康检查路径填写 `/actuator/health`。实际服务名称可自行选择。
+中文说明：先在 Railway 创建 MySQL，再在 Render 创建 Key Value 和 Web Service。Web Service 选择 Docker，根目录填写 `backend`，健康检查路径填写 `/actuator/health`。实际服务名称可自行选择。
 
 ## 3. Add backend environment variables
 
-Open the Web Service, choose **Environment**, then add the following variables. Copy database and Key Value connection details from the resources you created. Do not upload the local `.env` file or commit it.
+Open the Render Web Service, choose **Environment**, then add the following variables. Copy the public MySQL connection details from Railway and the internal Key Value URL from Render. Do not upload the local `.env` file or commit it.
 
 | Variable | Value |
 | --- | --- |
-| `POSTGRES_URL` | `jdbc:postgresql://<internal-host>:<port>/<database>` |
-| `POSTGRES_USER` | PostgreSQL username from Render |
-| `POSTGRES_PASSWORD` | PostgreSQL password from Render |
+| `APP_MYSQL_JDBC_URL` | `jdbc:mysql://<Railway-host>:<port>/<database>?useSSL=true&requireSSL=true` |
+| `APP_MYSQL_USER` | MySQL username from Railway |
+| `APP_MYSQL_PASSWORD` | MySQL password from Railway |
 | `SPRING_DATA_REDIS_URL` | Internal Redis/Key Value URL from Render |
 | `CORS_ALLOWED_ORIGINS` | `https://attraction-booking-intelligence.vercel.app,http://localhost:5173` |
 | `GOOGLE_PLACES_API_ENABLED` | `true` |
@@ -52,7 +52,7 @@ Open the Web Service, choose **Environment**, then add the following variables. 
 
 Do not set `VITE_GOOGLE_MAPS_API_KEY`, `GOOGLE_PLACES_API_KEY`, or `VIATOR_API_KEY` in Vercel. The first is a browser key and belongs only in the frontend configuration. The latter two are server secrets and belong only in Render.
 
-中文说明：在 Web Service 的 **Environment** 页面配置变量。`POSTGRES_URL` 必须以 `jdbc:postgresql://` 开头。`SPRING_DATA_REDIS_URL` 使用 Render Key Value 提供的内部连接 URL。Viator 目前仍是 Sandbox，因此公开后端先保持关闭。Google Places server key 只能放 Render，绝不能填写到 Vercel。
+中文说明：在 Render Web Service 的 **Environment** 页面配置变量。`APP_MYSQL_JDBC_URL` 必须以 `jdbc:mysql://` 开头，并使用 Railway MySQL 的 Public Networking 主机、端口和数据库名。`SPRING_DATA_REDIS_URL` 使用 Render Key Value 提供的内部连接 URL。Viator 目前仍是 Sandbox，因此公开后端先保持关闭。Google Places server key 只能放 Render，绝不能填写到 Vercel。
 
 ## 4. First backend deployment check
 

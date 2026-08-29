@@ -5,9 +5,9 @@ spring:
   application:
     name: attraction-booking-backend
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/attraction_booking}
-    username: ${POSTGRES_USER:attraction}
-    password: ${POSTGRES_PASSWORD:attraction_dev}
+    url: ${APP_MYSQL_JDBC_URL:jdbc:mysql://127.0.0.1:3307/attraction_booking}
+    username: ${APP_MYSQL_USER:attraction}
+    password: ${APP_MYSQL_PASSWORD:attraction_dev}
   data:
     redis:
       host: ${REDIS_HOST:localhost}
