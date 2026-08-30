@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.containers.MySQLContainer;
@@ -28,17 +26,8 @@ class InfrastructureIntegrationTests {
     static final MySQLContainer<?> MYSQL =
             new MySQLContainer<>(DockerImageName.parse("mysql:8.0"));
 
-    @Container
-    @ServiceConnection(name = "redis")
-    static final GenericContainer<?> REDIS =
-            new GenericContainer<>(DockerImageName.parse("redis:8.8.0-alpine"))
-                    .withExposedPorts(6379);
-
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    StringRedisTemplate redisTemplate;
 
     @LocalServerPort
     int port;
@@ -50,11 +39,6 @@ class InfrastructureIntegrationTests {
                 Integer.class);
 
         assertThat(migrationCount).isEqualTo(1);
-    }
-
-    @Test
-    void connectsToRedis() {
-        assertThat(redisTemplate.getConnectionFactory().getConnection().ping()).isEqualTo("PONG");
     }
 
     @Test

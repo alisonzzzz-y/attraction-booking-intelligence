@@ -11,7 +11,7 @@ if [[ ! -f "$env_file" ]]; then
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
-  echo "Docker Desktop is required for the local MySQL and Redis services."
+  echo "Docker Desktop is required for the local MySQL service."
   exit 1
 fi
 
@@ -41,7 +41,7 @@ export SPRING_DATASOURCE_URL="$APP_MYSQL_JDBC_URL"
 export SPRING_DATASOURCE_USERNAME="$APP_MYSQL_USER"
 export SPRING_DATASOURCE_PASSWORD="$APP_MYSQL_PASSWORD"
 
-docker compose -f "$repo_root/docker-compose.yml" up -d --wait mysql redis
+docker compose -f "$repo_root/docker-compose.yml" up -d --wait mysql
 
 cd "$repo_root/backend"
 exec ./mvnw spring-boot:run

@@ -28,7 +28,7 @@
 
 状态：已完成。
 
-已完成 Spring Boot modular monolith、React 应用壳、MySQL、Redis、Testcontainers、Docker Compose、CI、GitHub 私有仓库和基础文档。当前前后端测试及 GitHub Actions 已通过。
+已完成 Spring Boot modular monolith、React 应用壳、MySQL、Testcontainers、Docker Compose、CI、GitHub 私有仓库和基础文档。当前前后端测试及 GitHub Actions 已通过。
 
 ### Part 1：公开网站的信息结构与真实文案
 
@@ -109,7 +109,7 @@
 - 首选连接当前 GitHub 私有仓库的自动部署方式。
 - 配置 Vite SPA 路由 fallback 和生产环境变量边界。
 - 验证首页、深层路由、手机布局、HTTPS 和刷新行为。
-- 暂不部署 Spring Boot、MySQL 或 Redis；公开页面不能依赖后端才能加载。
+- 暂不部署 Spring Boot 或 MySQL；公开页面不能依赖后端才能加载。
 
 验收：匿名浏览器可以访问公开 URL，页面明确标记为开发中，GitHub 推送可以触发可追踪的部署。
 
@@ -338,7 +338,7 @@
 
 范围：
 
-- 在执行时评估适合 Java 21、MySQL 和 Redis 的托管方案。
+- 在执行时评估适合 Java 21 和 MySQL 的托管方案；Redis 只在实际引入合规缓存后再评估。
 - 配置生产 secret、CORS、数据库迁移、health check 和最小日志。
 - 前端连接公开后端，保留安全的失败降级页面。
 - 执行部署后 smoke test，不进行真实购买。

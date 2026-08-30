@@ -10,7 +10,7 @@
 - 自动部署：`main` 分支每次推送都会触发 Vercel production 部署
 - 当前更新：本次 Rome MVP 前端改动将在推送后由 Vercel 自动构建和部署
 
-当前部署只包含静态 React 前端。Spring Boot、Railway MySQL 和 Redis-compatible Key Value 正在准备部署，页面也不依赖这些服务才能加载。
+当前部署只包含静态 React 前端。Spring Boot 与 Railway MySQL 正在准备部署，页面也不依赖这些服务才能加载。
 
 ## Vercel 配置
 
