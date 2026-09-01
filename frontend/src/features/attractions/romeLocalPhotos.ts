@@ -10,7 +10,6 @@ export type LocalAttractionPhoto = {
 const creativeCommonsBySaFour =
   'https://creativecommons.org/licenses/by-sa/4.0/'
 const creativeCommonsByFour = 'https://creativecommons.org/licenses/by/4.0/'
-const creativeCommonsByTwo = 'https://creativecommons.org/licenses/by/2.0/'
 const creativeCommonsBySaThree =
   'https://creativecommons.org/licenses/by-sa/3.0/'
 const creativeCommonsZero = 'https://creativecommons.org/publicdomain/zero/1.0/'
@@ -29,34 +28,33 @@ const localPhotos: Record<string, LocalAttractionPhoto[]> = {
   ],
   'vatican-museums-sistine-chapel': [
     {
-      alt: 'Entrance to the Sistine Chapel in the Vatican Museums',
-      author: 'Tim Adams',
-      license: 'CC BY 2.0',
-      licenseUrl: creativeCommonsByTwo,
+      alt: 'The Cortile della Pigna at the Vatican Museums',
+      author: 'Wilfredor',
+      license: 'CC0 1.0',
+      licenseUrl: creativeCommonsZero,
       sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Entrance_to_Sistine_Chapel_in_Vatican_Museums_in_Rome,_Italy.jpg',
+        'https://commons.wikimedia.org/wiki/File:Cortile_della_Pigna,_Vatican_Museums.jpg',
       src: '/images/rome/vatican-museums-sistine-chapel.jpg',
     },
   ],
   'st-peters-basilica': [
     {
-      alt: 'Facade of St Peter Basilica in Rome',
-      author: 'Peter J St B Green',
-      license: 'CC BY-SA 3.0',
-      licenseUrl: creativeCommonsBySaThree,
+      alt: "St Peter's Basilica facade and dome at dusk",
+      author: 'NateBergin',
+      license: 'CC BY 4.0',
+      licenseUrl: creativeCommonsByFour,
       sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:St_Peters_Basilica_Rome_facade.jpg',
+        'https://commons.wikimedia.org/wiki/File:01_St_Peter%27s_Basilica_Facade.jpg',
       src: '/images/rome/st-peters-basilica.jpg',
     },
   ],
   pantheon: [
     {
-      alt: 'Interior dome of the Pantheon in Rome',
-      author: 'Livioandronico2013',
-      license: 'CC BY-SA 4.0',
-      licenseUrl: creativeCommonsBySaFour,
-      sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Dome_of_Pantheon_(Rome).jpg',
+      alt: 'The Pantheon and Piazza della Rotonda in Rome',
+      author: 'Meshari Alawfi',
+      license: 'CC BY 4.0',
+      licenseUrl: creativeCommonsByFour,
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:PantheonRome.jpg',
       src: '/images/rome/pantheon.jpg',
     },
   ],

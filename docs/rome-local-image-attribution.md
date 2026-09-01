@@ -7,9 +7,9 @@ The Rome MVP stores a small preview image for each supported attraction inside t
 | Attraction | Asset | Author | Licence | Source |
 | --- | --- | --- | --- | --- |
 | Colosseum Archaeological Park | colosseum-archaeological-park.jpg | Livioandronico2013 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Colosseum_and_Via_Sacra_(Rome).jpg |
-| Vatican Museums and Sistine Chapel | vatican-museums-sistine-chapel.jpg | Tim Adams | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:Entrance_to_Sistine_Chapel_in_Vatican_Museums_in_Rome,_Italy.jpg |
-| St Peter Basilica | st-peters-basilica.jpg | Peter J St B Green | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:St_Peters_Basilica_Rome_facade.jpg |
-| Pantheon | pantheon.jpg | Livioandronico2013 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Dome_of_Pantheon_(Rome).jpg |
+| Vatican Museums and Sistine Chapel | vatican-museums-sistine-chapel.jpg | Wilfredor | CC0 1.0 | https://commons.wikimedia.org/wiki/File:Cortile_della_Pigna,_Vatican_Museums.jpg |
+| St Peter Basilica | st-peters-basilica.jpg | NateBergin | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:01_St_Peter%27s_Basilica_Facade.jpg |
+| Pantheon | pantheon.jpg | Meshari Alawfi | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:PantheonRome.jpg |
 | Borghese Gallery | borghese-gallery.jpg | Livioandronico2013 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Ceiling_%22Dance_of_the_Bacchae%22_in_Galleria_Borghese_(Rome).jpg |
 | Castel Sant Angelo | castel-sant-angelo.jpg | BjoernEisbaer | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Castel_Sant_Angelo_(Rome).jpg |
 | Capitoline Museums | capitoline-museums.jpg | Nhartmannphotos | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Campidoglio_buildings,_Rome.jpg |
