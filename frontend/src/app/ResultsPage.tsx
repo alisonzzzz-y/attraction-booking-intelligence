@@ -877,8 +877,10 @@ export function ResultsPage() {
   )
   const hasMoreAttractions =
     visibleAttractionIds.length < orderedAttractionIds.length
+  const hasBookingOrder = orderedAttractionIds.length > 0
   const isLoading =
-    priorityQuery.isPending || ticketQuery.isPending || placeQuery.isPending
+    !hasBookingOrder &&
+    (priorityQuery.isPending || ticketQuery.isPending || placeQuery.isPending)
 
   return (
     <section className="page-section results-section" aria-live="polite">

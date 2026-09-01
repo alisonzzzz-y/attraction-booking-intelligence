@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { apiUrl } from './apiUrl'
+import { ApiRequestTimeoutError, fetchWithTimeout } from './fetchWithTimeout'
 
 const priceSchema = z.object({
   amount: z.number().nonnegative(),
@@ -73,9 +74,23 @@ export async function fetchRomeAttractions(
   stayEndDate: string,
 ): Promise<RomeAttractionsResponse> {
   const query = new URLSearchParams({ stayStartDate, stayEndDate })
-  const response = await fetch(apiUrl(`/api/v1/rome/attractions?${query}`), {
-    headers: { Accept: 'application/json' },
-  })
+  let response: Response
+  try {
+    response = await fetchWithTimeout(
+      apiUrl(`/api/v1/rome/attractions?${query}`),
+      {
+        headers: { Accept: 'application/json' },
+      },
+    )
+  } catch (error) {
+    if (error instanceof ApiRequestTimeoutError) {
+      throw new RomeAttractionsApiError(
+        'The attraction evidence service took too long to respond.',
+      )
+    }
+
+    throw error
+  }
 
   if (response.status === 503) {
     throw new RomeAttractionsApiError(

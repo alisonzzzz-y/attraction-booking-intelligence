@@ -688,15 +688,44 @@ describe('ResultsPage', () => {
     ).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/rome/places', {
       headers: { Accept: 'application/json' },
+      signal: expect.any(AbortSignal),
     })
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v1/rome/booking-priorities?stayStartDate=2026-09-10&stayEndDate=2026-09-12',
-      { headers: { Accept: 'application/json' } },
+      {
+        headers: { Accept: 'application/json' },
+        signal: expect.any(AbortSignal),
+      },
     )
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v1/rome/attractions?stayStartDate=2026-09-10&stayEndDate=2026-09-12',
-      { headers: { Accept: 'application/json' } },
+      {
+        headers: { Accept: 'application/json' },
+        signal: expect.any(AbortSignal),
+      },
     )
+  })
+
+  it('renders the booking order while a non-critical location request is pending', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input).endsWith('/places')) {
+          return new Promise<Response>(() => undefined)
+        }
+
+        return Promise.resolve(successfulResponseFor(input))
+      }),
+    )
+
+    renderResults()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Pantheon' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('Building your booking order...'),
+    ).not.toBeInTheDocument()
   })
 
   it('turns low-urgency official rules into practical same-day guidance', async () => {

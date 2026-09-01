@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { apiUrl } from './apiUrl'
+import { ApiRequestTimeoutError, fetchWithTimeout } from './fetchWithTimeout'
 
 const locationSchema = z.object({
   latitude: z.number().min(-90).max(90),
@@ -41,9 +42,20 @@ export class RomePlacesApiError extends Error {
 }
 
 export async function fetchRomePlaces(): Promise<RomePlacesResponse> {
-  const response = await fetch(apiUrl('/api/v1/rome/places'), {
-    headers: { Accept: 'application/json' },
-  })
+  let response: Response
+  try {
+    response = await fetchWithTimeout(apiUrl('/api/v1/rome/places'), {
+      headers: { Accept: 'application/json' },
+    })
+  } catch (error) {
+    if (error instanceof ApiRequestTimeoutError) {
+      throw new RomePlacesApiError(
+        'The location evidence service took too long to respond.',
+      )
+    }
+
+    throw error
+  }
 
   if (response.status === 503) {
     throw new RomePlacesApiError(

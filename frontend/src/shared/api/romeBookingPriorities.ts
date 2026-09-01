@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { apiUrl } from './apiUrl'
+import { ApiRequestTimeoutError, fetchWithTimeout } from './fetchWithTimeout'
 
 const officialEvidenceSchema = z.object({
   sourceType: z.literal('OFFICIAL_OPERATOR'),
@@ -59,12 +60,23 @@ export async function fetchRomeBookingPriorities(
   stayEndDate: string,
 ): Promise<RomeBookingPrioritiesResponse> {
   const query = new URLSearchParams({ stayStartDate, stayEndDate })
-  const response = await fetch(
-    apiUrl(`/api/v1/rome/booking-priorities?${query}`),
-    {
-      headers: { Accept: 'application/json' },
-    },
-  )
+  let response: Response
+  try {
+    response = await fetchWithTimeout(
+      apiUrl(`/api/v1/rome/booking-priorities?${query}`),
+      {
+        headers: { Accept: 'application/json' },
+      },
+    )
+  } catch (error) {
+    if (error instanceof ApiRequestTimeoutError) {
+      throw new RomeBookingPrioritiesApiError(
+        'The booking priority service took too long to respond.',
+      )
+    }
+
+    throw error
+  }
 
   if (!response.ok) {
     throw new RomeBookingPrioritiesApiError(
