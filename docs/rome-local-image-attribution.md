@@ -14,5 +14,5 @@ The Rome MVP stores a small preview image for each supported attraction inside t
 | Castel Sant Angelo | castel-sant-angelo.jpg | BjoernEisbaer | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Castel_Sant_Angelo_(Rome).jpg |
 | Capitoline Museums | capitoline-museums.jpg | Nhartmannphotos | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Campidoglio_buildings,_Rome.jpg |
 | Baths of Caracalla | baths-of-caracalla.jpg | Vyacheslav Argenberg | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Rome,_Italy,_The_Baths_of_Caracalla_facade.jpg |
-| Domus Aurea | domus-aurea.jpg | Mariordo | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Oculus_Domus_Aurea_04_2024_7962.jpg |
+| Domus Aurea | domus-aurea.jpg | Rabax63 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:EingangDomusAurea.jpg |
 | Trevi Fountain | trevi-fountain.jpg | Wilfredor | CC0 1.0 | https://commons.wikimedia.org/wiki/File:Fontaine_Trevi_-_Rome.jpg |

@@ -104,12 +104,12 @@ const localPhotos: Record<string, LocalAttractionPhoto[]> = {
   ],
   'domus-aurea': [
     {
-      alt: 'Oculus inside the Domus Aurea in Rome',
-      author: 'Mariordo',
+      alt: 'The entrance facade of the Domus Aurea in Rome',
+      author: 'Rabax63',
       license: 'CC BY-SA 4.0',
       licenseUrl: creativeCommonsBySaFour,
       sourceUrl:
-        'https://commons.wikimedia.org/wiki/File:Oculus_Domus_Aurea_04_2024_7962.jpg',
+        'https://commons.wikimedia.org/wiki/File:EingangDomusAurea.jpg',
       src: '/images/rome/domus-aurea.jpg',
     },
   ],
