@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { apiUrl } from './apiUrl'
 import { ApiRequestTimeoutError, fetchWithTimeout } from './fetchWithTimeout'
 
+const BOOKING_PRIORITY_TIMEOUT_MS = 120_000
+
 const officialEvidenceSchema = z.object({
   sourceType: z.literal('OFFICIAL_OPERATOR'),
   policy: z.enum([
@@ -67,6 +69,7 @@ export async function fetchRomeBookingPriorities(
       {
         headers: { Accept: 'application/json' },
       },
+      BOOKING_PRIORITY_TIMEOUT_MS,
     )
   } catch (error) {
     if (error instanceof ApiRequestTimeoutError) {
@@ -75,7 +78,9 @@ export async function fetchRomeBookingPriorities(
       )
     }
 
-    throw error
+    throw new RomeBookingPrioritiesApiError(
+      'The booking priority service could not be reached. Please try again.',
+    )
   }
 
   if (!response.ok) {

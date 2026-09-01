@@ -904,7 +904,7 @@ describe('ResultsPage', () => {
     ).toBeInTheDocument()
   })
 
-  it('keeps ticket evidence when the location provider fails', async () => {
+  it('keeps ticket evidence and verified map references when the location provider fails', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
       'fetch',
@@ -935,9 +935,7 @@ describe('ResultsPage', () => {
     ).toBeInTheDocument()
     await user.click(within(dialog).getByText('Supporting evidence'))
     expect(
-      within(dialog).getByText(
-        /Verified location evidence is temporarily unavailable/,
-      ),
+      within(dialog).getByText('Piazza della Rotonda, 00186 Roma RM, Italy'),
     ).toBeInTheDocument()
   })
 
@@ -972,6 +970,28 @@ describe('ResultsPage', () => {
       ),
     ).toBeInTheDocument()
     expect(screen.queryByText('Book first')).not.toBeInTheDocument()
+  })
+
+  it('keeps the verified Rome catalogue and map area when every API fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(jsonResponse({}, 503))),
+    )
+
+    renderResults()
+
+    expect(
+      await screen.findByText('Booking priority is temporarily unavailable.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getAllByRole('button', { name: /View details for/ }),
+    ).toHaveLength(10)
+    expect(
+      screen.getByLabelText('Map showing verified Rome attraction locations'),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('No attraction evidence was returned.'),
+    ).not.toBeInTheDocument()
   })
 
   it('does not request evidence without a complete Rome query', () => {

@@ -280,7 +280,8 @@ function AttractionEvidenceCard({
   stayStartDate: string
 }) {
   const name = attractionName(attraction, places, priority)
-  const attractionId = attraction?.id ?? priority?.attractionId
+  const attractionId =
+    attraction?.id ?? priority?.attractionId ?? places[0]?.attractionId
   const previewPhoto = localPhotosForAttraction(attractionId)[0]
   const price = attraction ? formatPrice(attraction) : null
   const thirdPartyOptionStatus = price ?? 'Coming soon'
@@ -487,7 +488,8 @@ function AttractionEvidenceDetails({
   stayStartDate: string
 }) {
   const name = attractionName(attraction, places, priority)
-  const attractionId = attraction?.id ?? priority?.attractionId
+  const attractionId =
+    attraction?.id ?? priority?.attractionId ?? places[0]?.attractionId
   const availability = attraction
     ? availabilityCopy(attraction.availabilityStatus)
     : null
@@ -864,11 +866,21 @@ export function ResultsPage() {
   const priorities = priorityQuery.data?.priorities ?? []
   const attractions = ticketQuery.data?.attractions ?? []
   const places = placeQuery.data?.attractions ?? []
-  const orderedAttractionIds = [
+  const providerAttractionIds = [
     ...priorities.map((priority) => priority.attractionId),
     ...attractions.map((attraction) => attraction.id),
     ...places.map((place) => place.attractionId),
   ].filter((id, index, ids) => ids.indexOf(id) === index)
+  const allQueriesSettled =
+    !priorityQuery.isPending && !ticketQuery.isPending && !placeQuery.isPending
+  const orderedAttractionIds =
+    providerAttractionIds.length > 0
+      ? providerAttractionIds
+      : allQueriesSettled
+        ? mapPlaces
+            .map((place) => place.attractionId)
+            .filter((id, index, ids) => ids.indexOf(id) === index)
+        : []
   const visibleAttractionIds = orderedAttractionIds.slice(
     0,
     pagination.resultSetKey === resultSetKey
@@ -971,7 +983,7 @@ export function ResultsPage() {
                 onOpen={() => setDetailAttractionId(attractionId)}
                 onSelect={() => setSelectedAttractionId(attractionId)}
                 onToggleFavourite={() => toggleFavourite(attractionId)}
-                places={places.filter(
+                places={mapPlaces.filter(
                   (place) => place.attractionId === attractionId,
                 )}
                 priority={priorities.find(
@@ -1019,7 +1031,7 @@ export function ResultsPage() {
           )}
           key={detailAttractionId}
           onClose={() => setDetailAttractionId(undefined)}
-          places={places.filter(
+          places={mapPlaces.filter(
             (place) => place.attractionId === detailAttractionId,
           )}
           priority={priorities.find(

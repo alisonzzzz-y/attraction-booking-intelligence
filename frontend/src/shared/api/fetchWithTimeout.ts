@@ -26,6 +26,12 @@ export async function fetchWithTimeout(
       fetch(input, { ...init, signal: controller.signal }),
       timeout,
     ])
+  } catch (error) {
+    if (controller.signal.aborted && !(error instanceof ApiRequestTimeoutError)) {
+      throw new ApiRequestTimeoutError()
+    }
+
+    throw error
   } finally {
     if (timeoutId) {
       clearTimeout(timeoutId)
