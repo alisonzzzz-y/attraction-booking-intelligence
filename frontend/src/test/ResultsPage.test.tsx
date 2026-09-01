@@ -564,7 +564,7 @@ describe('ResultsPage', () => {
       within(pantheonDialog).getByText('Recommended booking action'),
     ).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByText('Check today, 22 Aug 2026'),
+      within(pantheonDialog).getByText('Check today'),
     ).toBeInTheDocument()
     expect(
       within(pantheonDialog).queryByText('What to do'),

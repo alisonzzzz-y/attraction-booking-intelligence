@@ -122,13 +122,12 @@ function officialPolicyCopy(
 }
 
 function bookingGuidance(priority: RomeBookingPriority, stayStartDate: string) {
-  const calculatedDate = formatPlanningDate(priority.calculatedAt)
   const tripStartDate = formatPlanningDate(`${stayStartDate}T00:00:00Z`)
 
   switch (priority.priority) {
     case 'BOOK_FIRST':
       return {
-        summary: `Book today, ${calculatedDate}`,
+        summary: 'Book today',
         note: 'ABI planning recommendation. The official source requires a timed reservation but does not publish a verified sell-out deadline.',
       }
     case 'BOOK_SOON':
@@ -161,7 +160,7 @@ function bookingGuidance(priority: RomeBookingPriority, stayStartDate: string) {
       }
     default:
       return {
-        summary: `Check today, ${calculatedDate}`,
+        summary: 'Check today',
         note: 'No verified booking deadline is available. Check the official website before making the rest of your plan.',
       }
   }
