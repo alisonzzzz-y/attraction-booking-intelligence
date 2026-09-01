@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class RomeAttractionQueryService {
 
-    private static final int MAX_STAY_DAYS = 14;
+    private static final int MAX_STAY_DAYS = 31;
     private static final String VIATOR_PRODUCT_REFERENCE = "viator-product";
 
     private final List<ProviderAdapter> providerAdapters;
@@ -101,7 +101,7 @@ public class RomeAttractionQueryService {
         }
         long inclusiveDays = ChronoUnit.DAYS.between(stayStartDate, stayEndDate) + 1;
         if (inclusiveDays > MAX_STAY_DAYS) {
-            throw new IllegalArgumentException("A Rome stay can cover at most 14 days");
+            throw new IllegalArgumentException("A Rome stay can cover at most 31 days");
         }
     }
 }

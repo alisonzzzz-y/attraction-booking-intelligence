@@ -47,9 +47,9 @@ Open the Render Web Service, choose **Environment**, then add the following vari
 | `GOOGLE_PLACES_API_KEY` | Your server-side Places API key |
 | `VIATOR_API_ENABLED` | `false` for the current public MVP |
 
-Do not set `VITE_GOOGLE_MAPS_API_KEY`, `GOOGLE_PLACES_API_KEY`, or `VIATOR_API_KEY` in Vercel. The first is a browser key and belongs only in the frontend configuration. The latter two are server secrets and belong only in Render.
+Do not set `GOOGLE_PLACES_API_KEY` or `VIATOR_API_KEY` in Vercel. They are server secrets and belong only in Render. `VITE_GOOGLE_MAPS_API_KEY` is different: it is a restricted browser key, so it must be configured in Vercel for the deployed frontend. It is intentionally visible to the browser, but it must be restricted to the approved site domains in Google Cloud.
 
-中文说明：在 Render Web Service 的 **Environment** 页面配置变量。`APP_MYSQL_JDBC_URL` 必须以 `jdbc:mysql://` 开头，并使用 Railway MySQL 的 Public Networking 主机、端口和数据库名。Viator 目前仍是 Sandbox，因此公开后端先保持关闭。Google Places server key 只能放 Render，绝不能填写到 Vercel。
+中文说明：在 Render Web Service 的 **Environment** 页面配置变量。`APP_MYSQL_JDBC_URL` 必须以 `jdbc:mysql://` 开头，并使用 Railway MySQL 的 Public Networking 主机、端口和数据库名。Viator 目前仍是 Sandbox，因此公开后端先保持关闭。Google Places server key 只能放 Render，绝不能填写到 Vercel。浏览器地图 key 则需要单独放到 Vercel，并限制为你的站点域名。
 
 ## 4. First backend deployment check
 
@@ -75,9 +75,9 @@ In the Vercel project for this repository, add this Production environment varia
 | --- | --- |
 | `VITE_API_BASE_URL` | `https://<your-render-service>.onrender.com` |
 
-Keep the existing `VITE_GOOGLE_MAPS_API_KEY` configured with HTTP referrer restrictions for the Vercel domain. Redeploy Vercel after saving `VITE_API_BASE_URL`.
+Also add `VITE_GOOGLE_MAPS_API_KEY` in Vercel. Use the same restricted browser Maps key that works in `frontend/.env.local`, then redeploy Vercel after saving both variables. In Google Cloud, the key must allow `https://attraction-booking-intelligence.vercel.app/*`. If you test a preview URL, add that exact preview host too.
 
-中文说明：在 Vercel 配置公开的 `VITE_API_BASE_URL`，值为 Render 后端 URL。浏览器地图 key 继续保留在 Vercel，并限制到 Vercel 域名。保存后重新部署前端。
+中文说明：在 Vercel 配置公开的 `VITE_API_BASE_URL`，值为 Render 后端 URL。同时配置 `VITE_GOOGLE_MAPS_API_KEY`，它应使用本机前端已经能显示地图的同一个 browser key。不要把 Render 的 Google Places server key 填到这里。然后在 Google Cloud 为 browser key 加上生产域名 `https://attraction-booking-intelligence.vercel.app/*`，最后重新部署前端。
 
 ## 6. Final end-to-end check
 

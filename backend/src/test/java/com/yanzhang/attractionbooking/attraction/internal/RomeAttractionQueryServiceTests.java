@@ -98,8 +98,8 @@ class RomeAttractionQueryServiceTests {
                 .isThrownBy(() -> service.search(LocalDate.of(2026, 8, 18), LocalDate.of(2026, 8, 20)))
                 .withMessage("Stay start date must not be in the past");
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> service.search(LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 15)))
-                .withMessage("A Rome stay can cover at most 14 days");
+                .isThrownBy(() -> service.search(LocalDate.of(2026, 9, 1), LocalDate.of(2026, 10, 2)))
+                .withMessage("A Rome stay can cover at most 31 days");
     }
 
     @Test

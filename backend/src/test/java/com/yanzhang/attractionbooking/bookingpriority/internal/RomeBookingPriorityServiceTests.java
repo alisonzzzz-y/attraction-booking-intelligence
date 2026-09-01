@@ -71,10 +71,18 @@ class RomeBookingPriorityServiceTests {
     }
 
     @Test
-    void rejectsRomeMvpStaysLongerThanFourteenDays() {
+    void allowsRomeMvpStaysOfThirtyOneDays() {
+        List<BookingPriorityAssessment> assessments = service.assess(
+                LocalDate.of(2026, 9, 1), LocalDate.of(2026, 10, 1));
+
+        assertEquals(10, assessments.size());
+    }
+
+    @Test
+    void rejectsRomeMvpStaysLongerThanThirtyOneDays() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> service.assess(
-                        LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 16)));
+                        LocalDate.of(2026, 9, 1), LocalDate.of(2026, 10, 2)));
     }
 }

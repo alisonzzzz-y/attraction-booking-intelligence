@@ -15,7 +15,7 @@ afterEach(() => {
 })
 
 describe('PlanPage', () => {
-  it('keeps valid dates in a shareable results URL', async () => {
+  it('keeps an exact thirty-one-day stay in a shareable results URL', async () => {
     const user = userEvent.setup()
     render(
       <MemoryRouter initialEntries={['/plan']}>
@@ -26,14 +26,14 @@ describe('PlanPage', () => {
       </MemoryRouter>,
     )
 
-    await user.type(screen.getByLabelText('Arrival date'), '2026-09-10')
-    await user.type(screen.getByLabelText('Departure date'), '2026-09-12')
+    await user.type(screen.getByLabelText('Arrival date'), '2026-09-01')
+    await user.type(screen.getByLabelText('Departure date'), '2026-10-01')
     await user.click(
       screen.getByRole('button', { name: 'Find Rome attractions' }),
     )
 
     expect(screen.getByText(/Results location:/)).toHaveTextContent(
-      '/results?city=rome&stayStartDate=2026-09-10&stayEndDate=2026-09-12',
+      '/results?city=rome&stayStartDate=2026-09-01&stayEndDate=2026-10-01',
     )
   })
 
@@ -96,7 +96,7 @@ describe('PlanPage', () => {
     )
   })
 
-  it('rejects a stay longer than fourteen days', async () => {
+  it('rejects a stay longer than thirty-one days', async () => {
     const user = userEvent.setup()
     render(
       <MemoryRouter>
@@ -105,13 +105,13 @@ describe('PlanPage', () => {
     )
 
     await user.type(screen.getByLabelText('Arrival date'), '2026-09-01')
-    await user.type(screen.getByLabelText('Departure date'), '2026-09-15')
+    await user.type(screen.getByLabelText('Departure date'), '2026-10-02')
     await user.click(
       screen.getByRole('button', { name: 'Find Rome attractions' }),
     )
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'Choose a Rome stay of 14 days or fewer.',
+      'Choose a Rome stay of 31 days or fewer.',
     )
   })
 })

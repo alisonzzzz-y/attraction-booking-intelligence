@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 class RomeBookingPriorityService {
 
-    private static final long MAXIMUM_STAY_DAYS = 14;
+    private static final long MAXIMUM_STAY_DAYS = 31;
 
     private final RomeOfficialBookingEvidenceCatalog catalog;
     private final BookingPriorityCalculator calculator;
@@ -34,12 +34,12 @@ class RomeBookingPriorityService {
         if (stayStartDate == null || stayEndDate == null) {
             throw new IllegalArgumentException("Both stay dates are required");
         }
-        long stayDays = ChronoUnit.DAYS.between(stayStartDate, stayEndDate);
-        if (stayDays < 0) {
+        long inclusiveStayDays = ChronoUnit.DAYS.between(stayStartDate, stayEndDate) + 1;
+        if (inclusiveStayDays <= 0) {
             throw new IllegalArgumentException("Stay end date must not be before start date");
         }
-        if (stayDays > MAXIMUM_STAY_DAYS) {
-            throw new IllegalArgumentException("Rome MVP stays cannot exceed 14 days");
+        if (inclusiveStayDays > MAXIMUM_STAY_DAYS) {
+            throw new IllegalArgumentException("Rome MVP stays cannot exceed 31 days");
         }
     }
 }

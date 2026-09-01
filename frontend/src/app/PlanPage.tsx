@@ -6,7 +6,7 @@ import {
   type TripDateMode,
 } from '../features/trips/localTripStorage'
 
-const MAX_STAY_DAYS = 14
+const MAX_STAY_DAYS = 31
 const FLEXIBLE_MONTH_COUNT = 8
 const FLEXIBLE_TRIP_LENGTHS = [3, 5, 7, 10] as const
 const FLEXIBLE_LENGTH_OPTIONS = [0, 1, 2] as const
@@ -134,7 +134,7 @@ export function PlanPage({
           86_400_000,
       ) + 1
     if (inclusiveDays > MAX_STAY_DAYS) {
-      setError('Choose a Rome stay of 14 days or fewer.')
+      setError('Choose a Rome stay of 31 days or fewer.')
       return
     }
 
