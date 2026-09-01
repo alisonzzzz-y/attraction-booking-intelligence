@@ -284,6 +284,7 @@ function AttractionEvidenceCard({
   const attractionId = attraction?.id ?? priority?.attractionId
   const previewPhoto = localPhotosForAttraction(attractionId)[0]
   const price = attraction ? formatPrice(attraction) : null
+  const thirdPartyOptionStatus = price ?? 'Coming soon'
   const priorityLabel = priority
     ? priorityCopy(priority.priority)
     : 'Priority unavailable'
@@ -349,8 +350,8 @@ function AttractionEvidenceCard({
             </strong>
           </span>
           <span>
-            <small>Third-party option</small>
-            <strong>{price ?? 'Unavailable'}</strong>
+            <small>Third-party options</small>
+            <strong>{thirdPartyOptionStatus}</strong>
           </span>
         </div>
 
@@ -552,7 +553,7 @@ function AttractionEvidenceDetails({
                 <div className="result-third-party-option-heading">
                   <div>
                     <small>{attraction.source.provider}</small>
-                    <strong>{price ?? 'Price unavailable'}</strong>
+                    <strong>{price ?? 'Price coming soon'}</strong>
                   </div>
                   <span>{attraction.source.environment}</span>
                 </div>
@@ -585,8 +586,8 @@ function AttractionEvidenceDetails({
               </article>
             ) : (
               <p className="result-third-party-empty">
-                No third-party booking option is connected for this attraction.
-                This does not mean it is sold out.
+                Third-party options are coming soon. We are still connecting
+                verified ticket providers for this attraction.
               </p>
             )}
           </section>

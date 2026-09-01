@@ -870,7 +870,7 @@ describe('ResultsPage', () => {
     ).toHaveLength(1)
     expect(
       within(dialog).getByText(
-        'No third-party booking option is connected for this attraction. This does not mean it is sold out.',
+        'Third-party options are coming soon. We are still connecting verified ticket providers for this attraction.',
       ),
     ).toBeInTheDocument()
   })
