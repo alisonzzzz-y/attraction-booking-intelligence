@@ -8,10 +8,6 @@ spring:
     url: ${APP_MYSQL_JDBC_URL:jdbc:mysql://127.0.0.1:3307/attraction_booking}
     username: ${APP_MYSQL_USER:attraction}
     password: ${APP_MYSQL_PASSWORD:attraction_dev}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: validate
   flyway:
     enabled: true
 

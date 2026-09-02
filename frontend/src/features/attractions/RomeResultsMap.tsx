@@ -9,6 +9,7 @@ declare global {
 }
 
 type MapState = 'loading' | 'ready' | 'missing-key' | 'failed' | 'empty'
+type MapFailure = 'authentication' | 'loading' | null
 
 type RomeResultsMapProps = {
   places: RomePlace[]
@@ -45,6 +46,7 @@ export function RomeResultsMap({
   const mapInstanceRef = useRef<ResultsMapInstance | null>(null)
   const mapMarkersRef = useRef<ResultsMapMarker[]>([])
   const [mapState, setMapState] = useState<MapState>('loading')
+  const [mapFailure, setMapFailure] = useState<MapFailure>(null)
   const visibleMapState: MapState =
     places.length === 0 ? 'empty' : apiKey ? mapState : 'missing-key'
   const selectedPlaces = places.filter(
@@ -58,7 +60,10 @@ export function RomeResultsMap({
     const markers: ResultsMapMarker[] = []
     const previousAuthenticationFailure = window.gm_authFailure
     const handleAuthenticationFailure = () => {
-      if (isActive) setMapState('failed')
+      if (isActive) {
+        setMapFailure('authentication')
+        setMapState('failed')
+      }
     }
 
     window.gm_authFailure = handleAuthenticationFailure
@@ -109,7 +114,10 @@ export function RomeResultsMap({
         setMapState('ready')
       })
       .catch(() => {
-        if (isActive) setMapState('failed')
+        if (isActive) {
+          setMapFailure('loading')
+          setMapState('failed')
+        }
       })
 
     return () => {
@@ -190,7 +198,11 @@ export function RomeResultsMap({
             {visibleMapState === 'failed' ? (
               <div>
                 <strong>The map could not be loaded.</strong>
-                <p>The verified location facts remain available in the list.</p>
+                <p>
+                  {mapFailure === 'authentication'
+                    ? `Google Maps rejected ${window.location.origin}.`
+                    : 'The verified location facts remain available in the list.'}
+                </p>
               </div>
             ) : null}
             {visibleMapState === 'empty' ? (

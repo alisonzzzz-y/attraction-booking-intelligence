@@ -18,4 +18,4 @@ COPY --from=build /workspace/target/*.jar app.jar
 USER app
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-XX:TieredStopAtLevel=1", "-jar", "/app/app.jar"]

@@ -7,7 +7,7 @@ This guide deploys the Spring Boot API to Render, MySQL to Railway, and the Reac
 ## 1. What this deployment contains
 
 - A Render Docker Web Service built from `backend/Dockerfile`.
-- A Railway MySQL database for Spring Boot, JPA, and Flyway startup checks.
+- A Railway MySQL database for Spring Boot JDBC and Flyway startup checks.
 - The existing Vercel frontend, configured with the public backend URL only.
 
 中文说明：部署由一个 Render Docker Web Service、一个 Railway MySQL 数据库和 Vercel 前端组成。Vercel 只接收公开的后端 URL，不接收服务端 key。

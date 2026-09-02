@@ -9,7 +9,7 @@ Public preview: <https://attraction-booking-intelligence.vercel.app/>
 The repository currently contains the project foundation and a deployed public preview:
 
 - A Spring Boot modular monolith with Spring Modulith boundary checks
-- Basic MySQL, Flyway, Actuator, Spring Security, and OpenAPI configuration
+- Basic MySQL, Flyway, Actuator, CORS, and OpenAPI configuration
 - MySQL, Flyway, and health integration tests with Testcontainers
 - A responsive Vite and React app with home, methodology, and Rome date-planning routes
 - Exact or flexible Rome travel windows, browser-local attraction favourites, and a browser-local saved trip

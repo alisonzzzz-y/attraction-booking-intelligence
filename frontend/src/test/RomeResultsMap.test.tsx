@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RomeResultsMap } from '../features/attractions/RomeResultsMap'
 
@@ -60,6 +60,8 @@ const pantheon = {
 
 describe('RomeResultsMap', () => {
   beforeEach(() => {
+    cleanup()
+    window.gm_authFailure = undefined
     mapConstructor.mockClear()
     panTo.mockClear()
     createdMarkers.length = 0
@@ -184,5 +186,18 @@ describe('RomeResultsMap', () => {
 
     await waitFor(() => expect(createdPins[1]?.scale).toBe(1.3))
     expect(createdPins[0]?.scale).toBe(0.8)
+  })
+
+  it('identifies a browser-key rejection without exposing the key', async () => {
+    render(<RomeResultsMap apiKey="browser-key" places={[pantheon]} />)
+
+    await waitFor(() => expect(mapConstructor).toHaveBeenCalledOnce())
+    window.gm_authFailure?.()
+
+    await waitFor(() =>
+      expect(screen.getByText('The map could not be loaded.')).toBeInTheDocument(),
+    )
+    expect(screen.getByText(`Google Maps rejected ${window.location.origin}.`)).toBeInTheDocument()
+    expect(screen.queryByText('browser-key')).not.toBeInTheDocument()
   })
 })
