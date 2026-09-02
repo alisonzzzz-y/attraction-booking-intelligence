@@ -176,7 +176,9 @@ CI runs the backend verification, frontend lint check, unit test, and production
 
 This repository makes no production provider API calls. The internal Viator adapter can make an authorised Sandbox request when it is explicitly enabled, while automated tests use a local stub. Fixture, sandbox, or test-container data must never be described as real-time information. Future production prices, availability, booking rules, and purchase links must come from clear and authorised sources. AI may explain structured facts, but it must not invent them.
 
-中文说明：仓库不会调用 production Provider API。内部 Viator adapter 只有在明确启用后才会发起已授权的 Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。
+The Viator Sandbox client has a three-second connection timeout, an eight-second response timeout, and at most one immediate retry after a timeout or upstream 5xx failure. It does not retry authentication or rate-limit failures. A failed product remains a provider error, while other verified product results are preserved.
+
+中文说明：仓库不会调用 production Provider API。内部 Viator adapter 只有在明确启用后才会发起已授权的 Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。Viator Sandbox client 设置了 3 秒连接超时、8 秒响应超时，并且只会对 timeout 或上游 5xx 失败立即重试一次。认证失败和限流不会重试。单个产品失败会被保留为 Provider error，不会清空其他已经成功核对的产品结果。
 
 ## Not implemented
 
@@ -184,7 +186,7 @@ This repository makes no production provider API calls. The internal Viator adap
 - Deployed provider secrets or production provider configuration
 - Full registration, JWT, and access control
 - Complete domain models and business database tables
-- Provider timeouts, retries, circuit breakers, and business caching
+- Provider circuit breakers and business caching
 - Evidence-based exact lead-time estimates, alerts, notifications, and deduplication
 - Dedicated attraction detail routes and account-synchronised saved trips
 - Payments, ticket fulfilment, email, LLM calls, microservices, Kafka, Kubernetes, or backend cloud deployment
@@ -213,6 +215,6 @@ The historical observation design and its implementation gates are recorded in [
 
 中文说明：历史观察设计和实施闸门记录在 ADR 0004。由于当前账号只有 Viator Sandbox Basic Access，项目没有实现采集器或历史余票表。
 
-Recommended next task: add tested timeout, limited retry, and provider-independent failure handling before introducing any permitted short-term cache.
+Recommended next task: add provider-independent orchestration, rate-limit handling, and a circuit-breaker decision before introducing any permitted short-term cache.
 
-中文说明：下一步建议先为 Provider 调用加入经过测试的 timeout、有限 retry 和来源独立失败处理，再根据条款决定是否加入短期缓存。
+中文说明：下一步建议先补充 Provider 无关的编排、限流处理和 circuit breaker 决策，再根据条款决定是否加入短期缓存。

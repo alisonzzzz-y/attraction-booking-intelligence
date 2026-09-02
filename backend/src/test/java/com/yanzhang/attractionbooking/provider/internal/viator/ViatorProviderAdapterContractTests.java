@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,8 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
     private String productResponse;
     private int scheduleStatus;
     private String scheduleResponse;
+    private int productFailuresBeforeSuccess;
+    private final AtomicInteger productRequestCount = new AtomicInteger();
 
     @BeforeEach
     void startServer() throws IOException {
@@ -55,6 +58,8 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
         productResponse = activeProductJson();
         scheduleStatus = 200;
         scheduleResponse = scheduleJson();
+        productFailuresBeforeSuccess = 0;
+        productRequestCount.set(0);
 
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/partner/products/" + PRODUCT_CODE, this::handleProduct);
@@ -135,6 +140,34 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
     }
 
     @Test
+    void retriesOneTransientUpstreamFailureThenReturnsTheVerifiedProduct() {
+        productFailuresBeforeSuccess = 1;
+
+        ProviderSearchResult result = adapter.search(supportedQuery());
+
+        assertTrue(result.errors().isEmpty());
+        assertEquals(1, result.attractions().size());
+        assertEquals(2, productRequestCount.get());
+    }
+
+    @Test
+    void keepsAHealthyAttractionWhenAnotherProviderProductFails() {
+        AttractionRequest missingProduct = new AttractionRequest(
+                "unsupported-provider-product",
+                "Unsupported provider product",
+                Set.of(new ExternalReference(ViatorProviderAdapter.PRODUCT_REFERENCE_SYSTEM, "missing-product")));
+
+        ProviderSearchResult result = adapter.search(new AvailabilityQuery(
+                "Rome", LocalDate.parse("2026-08-20"), LocalDate.parse("2026-08-22"),
+                List.of(pantheonRequest(), missingProduct)));
+
+        assertEquals(1, result.attractions().size());
+        assertTrue(result.isPartialFailure());
+        assertEquals(ProviderError.Type.UNSUPPORTED_REQUEST, result.errors().getFirst().type());
+        assertEquals(Set.of("unsupported-provider-product"), result.errors().getFirst().affectedAttractionIds());
+    }
+
+    @Test
     void mapsAnInactiveProductToExplicitUnavailability() {
         productResponse = """
                 {
@@ -159,6 +192,12 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
 
     private void handleProduct(HttpExchange exchange) throws IOException {
         captureHeaders(exchange);
+        productRequestCount.incrementAndGet();
+        if (productFailuresBeforeSuccess > 0) {
+            productFailuresBeforeSuccess--;
+            respond(exchange, 503, "{\"error\":\"temporary outage\"}");
+            return;
+        }
         respond(exchange, productStatus, productResponse);
     }
 
