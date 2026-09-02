@@ -332,6 +332,17 @@
 
 验收：单个 Provider 故障时仍返回可用结果或明确 unknown，绝不显示为“无票”。
 
+#### Part 11A 已完成：Sandbox 外部调用的基础韧性
+
+- Viator Sandbox client 使用 3 秒连接超时、8 秒响应超时，并把总重试次数限制为 1 次。
+- 只有 timeout、503 等上游失败可以立即重试；403 认证失败和 429 限流不重试。
+- 每个已核对产品独立请求。一个产品失败会返回带受影响景点 ID 的稳定错误，其余产品结果会保留。
+- 本地 HTTP stub contract tests 覆盖 503、504、429、403、持续 503 以及部分失败。测试不调用 Viator 网络。
+
+Part 11B remains deliberately open: a Provider-independent orchestrator, circuit-breaker policy, and any short-term cache must be designed together and checked against provider terms before implementation. No Redis cache or circuit breaker has been added.
+
+中文说明：Part 11A 已完成 Sandbox 外部调用的基础韧性：3 秒连接超时、8 秒响应超时、最多一次重试；只对 timeout 和上游 503 等失败重试；403 与 429 不重试；一个产品失败不会清空其他产品结果。Part 11B 仍需在确认 Provider 条款后，统一设计 Provider 无关编排、circuit breaker 策略和短期缓存。目前没有加入 Redis 缓存或 circuit breaker。
+
 ### Part 12：部署后端与真实纵向切片
 
 目标：将已经验证的全栈切片部署到公开环境。
@@ -365,6 +376,6 @@
 
 ## 4. 当前只执行的下一部分
 
-下一次只执行 **Part 11：Provider 韧性与缓存边界**。先为外部调用补充明确的 timeout、有限 retry 和来源独立失败测试，再按已确认的 Provider 条款决定是否加入短期缓存。不得用缓存掩盖数据来源、环境或 freshness。
+当前优先执行 **Part 11B：Provider 无关编排与缓存边界设计**。Part 11A 的 timeout、有限 retry 和单 Provider 内部的部分失败测试已经完成。下一步需要先定义多 Provider 聚合时的超时预算、错误隔离和 circuit-breaker 决策，再按已确认的 Provider 条款决定是否加入短期缓存。不得用缓存掩盖数据来源、环境或 freshness。
 
-Part 1–9 和 Part 10A 至 10J 已完成。Part 10J 只完成历史观察模型和实施闸门设计，没有创建采集器、历史业务表或精确提前购买天数。原因是当前 Viator 权限仍为 Sandbox Basic Access，不能提供合规且可验证的 production 历史余票。详细决定见 [`decisions/0004-historical-availability-observations.md`](decisions/0004-historical-availability-observations.md)。Part 10A 至 10I 已实现本地 Rome 日期查询、10 个景点的 Booking Priority、9 条 Google Places 组件记录和 6 条 Viator Sandbox 产品映射。官方预约建议、地点事实和第三方 Sandbox 票务证据分别存储和展示。这些前端改动随本次提交推送到 `main` 后，将由 Vercel 自动触发 production 部署；后端仍未部署。详细部署配置与验证记录见 [`deployment.md`](deployment.md)。
+Part 1–9 和 Part 10A 至 10J 已完成。Part 10J 只完成历史观察模型和实施闸门设计，没有创建采集器、历史业务表或精确提前购买天数。原因是当前 Viator 权限仍为 Sandbox Basic Access，不能提供合规且可验证的 production 历史余票。详细决定见 [`decisions/0004-historical-availability-observations.md`](decisions/0004-historical-availability-observations.md)。Part 10A 至 10I 已实现本地 Rome 日期查询、10 个景点的 Booking Priority、9 条 Google Places 组件记录和 6 条 Viator Sandbox 产品映射。官方预约建议、地点事实和第三方 Sandbox 票务证据分别存储和展示。前端部署在 Vercel，后端部署在 Render 并连接 Railway MySQL；每次推送到 `main` 后，由平台自动创建新部署。详细部署配置与验证记录见 [`deployment.md`](deployment.md)。

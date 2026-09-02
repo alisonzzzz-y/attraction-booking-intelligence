@@ -215,6 +215,6 @@ The historical observation design and its implementation gates are recorded in [
 
 中文说明：历史观察设计和实施闸门记录在 ADR 0004。由于当前账号只有 Viator Sandbox Basic Access，项目没有实现采集器或历史余票表。
 
-Recommended next task: add provider-independent orchestration, rate-limit handling, and a circuit-breaker decision before introducing any permitted short-term cache.
+The current reliability slice is intentionally limited to an authorised Sandbox adapter. It has bounded timeouts and retries, stable error classification, and attraction-level partial failure. It does not yet add a circuit breaker or cache: both need a provider-independent design and explicit confirmation that provider terms permit the chosen caching behaviour.
 
-中文说明：下一步建议先补充 Provider 无关的编排、限流处理和 circuit breaker 决策，再根据条款决定是否加入短期缓存。
+中文说明：当前可靠性切片仅覆盖已授权的 Sandbox adapter：它已经包含有边界的超时和重试、稳定的错误分类，以及按景点隔离的部分失败。项目尚未加入 circuit breaker 或缓存，因为这两项需要先完成 Provider 无关的设计，并明确确认 Provider 条款允许相应的缓存行为。

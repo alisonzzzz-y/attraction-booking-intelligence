@@ -50,6 +50,7 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
     private int scheduleStatus;
     private String scheduleResponse;
     private int productFailuresBeforeSuccess;
+    private int transientProductFailureStatus;
     private final AtomicInteger productRequestCount = new AtomicInteger();
 
     @BeforeEach
@@ -59,6 +60,7 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
         scheduleStatus = 200;
         scheduleResponse = scheduleJson();
         productFailuresBeforeSuccess = 0;
+        transientProductFailureStatus = 503;
         productRequestCount.set(0);
 
         server = HttpServer.create(new InetSocketAddress(0), 0);
@@ -135,8 +137,21 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
 
         assertTrue(result.isCompleteFailure());
         assertEquals(ProviderError.Type.AUTHENTICATION, result.errors().getFirst().type());
+        assertEquals(1, productRequestCount.get());
         assertFalse(result.errors().getFirst().message().contains(TEST_API_KEY));
         assertFalse(result.errors().getFirst().code().contains(TEST_API_KEY));
+    }
+
+    @Test
+    void doesNotRetryRateLimitFailures() {
+        productStatus = 429;
+        productResponse = "{\"error\":\"too many requests\"}";
+
+        ProviderSearchResult result = adapter.search(supportedQuery());
+
+        assertTrue(result.isCompleteFailure());
+        assertEquals(ProviderError.Type.RATE_LIMIT, result.errors().getFirst().type());
+        assertEquals(1, productRequestCount.get());
     }
 
     @Test
@@ -147,6 +162,29 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
 
         assertTrue(result.errors().isEmpty());
         assertEquals(1, result.attractions().size());
+        assertEquals(2, productRequestCount.get());
+    }
+
+    @Test
+    void retriesOneGatewayTimeoutThenReturnsTheVerifiedProduct() {
+        productFailuresBeforeSuccess = 1;
+        transientProductFailureStatus = 504;
+
+        ProviderSearchResult result = adapter.search(supportedQuery());
+
+        assertTrue(result.errors().isEmpty());
+        assertEquals(1, result.attractions().size());
+        assertEquals(2, productRequestCount.get());
+    }
+
+    @Test
+    void stopsAfterTheConfiguredSingleRetryWhenTheUpstreamStaysUnavailable() {
+        productFailuresBeforeSuccess = 2;
+
+        ProviderSearchResult result = adapter.search(supportedQuery());
+
+        assertTrue(result.isCompleteFailure());
+        assertEquals(ProviderError.Type.UPSTREAM_FAILURE, result.errors().getFirst().type());
         assertEquals(2, productRequestCount.get());
     }
 
@@ -195,7 +233,7 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
         productRequestCount.incrementAndGet();
         if (productFailuresBeforeSuccess > 0) {
             productFailuresBeforeSuccess--;
-            respond(exchange, 503, "{\"error\":\"temporary outage\"}");
+            respond(exchange, transientProductFailureStatus, "{\"error\":\"temporary outage\"}");
             return;
         }
         respond(exchange, productStatus, productResponse);

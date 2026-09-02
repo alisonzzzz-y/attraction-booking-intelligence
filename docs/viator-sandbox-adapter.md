@@ -67,9 +67,9 @@ The HTTP client sends the API key only in the required `exp-api-key` header. It 
 
 ## Test coverage
 
-The contract tests verify required headers, the confirmed Pantheon field mapping, Sandbox source metadata, retrieval time, inactive products, missing mappings, partial failure, and authentication error redaction.
+The contract tests verify required headers, the confirmed Pantheon field mapping, Sandbox source metadata, retrieval time, inactive products, missing mappings, partial failure, and authentication error redaction. They also prove the retry boundary: one retry after an upstream `503` or gateway-timeout `504`, no retry after `403` authentication failure or `429` rate limiting, and no third request when the upstream remains unavailable.
 
-中文说明：Contract tests 覆盖必要请求头、Pantheon 已确认字段映射、Sandbox 来源信息、获取时间、inactive 产品、缺少映射、部分失败和认证错误脱敏。
+中文说明：Contract tests 覆盖必要请求头、Pantheon 已确认字段映射、Sandbox 来源信息、获取时间、inactive 产品、缺少映射、部分失败和认证错误脱敏。它们也验证重试边界：遇到上游 `503` 或网关超时 `504` 时只重试一次；`403` 认证失败和 `429` 限流不重试；持续上游故障时不会发出第三次请求。
 
 Current official reference: [Viator Partner API technical documentation](https://docs.viator.com/partner-api/technical/).
 
