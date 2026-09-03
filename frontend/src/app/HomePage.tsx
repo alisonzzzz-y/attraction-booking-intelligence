@@ -138,8 +138,9 @@ export function HomePage() {
           <div>
             <h3>Not published yet</h3>
             <p>
-              Live prices, real-time availability, production booking links, and
-              AI explanations are not published yet.
+              Live prices, real-time availability, and production booking links
+              are not published yet. Booking explanations stay constrained to
+              checked facts.
             </p>
           </div>
         </div>

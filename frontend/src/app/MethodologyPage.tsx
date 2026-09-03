@@ -98,8 +98,8 @@ export function MethodologyPage() {
         </div>
         <div>
           <p>
-            AI may later turn verified fields and deterministic booking rules
-            into a clearer explanation. It will not generate prices, remaining
+            AI can turn verified fields and deterministic booking rules into a
+            clearer explanation. It will not generate prices, remaining
             tickets, cancellation rules, or booking priority facts.
           </p>
           <p>

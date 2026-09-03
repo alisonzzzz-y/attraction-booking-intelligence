@@ -371,11 +371,10 @@ Part 11B remains deliberately open: a Provider-independent orchestrator, circuit
 - 行程保存和基础身份功能。
 - Routes API、景点间通行时间和图形化行程安排。
 - 提醒、通知和去重。
-- AI 对结构化事实的解释与模板 fallback。
 - 更完整的可观测性、性能测量和作品集证据整理。
 
 ## 4. 当前只执行的下一部分
 
-当前优先执行 **Part 11B：Provider 无关编排与缓存边界设计**。Part 11A 的 timeout、有限 retry 和单 Provider 内部的部分失败测试已经完成。下一步需要先定义多 Provider 聚合时的超时预算、错误隔离和 circuit-breaker 决策，再按已确认的 Provider 条款决定是否加入短期缓存。不得用缓存掩盖数据来源、环境或 freshness。
+当前优先执行 **Part 14 的 Agent evaluation、演示和作品集证据整理**。Provider 的 timeout、有限 retry、单 Provider 内部部分失败测试，以及受约束的 Rome 预约解释接口已经完成。下一步应建立一组可复现的 evaluation cases，验证模型不会编造价格、余票、预约规则或优先级，再录制简短的端到端演示。不得用模型输出或缓存掩盖数据来源、环境或 freshness。
 
-Part 1–9 和 Part 10A 至 10J 已完成。Part 10J 只完成历史观察模型和实施闸门设计，没有创建采集器、历史业务表或精确提前购买天数。原因是当前 Viator 权限仍为 Sandbox Basic Access，不能提供合规且可验证的 production 历史余票。详细决定见 [`decisions/0004-historical-availability-observations.md`](decisions/0004-historical-availability-observations.md)。Part 10A 至 10I 已实现本地 Rome 日期查询、10 个景点的 Booking Priority、9 条 Google Places 组件记录和 6 条 Viator Sandbox 产品映射。官方预约建议、地点事实和第三方 Sandbox 票务证据分别存储和展示。前端部署在 Vercel，后端部署在 Render 并连接 Railway MySQL；每次推送到 `main` 后，由平台自动创建新部署。详细部署配置与验证记录见 [`deployment.md`](deployment.md)。
+Part 1–9 和 Part 10A 至 10J 已完成。Part 10J 只完成历史观察模型和实施闸门设计，没有创建采集器、历史业务表或精确提前购买天数。原因是当前 Viator 权限仍为 Sandbox Basic Access，不能提供合规且可验证的 production 历史余票。详细决定见 [`decisions/0004-historical-availability-observations.md`](decisions/0004-historical-availability-observations.md)。Part 10A 至 10I 已实现本地 Rome 日期查询、10 个景点的 Booking Priority、9 条 Google Places 组件记录和 6 条 Viator Sandbox 产品映射。受约束的 `aiexplanation` 接口会先经由唯一工具读取确定性预约事实；没有模型密钥或模型失败时会返回模板 fallback。官方预约建议、地点事实和第三方 Sandbox 票务证据分别存储和展示。前端部署在 Vercel，后端部署在 Render 并连接 Railway MySQL；每次推送到 `main` 后，由平台自动创建新部署。详细部署配置与验证记录见 [`deployment.md`](deployment.md)。

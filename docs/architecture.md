@@ -22,4 +22,4 @@
 
 ## 尚未实现
 
-完整领域实体和业务表、Provider 聚合服务、REST 查询入口、production API 调用、Redis 业务缓存、韧性策略、完整认证、提醒通知、LLM 调用和复杂页面均未实现。当前唯一的具体 adapter 是默认关闭的 Viator Sandbox 只读实现。
+完整领域实体和业务表、跨 Provider 聚合服务、production API 调用、Redis 业务缓存、完整认证、提醒通知和复杂页面均未实现。`aiexplanation` 已提供一个默认关闭模型调用、可安全降级为规则化说明的 Rome 预约解释接口。当前唯一的具体票务 adapter 是默认关闭的 Viator Sandbox 只读实现。

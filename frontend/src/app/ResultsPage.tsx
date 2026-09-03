@@ -17,6 +17,10 @@ import {
   fetchRomeBookingPriorities,
   type RomeBookingPriority,
 } from '../shared/api/romeBookingPriorities'
+import {
+  fetchRomeBookingExplanation,
+  type RomeBookingExplanation,
+} from '../shared/api/romeBookingExplanation'
 import { fetchRomePlaces, type RomePlace } from '../shared/api/romePlaces'
 import {
   localPhotosForAttraction,
@@ -164,6 +168,12 @@ function bookingGuidance(priority: RomeBookingPriority, stayStartDate: string) {
         note: 'No verified booking deadline is available. Check the official website before making the rest of your plan.',
       }
   }
+}
+
+function explanationModeCopy(mode: RomeBookingExplanation['mode']) {
+  return mode === 'MODEL'
+    ? 'AI explanation, constrained by verified facts'
+    : 'Rule-based explanation while AI is unavailable'
 }
 
 function availabilityCopy(status: RomeAttraction['availabilityStatus']) {
@@ -831,6 +841,13 @@ export function ResultsPage() {
     enabled: hasValidQuery,
     retry: false,
   })
+  const [explanationRequested, setExplanationRequested] = useState(false)
+  const explanationQuery = useQuery({
+    queryKey: ['rome-booking-explanation', startDate, endDate],
+    queryFn: () => fetchRomeBookingExplanation(startDate!, endDate!),
+    enabled: hasValidQuery && explanationRequested,
+    retry: false,
+  })
   const ticketQuery = useQuery({
     queryKey: ['rome-attractions', startDate, endDate],
     queryFn: () => fetchRomeAttractions(startDate!, endDate!),
@@ -967,6 +984,49 @@ export function ResultsPage() {
                 Save trip
               </button>
             </header>
+            <section className="booking-explanation" aria-live="polite">
+              <div>
+                <p className="eyebrow">Booking explanation</p>
+                <h2>Why is this the order?</h2>
+                <p>
+                  Read a short explanation based only on the checked official
+                  facts already used to build this plan.
+                </p>
+              </div>
+              {!explanationRequested ? (
+                <button
+                  className="button button-secondary"
+                  onClick={() => setExplanationRequested(true)}
+                  type="button"
+                >
+                  Explain this order
+                </button>
+              ) : null}
+              {explanationQuery.isPending ? (
+                <p className="booking-explanation-status" role="status">
+                  Preparing an explanation from verified booking facts...
+                </p>
+              ) : null}
+              {explanationQuery.isError ? (
+                <div className="booking-explanation-error" role="alert">
+                  <p>{explanationQuery.error.message}</p>
+                  <button
+                    className="button button-secondary"
+                    onClick={() => explanationQuery.refetch()}
+                    type="button"
+                  >
+                    Retry explanation
+                  </button>
+                </div>
+              ) : null}
+              {explanationQuery.data ? (
+                <div className="booking-explanation-answer">
+                  <span>{explanationModeCopy(explanationQuery.data.mode)}</span>
+                  <p>{explanationQuery.data.summary}</p>
+                  <small>{explanationQuery.data.boundaryNotice}</small>
+                </div>
+              ) : null}
+            </section>
             {saveFeedback ? (
               <p className="result-save-feedback" role="status">
                 {saveFeedback}

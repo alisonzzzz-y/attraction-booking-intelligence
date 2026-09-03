@@ -57,7 +57,7 @@
 - `Available now`：当前已经具备
 - `A tested full-stack foundation, public product explanation, and a documented approach to provider data.`：经过测试的全栈地基、公开产品说明，以及有文档记录的 Provider 数据处理方法。
 - `Not published yet`：尚未发布
-- `Attraction search, prices, availability, booking links, and AI explanations remain unavailable until authorised access is tested.`：在经过授权的访问权限得到实际验证前，景点搜索、价格、余票、购买链接和 AI 解释均不会开放。
+- `Live prices, real-time availability, and production booking links are not published yet. Booking explanations stay constrained to checked facts.`：实时价格、实时余票和 production 购票链接暂未发布。预约解释始终受已经核对的事实约束。
 
 ## Methodology 页面
 
@@ -74,5 +74,5 @@
 - `Stale`：数据超过允许的新鲜度范围
 - `Request failed`：Provider 请求失败
 - `Explanation comes after the facts.`：先有事实，再进行解释。
-- `AI may later turn verified fields and deterministic booking rules into a clearer explanation. It will not generate prices, remaining tickets, cancellation rules, or booking priority facts.`：未来 AI 可以把已经确认的字段和确定性预订规则整理成更清楚的解释，但不能生成价格、剩余票量、取消规则或预订优先级事实。
+- `AI can turn verified fields and deterministic booking rules into a clearer explanation. It will not generate prices, remaining tickets, cancellation rules, or booking priority facts.`：AI 可以把已经确认的字段和确定性预订规则整理成更清楚的解释，但不能生成价格、剩余票量、取消规则或预订优先级事实。
 - `Foundation tested. Provider access not yet connected.`：工程地基已经通过测试，Provider 权限尚未接入。

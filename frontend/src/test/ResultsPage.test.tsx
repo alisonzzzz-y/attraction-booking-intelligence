@@ -380,6 +380,30 @@ const placeResponse = {
   ],
 }
 
+const explanationResponse = {
+  city: 'Rome',
+  stayStartDate: '2026-09-10',
+  stayEndDate: '2026-09-12',
+  mode: 'TEMPLATE_FALLBACK',
+  summary:
+    'This booking order starts with the attractions whose official guidance requires a timed reservation.',
+  facts: [
+    {
+      attractionId: 'colosseum-archaeological-park',
+      attractionName: 'Colosseum, Roman Forum and Palatine Hill',
+      priority: 'BOOK_FIRST',
+      timing: 'AS_SOON_AS_VISIT_DATE_IS_FIXED',
+      officialPolicy: 'TIMED_RESERVATION_REQUIRED',
+      factualBasis: 'The operator requires a timed reservation.',
+      action: 'Secure this before lower-priority visits.',
+      ruleVersion: 'rome-official-policy-v1',
+      checkedOn: '2026-08-25',
+    },
+  ],
+  boundaryNotice:
+    'This explanation is anchored to checked official booking facts and deterministic priority rules.',
+}
+
 function renderResults(route = resultsRoute) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -403,6 +427,9 @@ function jsonResponse(body: unknown, status = 200) {
 
 function successfulResponseFor(input: RequestInfo | URL) {
   const url = String(input)
+  if (url.includes('/booking-explanation?')) {
+    return jsonResponse(explanationResponse)
+  }
   if (url.includes('/booking-priorities?')) {
     return jsonResponse(priorityResponse)
   }
@@ -448,6 +475,41 @@ afterEach(() => {
 })
 
 describe('ResultsPage', () => {
+  it('requests an explanation only after the traveller asks for it', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn((input: RequestInfo | URL) =>
+      Promise.resolve(successfulResponseFor(input)),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderResults()
+
+    await screen.findByRole('heading', { name: 'Pantheon' })
+    expect(
+      fetchMock.mock.calls.some(([input]) =>
+        String(input).includes('/booking-explanation?'),
+      ),
+    ).toBe(false)
+
+    await user.click(screen.getByRole('button', { name: 'Explain this order' }))
+
+    expect(
+      await screen.findByText(
+        'This booking order starts with the attractions whose official guidance requires a timed reservation.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Rule-based explanation while AI is unavailable'),
+    ).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/rome/booking-explanation?stayStartDate=2026-09-10&stayEndDate=2026-09-12',
+      {
+        headers: { Accept: 'application/json' },
+        signal: expect.any(AbortSignal),
+      },
+    )
+  })
+
   it('saves favourite attractions and the current trip in this browser', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
@@ -563,9 +625,7 @@ describe('ResultsPage', () => {
     expect(
       within(pantheonDialog).getByText('Recommended booking action'),
     ).toBeInTheDocument()
-    expect(
-      within(pantheonDialog).getByText('Check today'),
-    ).toBeInTheDocument()
+    expect(within(pantheonDialog).getByText('Check today')).toBeInTheDocument()
     expect(
       within(pantheonDialog).queryByText('What to do'),
     ).not.toBeInTheDocument()

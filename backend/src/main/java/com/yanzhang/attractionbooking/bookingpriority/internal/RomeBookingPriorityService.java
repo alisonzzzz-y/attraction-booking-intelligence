@@ -1,6 +1,7 @@
 package com.yanzhang.attractionbooking.bookingpriority.internal;
 
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriorityAssessment;
+import com.yanzhang.attractionbooking.bookingpriority.RomeBookingPriorityQuery;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -8,7 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-class RomeBookingPriorityService {
+class RomeBookingPriorityService implements RomeBookingPriorityQuery {
 
     private static final long MAXIMUM_STAY_DAYS = 31;
 
@@ -22,7 +23,8 @@ class RomeBookingPriorityService {
         this.calculator = calculator;
     }
 
-    List<BookingPriorityAssessment> assess(LocalDate stayStartDate, LocalDate stayEndDate) {
+    @Override
+    public List<BookingPriorityAssessment> assess(LocalDate stayStartDate, LocalDate stayEndDate) {
         validate(stayStartDate, stayEndDate);
         return catalog.all().stream()
                 .map(calculator::assess)

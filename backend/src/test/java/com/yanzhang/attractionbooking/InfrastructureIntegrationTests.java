@@ -80,6 +80,18 @@ class InfrastructureIntegrationTests {
     }
 
     @Test
+    void returnsASafeTemplateBookingExplanationWithoutAModelCredential() throws Exception {
+        var response = get(
+                "/api/v1/rome/booking-explanation"
+                        + "?stayStartDate=2026-09-10&stayEndDate=2026-09-12");
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.body()).contains("\"city\":\"Rome\"");
+        assertThat(response.body()).contains("\"mode\":\"TEMPLATE_FALLBACK\"");
+        assertThat(response.body()).doesNotContain("\"price\"");
+    }
+
+    @Test
     void doesNotAdvertiseBrowserLoginForAnUnknownPublicRoute() throws Exception {
         var response = get("/api/v1/rome/not-a-route");
 

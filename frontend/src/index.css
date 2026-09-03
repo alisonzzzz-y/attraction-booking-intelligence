@@ -1207,6 +1207,79 @@ body:has(.results-section) {
   font-size: 0.74rem;
 }
 
+.booking-explanation {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: rgb(232 241 236 / 72%);
+}
+
+.booking-explanation h2,
+.booking-explanation p {
+  margin: 0;
+}
+
+.booking-explanation h2 {
+  margin-top: 0.22rem;
+  font-size: 1.15rem;
+}
+
+.booking-explanation > div > p:last-child {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.booking-explanation > .button,
+.booking-explanation-status,
+.booking-explanation-error,
+.booking-explanation-answer {
+  margin-top: 0.85rem;
+}
+
+.booking-explanation-status,
+.booking-explanation-error p {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.booking-explanation-error .button {
+  margin-top: 0.55rem;
+}
+
+.booking-explanation-answer {
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+
+.booking-explanation-answer > span {
+  display: inline-flex;
+  padding: 0.32rem 0.5rem;
+  border-radius: 999px;
+  color: var(--forest);
+  background: #fff;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.booking-explanation-answer > p {
+  margin-top: 0.55rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.booking-explanation-answer small {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .result-save-trip {
   min-height: 2.4rem;
   margin: 0;

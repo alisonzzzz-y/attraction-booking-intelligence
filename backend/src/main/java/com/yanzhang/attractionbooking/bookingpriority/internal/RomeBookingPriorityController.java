@@ -3,6 +3,7 @@ package com.yanzhang.attractionbooking.bookingpriority.internal;
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriorityAssessment;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialAttractionDetails;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingEvidence;
+import com.yanzhang.attractionbooking.bookingpriority.RomeBookingPriorityQuery;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/rome/booking-priorities")
 class RomeBookingPriorityController {
 
-    private final RomeBookingPriorityService service;
+    private final RomeBookingPriorityQuery service;
 
-    RomeBookingPriorityController(RomeBookingPriorityService service) {
+    RomeBookingPriorityController(RomeBookingPriorityQuery service) {
         this.service = service;
     }
 

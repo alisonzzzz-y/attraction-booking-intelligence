@@ -20,6 +20,7 @@ The repository currently contains the project foundation and a deployed public p
 - An accepted first-provider decision and an explicit MVP data-truth statement
 - A provider-neutral Java contract with source, environment, freshness, availability, price, error, and partial-failure types
 - A deterministic Rome Booking Priority service for ten attractions, based on manually verified official booking policies
+- A constrained Rome booking-explanation endpoint: it requests the same verified priority facts through one server-side tool, with a safe rule-based fallback when model mode is disabled or fails
 - A documented historical-observation model and implementation gate that prevents Sandbox schedules from becoming false lead-time claims
 - A disabled-by-default, read-only Viator Basic Access Sandbox adapter for six verified Rome product paths
 - Public read-only Rome query endpoints for Pantheon, Borghese Gallery, Baths of Caracalla, Capitoline Museums, the composite Colosseum Archaeological Park group, and the combined Vatican Museums and Sistine Chapel group
@@ -28,9 +29,9 @@ The repository currently contains the project foundation and a deployed public p
 
 中文说明：项目也已经完成历史观察模型和实施闸门设计。当前不会创建采集器或历史余票表，也不会把 Sandbox 排期转换成提前购买天数。
 
-It does not include production provider integrations, live ticket prices, live availability checks, full authentication, business persistence models, alerts, notifications, payments, or AI calls.
+It does not include production provider integrations, live ticket prices, live availability checks, full authentication, business persistence models, alerts, notifications, payments, or a deployed model credential.
 
-中文说明：项目仍未实现 production Provider 集成、实时票价、实时余票查询、完整认证、业务持久化模型、提醒、通知、支付或 AI 调用。
+中文说明：项目仍未实现 production Provider 集成、实时票价、实时余票查询、完整认证、业务持久化模型、提醒、通知、支付或已部署的模型密钥。预约解释接口默认使用规则化降级说明；只有在后端安全配置模型密钥后，才会启用受约束的模型解释。
 
 The current MVP exposes public read-only planning endpoints. It does not provide a user login flow, and the backend does not advertise HTTP Basic authentication to the browser.
 
@@ -176,6 +177,8 @@ CI runs the backend verification, frontend lint check, unit test, and production
 
 This repository makes no production provider API calls. The internal Viator adapter can make an authorised Sandbox request when it is explicitly enabled, while automated tests use a local stub. Fixture, sandbox, or test-container data must never be described as real-time information. Future production prices, availability, booking rules, and purchase links must come from clear and authorised sources. AI may explain structured facts, but it must not invent them.
 
+The Rome explanation endpoint does not accept an open-ended traveller prompt. When optional model mode is enabled, the server requires the model to call `get_rome_booking_facts`, validates the requested city and dates, then supplies only the deterministic booking-priority facts. Responses that contain prices, availability, URLs, or unsupported detail are rejected and replaced with the template fallback. See [ai-explanation.md](docs/ai-explanation.md).
+
 The Viator Sandbox client has a three-second connection timeout, an eight-second response timeout, and at most one immediate retry after a timeout or upstream 5xx failure. It does not retry authentication or rate-limit failures. A failed product remains a provider error, while other verified product results are preserved.
 
 中文说明：仓库不会调用 production Provider API。内部 Viator adapter 只有在明确启用后才会发起已授权的 Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。Viator Sandbox client 设置了 3 秒连接超时、8 秒响应超时，并且只会对 timeout 或上游 5xx 失败立即重试一次。认证失败和限流不会重试。单个产品失败会被保留为 Provider error，不会清空其他已经成功核对的产品结果。
@@ -189,7 +192,7 @@ The Viator Sandbox client has a three-second connection timeout, an eight-second
 - Provider circuit breakers and business caching
 - Evidence-based exact lead-time estimates, alerts, notifications, and deduplication
 - Dedicated attraction detail routes and account-synchronised saved trips
-- Payments, ticket fulfilment, email, LLM calls, microservices, Kafka, Kubernetes, or backend cloud deployment
+- Payments, ticket fulfilment, email, a deployed model credential, microservices, Kafka, or Kubernetes
 
 Deployment details are recorded in [deployment.md](docs/deployment.md).
 
