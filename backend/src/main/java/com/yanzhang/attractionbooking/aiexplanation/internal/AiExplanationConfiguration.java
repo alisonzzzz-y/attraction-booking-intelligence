@@ -13,7 +13,7 @@ class AiExplanationConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "ai-explanation", name = "enabled", havingValue = "true")
-    OpenAiBookingExplanationClient openAiBookingExplanationClient(
+    BookingExplanationModelClient bookingExplanationModelClient(
             RestClient.Builder restClientBuilder,
             ObjectMapper objectMapper,
             AiExplanationProperties properties) {

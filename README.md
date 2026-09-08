@@ -173,6 +173,10 @@ npm run test:e2e
 
 CI runs the backend verification, frontend lint check, unit test, and production build. The Playwright smoke test is currently kept as a local check to avoid downloading a browser during the first CI setup.
 
+The latest repeatable test results and the 13 constrained-Agent evaluation cases are recorded in [ai-agent-evaluation.md](docs/ai-agent-evaluation.md).
+
+中文说明：最新的可重复测试结果和 13 个受约束 Agent evaluation cases 记录在 `docs/ai-agent-evaluation.md` 中。
+
 ## Data accuracy
 
 This repository makes no production provider API calls. The internal Viator adapter can make an authorised Sandbox request when it is explicitly enabled, while automated tests use a local stub. Fixture, sandbox, or test-container data must never be described as real-time information. Future production prices, availability, booking rules, and purchase links must come from clear and authorised sources. AI may explain structured facts, but it must not invent them.

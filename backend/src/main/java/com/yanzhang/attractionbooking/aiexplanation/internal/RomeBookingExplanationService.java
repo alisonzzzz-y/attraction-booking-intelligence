@@ -17,12 +17,12 @@ class RomeBookingExplanationService implements RomeBookingExplanationQuery {
 
     private final RomeBookingPriorityQuery bookingPriorityQuery;
     private final TemplateBookingExplanation template;
-    private final Optional<OpenAiBookingExplanationClient> modelClient;
+    private final Optional<BookingExplanationModelClient> modelClient;
 
     RomeBookingExplanationService(
             RomeBookingPriorityQuery bookingPriorityQuery,
             TemplateBookingExplanation template,
-            Optional<OpenAiBookingExplanationClient> modelClient) {
+            Optional<BookingExplanationModelClient> modelClient) {
         this.bookingPriorityQuery = bookingPriorityQuery;
         this.template = template;
         this.modelClient = modelClient;

@@ -13,6 +13,8 @@
 
 The response always identifies whether `mode` is `MODEL` or `TEMPLATE_FALLBACK`. A model failure never removes the booking order or turns missing data into a ticket conclusion.
 
+The repeatable boundary and fallback evaluation is recorded in [ai-agent-evaluation.md](ai-agent-evaluation.md).
+
 ## Configuration
 
 Model mode is disabled by default. To enable it on the Spring Boot service only, set these Render secrets:
@@ -39,6 +41,8 @@ Do not set `OPENAI_API_KEY` in Vercel or any `VITE_*` variable. The browser call
 6. 模型输出只要包含数字、网址、价格、余票、库存或售罄判断，服务端就会拒绝该输出，并返回规则化模板说明。
 
 响应会明确标注 `mode` 是 `MODEL` 还是 `TEMPLATE_FALLBACK`。模型失败不会让预约顺序消失，也不会把缺失数据变成票务结论。
+
+可重复运行的事实边界和降级评估记录在 [ai-agent-evaluation.md](ai-agent-evaluation.md) 中。
 
 ## 配置
 

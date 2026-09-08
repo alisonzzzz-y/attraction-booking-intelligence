@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAppQueryClient } from '../app/providers'
+import { createAppQueryClient } from '../app/queryClient'
 
 describe('app query defaults', () => {
   it('does not refetch stale planning data when the browser regains focus', () => {

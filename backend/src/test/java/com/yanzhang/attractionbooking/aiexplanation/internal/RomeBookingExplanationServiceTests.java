@@ -1,6 +1,7 @@
 package com.yanzhang.attractionbooking.aiexplanation.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.yanzhang.attractionbooking.aiexplanation.BookingExplanation;
@@ -35,6 +36,53 @@ class RomeBookingExplanationServiceTests {
         assertEquals("colosseum", explanation.facts().getFirst().attractionId());
         assertEquals("TIMED_RESERVATION_REQUIRED", explanation.facts().getFirst().officialPolicy());
         assertTrue(explanation.boundaryNotice().contains("does not claim prices"));
+    }
+
+    @Test
+    void returnsAModelSummaryOnlyAfterTheClientAcceptsIt() {
+        RomeBookingPriorityQuery factsTool = (startDate, endDate) -> List.of(assessment());
+        BookingExplanationModelClient modelClient =
+                facts -> "This order follows the checked official booking facts.";
+        RomeBookingExplanationService service = new RomeBookingExplanationService(
+                factsTool, new TemplateBookingExplanation(), Optional.of(modelClient));
+
+        BookingExplanation explanation = service.explain(
+                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12));
+
+        assertEquals(BookingExplanation.Mode.MODEL, explanation.mode());
+        assertEquals("This order follows the checked official booking facts.", explanation.summary());
+        assertEquals("colosseum", explanation.facts().getFirst().attractionId());
+    }
+
+    @Test
+    void fallsBackWithoutLosingFactsWhenTheModelClientRejectsAnAnswer() {
+        RomeBookingPriorityQuery factsTool = (startDate, endDate) -> List.of(assessment());
+        BookingExplanationModelClient modelClient = facts -> {
+            throw new AiExplanationClientException("The model invented unsupported detail");
+        };
+        RomeBookingExplanationService service = new RomeBookingExplanationService(
+                factsTool, new TemplateBookingExplanation(), Optional.of(modelClient));
+
+        BookingExplanation explanation = service.explain(
+                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12));
+
+        assertEquals(BookingExplanation.Mode.TEMPLATE_FALLBACK, explanation.mode());
+        assertTrue(explanation.summary().contains("official guidance requires a timed reservation"));
+        assertEquals(1, explanation.facts().size());
+        assertEquals("TIMED_RESERVATION_REQUIRED", explanation.facts().getFirst().officialPolicy());
+    }
+
+    @Test
+    void rejectsAnEmptyFactPackageInsteadOfAskingTheModelToGuess() {
+        RomeBookingPriorityQuery emptyFactsTool = (startDate, endDate) -> List.of();
+        RomeBookingExplanationService service = new RomeBookingExplanationService(
+                emptyFactsTool, new TemplateBookingExplanation(), Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.explain(LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12)));
+
+        assertEquals("At least one booking fact is required", exception.getMessage());
     }
 
     private static BookingPriorityAssessment assessment() {

@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClientResponseException;
  * A deliberately narrow Responses API client. The model must call the single booking-facts tool
  * before it can produce a summary. The client never gives the model direct provider access.
  */
-final class OpenAiBookingExplanationClient {
+final class OpenAiBookingExplanationClient implements BookingExplanationModelClient {
 
     private static final String BOOKING_FACTS_TOOL = "get_rome_booking_facts";
     private static final Pattern FORBIDDEN_MODEL_DETAIL = Pattern.compile(
@@ -52,7 +52,8 @@ final class OpenAiBookingExplanationClient {
         this.properties = properties;
     }
 
-    String explain(BookingExplanationFacts facts) {
+    @Override
+    public String explain(BookingExplanationFacts facts) {
         JsonNode firstResponse = create(firstRequest(facts));
         ToolCall toolCall = requiredBookingFactsToolCall(firstResponse, facts);
         JsonNode finalResponse = create(finalRequest(firstResponse, toolCall, facts));

@@ -12,7 +12,10 @@ afterEach(() => {
 describe('fetchWithTimeout', () => {
   it('rejects instead of leaving the page loading when a request never settles', async () => {
     vi.useFakeTimers()
-    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => undefined)))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => undefined)),
+    )
 
     const request = fetchWithTimeout('/slow-request', {}, 50)
     const timeoutExpectation = expect(request).rejects.toBeInstanceOf(
@@ -27,14 +30,18 @@ describe('fetchWithTimeout', () => {
     vi.useFakeTimers()
     vi.stubGlobal(
       'fetch',
-      vi.fn((_input: RequestInfo | URL, init?: RequestInit) =>
-        new Promise<Response>((_resolve, reject) => {
-          init?.signal?.addEventListener('abort', () => {
-            reject(
-              new DOMException('signal is aborted without reason', 'AbortError'),
-            )
-          })
-        }),
+      vi.fn(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => {
+              reject(
+                new DOMException(
+                  'signal is aborted without reason',
+                  'AbortError',
+                ),
+              )
+            })
+          }),
       ),
     )
 

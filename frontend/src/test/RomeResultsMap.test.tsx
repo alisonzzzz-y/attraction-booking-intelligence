@@ -195,9 +195,13 @@ describe('RomeResultsMap', () => {
     window.gm_authFailure?.()
 
     await waitFor(() =>
-      expect(screen.getByText('The map could not be loaded.')).toBeInTheDocument(),
+      expect(
+        screen.getByText('The map could not be loaded.'),
+      ).toBeInTheDocument(),
     )
-    expect(screen.getByText(`Google Maps rejected ${window.location.origin}.`)).toBeInTheDocument()
+    expect(
+      screen.getByText(`Google Maps rejected ${window.location.origin}.`),
+    ).toBeInTheDocument()
     expect(screen.queryByText('browser-key')).not.toBeInTheDocument()
   })
 })
