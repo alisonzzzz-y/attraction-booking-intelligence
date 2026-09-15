@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.yanzhang.attractionbooking.aiexplanation.BookingExplanationFact;
+import com.yanzhang.attractionbooking.service.BookingExplanationFacts;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;

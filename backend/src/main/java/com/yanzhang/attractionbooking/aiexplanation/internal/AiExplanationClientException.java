@@ -1,8 +1,8 @@
 package com.yanzhang.attractionbooking.aiexplanation.internal;
 
-final class AiExplanationClientException extends RuntimeException {
+public final class AiExplanationClientException extends RuntimeException {
 
-    AiExplanationClientException(String message) {
+    public AiExplanationClientException(String message) {
         super(message);
     }
 }

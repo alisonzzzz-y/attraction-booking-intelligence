@@ -115,7 +115,7 @@ cd backend
 
 这一次后端结果必须显示 Testcontainers 集成测试实际执行，不能再显示3个测试因缺少 Docker 而跳过。
 
-2026-08-17 的实际验证结果：
+2026-08-17 的历史验证结果（当时仍使用 Spring Modulith，当前结构见 ADR 0006）：
 
 - `docker compose config`：通过
 - MySQL 17.10：healthy

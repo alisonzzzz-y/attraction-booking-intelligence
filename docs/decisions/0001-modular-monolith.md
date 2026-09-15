@@ -1,10 +1,10 @@
 # ADR 0001：采用 modular monolith
 
-状态：已接受
+状态：部分被 ADR 0006 取代
 
 ## 决策
 
-第一版后端使用单一 Spring Boot 部署单元，并通过 Spring Modulith 维持业务模块边界。
+第一版后端使用单一 Spring Boot 部署单元，并通过 Spring Modulith 维持业务模块边界。项目继续保留单体部署，但 package 组织和 Spring Modulith 依赖已经由 ADR 0006 的经典四层结构取代。
 
 ## 原因
 

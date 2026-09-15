@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriority;
 import com.yanzhang.attractionbooking.bookingpriority.BookingPriorityAssessment;
+import com.yanzhang.attractionbooking.repository.RomeOfficialBookingEvidenceRepository;
+import com.yanzhang.attractionbooking.service.BookingPriorityCalculator;
+import com.yanzhang.attractionbooking.service.RomeBookingPriorityService;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -18,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class RomeBookingPriorityServiceTests {
 
     private final RomeBookingPriorityService service = new RomeBookingPriorityService(
-            new RomeOfficialBookingEvidenceCatalog(),
+            new RomeOfficialBookingEvidenceRepository(),
             new BookingPriorityCalculator(
                     Clock.fixed(Instant.parse("2026-08-22T02:00:00Z"), ZoneOffset.UTC)));
 

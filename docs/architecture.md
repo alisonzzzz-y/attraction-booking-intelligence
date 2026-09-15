@@ -1,25 +1,63 @@
-# 架构说明
+# Backend architecture / 后端架构
 
-## 当前选择
+## Layered structure
 
-后端采用 Spring Boot modular monolith。业务能力位于根 package 下的顶层模块，模块公开类型只放在模块根 package，实现细节放入 `internal`。Spring Modulith 在测试中验证模块边界。当前不拆分微服务，也不加入 Kafka 或 Kubernetes。
+The backend uses a conventional Spring Boot four-layer structure. Dependencies flow in one direction:
 
-前端是独立的 Vite + React 应用，通过 REST API 与后端通信。开发服务器将 `/actuator` 代理到本机后端，用于最小 health 连接验证。当前 UI 只有应用壳和范围说明。
+```text
+controller -> service -> repository -> entity
+```
 
-## Provider adapter 边界
+- `controller` owns HTTP routes, request validation, response DTOs, and exception mapping.
+- `service` owns use cases, validation, orchestration, and deterministic booking rules.
+- `repository` owns database access and the checked official-evidence catalogue.
+- `entity` contains JPA persistence models for trips and saved attractions.
+- Provider-specific packages contain external API clients and adapters. They are infrastructure, not database repositories.
+- Provider and booking-priority value objects remain separate from JPA entities because external facts should not be persisted as if they were current production data.
 
-`provider` 模块已经定义统一的 `ProviderAdapter` 契约、标准化事实、来源与环境元数据、freshness、错误和 partial failure 类型。第一版 Viator Basic Access Sandbox 实现位于 `provider.internal.viator`，其中包含认证配置、HTTP client、原始 DTO、字段映射和错误转换。原始 Provider 响应不会直接暴露给其他模块，跨模块只传递标准化结果和明确的来源元数据。详细语义见 [`provider-domain-contract.md`](provider-domain-contract.md)，第一版实现边界见 [`viator-sandbox-adapter.md`](viator-sandbox-adapter.md)。
+The application remains one deployable Spring Boot service. It is not split into microservices and does not require Kafka or Kubernetes.
 
-## 计划中的数据流
+## 分层结构
 
-1. 行程输入进入 `trip`。
-2. 景点标识由 `attraction` 管理。
-3. `provider` 并发查询授权来源并标准化响应。
-4. `availability` 聚合结果，同时保留 partial failure 信息。
-5. `bookingpriority` 只根据经过测试的结构化规则计算优先级。
-6. `alert` 与 `notification` 后续负责提醒和去重。
-7. `aiexplanation` 只能解释上述结构化事实。
+后端采用经典的 Spring Boot 四层结构，依赖方向保持单向：
 
-## 尚未实现
+```text
+controller -> service -> repository -> entity
+```
 
-完整领域实体和业务表、跨 Provider 聚合服务、production API 调用、Redis 业务缓存、完整认证、提醒通知和复杂页面均未实现。`aiexplanation` 已提供一个默认关闭模型调用、可安全降级为规则化说明的 Rome 预约解释接口。当前唯一的具体票务 adapter 是默认关闭的 Viator Sandbox 只读实现。
+- `controller` 负责 HTTP 路由、请求校验、响应 DTO 和异常映射。
+- `service` 负责业务用例、参数校验、流程编排和确定性的预约规则。
+- `repository` 负责数据库访问，以及经过人工核对的官方证据目录。
+- `entity` 包含 Trip 和 Saved Attraction 的 JPA 持久化实体。
+- 外部 API client 和 adapter 属于基础设施代码，不伪装成数据库 Repository。
+- Provider 与 Booking Priority 的值对象不会直接变成 JPA Entity，避免把外部事实当作本项目拥有的实时数据库事实。
+
+整个后端仍然是一个 Spring Boot 单体服务，不拆分微服务，也不引入 Kafka 或 Kubernetes。
+
+## Persistent trip flow / 行程持久化流程
+
+`TripController` accepts an anonymous trip payload. `TripService` validates the Rome scope and the 31-day limit. `TripRepository` persists `TripEntity` and its ordered `SavedAttractionEntity` children through Spring Data JPA. Flyway migration `V2__create_trip_tables.sql` creates the MySQL tables.
+
+`TripController` 接收匿名行程数据，`TripService` 校验 Rome 范围和最长 31 天限制，`TripRepository` 通过 Spring Data JPA 保存 `TripEntity` 及其有顺序的 `SavedAttractionEntity`。MySQL 表由 Flyway 的 `V2__create_trip_tables.sql` 创建。
+
+The API currently provides:
+
+- `POST /api/v1/trips`
+- `GET /api/v1/trips/{tripId}`
+- `PUT /api/v1/trips/{tripId}`
+
+The public frontend still keeps its browser-local fallback. Connecting that UI to the persistent API is separate from account synchronisation because authentication has not been implemented.
+
+公开前端目前仍保留浏览器本地保存作为降级方式。由于项目尚未实现登录认证，不能把匿名 Trip API 描述成账号同步功能。
+
+## Provider boundary / Provider 边界
+
+Every provider enters through the common `ProviderAdapter` contract. The Viator implementation is authorised Sandbox access only. Google Places supplies location evidence only. A single provider or attraction failure is retained as a partial error and must not erase successful facts from other sources.
+
+所有 Provider 都通过统一的 `ProviderAdapter` 契约接入。Viator 当前仅为经过授权的 Sandbox，Google Places 只提供地点证据。单个 Provider 或景点失败会保留为 partial error，不能清空其他来源已经成功返回的事实。
+
+## AI boundary / AI 边界
+
+The AI explanation service can only explain the structured result returned by the deterministic booking-priority service. Model output that introduces prices, live availability, URLs, or unsupported claims is rejected and replaced by a rule-based fallback.
+
+AI 解释服务只能解释确定性 Booking Priority Service 已经返回的结构化事实。任何自行加入价格、实时余票、URL 或无来源结论的模型输出都会被拒绝，并回退到规则模板。

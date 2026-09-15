@@ -36,14 +36,14 @@ Verification date: 8 September 2026.
 | --- | --- |
 | Agent evaluation tests | 13 passed, 0 failed |
 | Complete backend verification | 55 passed, 0 failed, 0 errors, 0 skipped |
-| MySQL, Flyway and health integration tests | 6 passed through Testcontainers |
+| MySQL, Flyway, health, and Trip persistence integration tests | 7 passed through Testcontainers |
 | Frontend ESLint | Passed with 0 errors and 0 warnings |
 | Frontend Prettier check | Passed |
 | Frontend Vitest suite | 30 passed across 9 test files |
 | Frontend production build | Passed |
 | Playwright Chromium smoke suite | 7 passed |
 
-中文说明：完整后端验证共通过 55 个测试，其中包括 13 个 Agent evaluation cases 和 6 个基于 Testcontainers 的 MySQL、Flyway 与 health 集成测试。前端 ESLint、Prettier 和 production build 全部通过，Vitest 通过 30 个测试，Playwright Chromium 通过 7 个端到端 smoke tests。
+中文说明：完整后端验证共通过 55 个测试，其中包括 13 个 Agent evaluation cases 和 7 个基于 Testcontainers 的 MySQL、Flyway、health 与 Trip 持久化集成测试。前端 ESLint、Prettier 和 production build 全部通过，Vitest 通过 30 个测试，Playwright Chromium 通过 7 个端到端 smoke tests。
 
 Commands used:
 

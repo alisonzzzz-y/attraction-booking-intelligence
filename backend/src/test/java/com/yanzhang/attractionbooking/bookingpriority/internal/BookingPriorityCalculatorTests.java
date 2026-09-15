@@ -9,6 +9,7 @@ import com.yanzhang.attractionbooking.bookingpriority.BookingTiming;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialAttractionDetails;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingEvidence;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingPolicy;
+import com.yanzhang.attractionbooking.service.BookingPriorityCalculator;
 import java.net.URI;
 import java.time.Clock;
 import java.time.Instant;

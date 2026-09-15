@@ -2,6 +2,7 @@ package com.yanzhang.attractionbooking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -29,6 +30,8 @@ class InfrastructureIntegrationTests {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
     @LocalServerPort
     int port;
 
@@ -38,7 +41,37 @@ class InfrastructureIntegrationTests {
                 "select count(*) from flyway_schema_history where success = true",
                 Integer.class);
 
-        assertThat(migrationCount).isEqualTo(1);
+        assertThat(migrationCount).isEqualTo(2);
+        assertThat(tableExists("trips")).isEqualTo(1);
+        assertThat(tableExists("saved_attractions")).isEqualTo(1);
+    }
+
+    @Test
+    void persistsAndReadsATripThroughTheFourLayerStack() throws Exception {
+        String requestBody = """
+                {
+                  "city": "Rome",
+                  "stayStartDate": "2026-09-10",
+                  "stayEndDate": "2026-09-12",
+                  "dateMode": "EXACT",
+                  "attractionIds": ["pantheon", "borghese-gallery"]
+                }
+                """;
+
+        var createResponse = sendJson("POST", "/api/v1/trips", requestBody);
+
+        assertThat(createResponse.statusCode()).isEqualTo(201);
+        String tripId = objectMapper.readTree(createResponse.body()).required("id").asText();
+        assertThat(createResponse.headers().firstValue("location"))
+                .contains("/api/v1/trips/" + tripId);
+
+        var readResponse = get("/api/v1/trips/" + tripId);
+
+        assertThat(readResponse.statusCode()).isEqualTo(200);
+        assertThat(readResponse.body()).contains("\"attractionIds\":[\"pantheon\",\"borghese-gallery\"]");
+        assertThat(jdbcTemplate.queryForObject("select count(*) from trips", Integer.class)).isEqualTo(1);
+        assertThat(jdbcTemplate.queryForObject("select count(*) from saved_attractions", Integer.class))
+                .isEqualTo(2);
     }
 
     @Test
@@ -70,7 +103,7 @@ class InfrastructureIntegrationTests {
     void returnsProviderConfigurationErrorWithoutRequestingLogin() throws Exception {
         var ticketResponse = get(
                 "/api/v1/rome/attractions"
-                        + "?stayStartDate=2026-09-10&stayEndDate=2026-09-12");
+                        + "?stayStartDate=2026-10-10&stayEndDate=2026-10-12");
         var locationResponse = get("/api/v1/rome/places");
 
         assertThat(ticketResponse.statusCode()).isEqualTo(503);
@@ -107,5 +140,23 @@ class InfrastructureIntegrationTests {
 
         return HttpClient.newHttpClient()
                 .send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> sendJson(String method, String path, String body) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + path))
+                .header("Content-Type", "application/json")
+                .method(method, HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        return HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private Integer tableExists(String tableName) {
+        return jdbcTemplate.queryForObject(
+                "select count(*) from information_schema.tables where table_schema = database() and table_name = ?",
+                Integer.class,
+                tableName);
     }
 }

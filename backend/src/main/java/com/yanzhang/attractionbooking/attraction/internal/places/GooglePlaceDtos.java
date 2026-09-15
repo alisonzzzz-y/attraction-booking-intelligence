@@ -2,12 +2,12 @@ package com.yanzhang.attractionbooking.attraction.internal.places;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-final class GooglePlaceDtos {
+public final class GooglePlaceDtos {
 
     private GooglePlaceDtos() {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record Place(
+    public record Place(
             String id,
             DisplayName displayName,
             String formattedAddress,
@@ -18,9 +18,9 @@ final class GooglePlaceDtos {
             Integer userRatingCount) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record DisplayName(String text, String languageCode) {}
+    public record DisplayName(String text, String languageCode) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record Coordinates(Double latitude, Double longitude) {}
+    public record Coordinates(Double latitude, Double longitude) {}
 
 }

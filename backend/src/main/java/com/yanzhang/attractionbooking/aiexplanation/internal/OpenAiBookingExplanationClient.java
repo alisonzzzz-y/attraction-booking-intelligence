@@ -1,5 +1,6 @@
 package com.yanzhang.attractionbooking.aiexplanation.internal;
 
+import com.yanzhang.attractionbooking.service.BookingExplanationFacts;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpClient;

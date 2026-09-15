@@ -10,6 +10,10 @@ spring:
     password: ${APP_MYSQL_PASSWORD:attraction_dev}
   flyway:
     enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
 
 management:
   endpoints:

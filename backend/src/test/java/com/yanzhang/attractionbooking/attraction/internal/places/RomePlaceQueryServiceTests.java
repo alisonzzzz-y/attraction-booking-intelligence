@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.yanzhang.attractionbooking.service.RomePlaceQueryService;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;

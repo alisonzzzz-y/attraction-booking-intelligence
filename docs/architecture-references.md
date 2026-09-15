@@ -3,7 +3,7 @@
 | 项目 | 借鉴范围 | 复制代码 |
 | --- | --- | --- |
 | [Spring Initializr](https://start.spring.io/) | 生成 Spring Boot、Maven Wrapper 和基础依赖配置 | 否，使用官方生成器 |
-| [Spring Modulith](https://spring.io/projects/spring-modulith) | 业务 package 模块化与架构验证 | 仅采用官方文档中的验证模式 |
+| [Spring Modulith](https://spring.io/projects/spring-modulith) | 第一版业务 package 模块化与架构验证，现已由 ADR 0006 取代 | 当前不再依赖 |
 | [JHipster](https://www.jhipster.tech/) | 后续认证、监控和完整工程结构的参考 | 否 |
 | [Full Stack FastAPI Template](https://github.com/fastapi/full-stack-fastapi-template) | 前后端目录、Docker 和 CI 的参考 | 否 |
 | [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) | REST API 与示例项目组织方式的参考 | 否 |

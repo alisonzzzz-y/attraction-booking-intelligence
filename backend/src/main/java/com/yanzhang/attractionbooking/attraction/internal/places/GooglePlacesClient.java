@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
-final class GooglePlacesClient {
+public final class GooglePlacesClient {
 
     private static final Pattern PLACE_ID = Pattern.compile("[A-Za-z0-9_-]+");
     private static final String FIELD_MASK =
@@ -17,7 +17,7 @@ final class GooglePlacesClient {
 
     private final RestClient restClient;
 
-    GooglePlacesClient(RestClient.Builder builder, GooglePlacesProperties properties) {
+    public GooglePlacesClient(RestClient.Builder builder, GooglePlacesProperties properties) {
         Objects.requireNonNull(builder, "RestClient builder must not be null");
         Objects.requireNonNull(properties, "Google Places properties must not be null");
         this.restClient = builder.baseUrl(properties.baseUrl().toString())
@@ -26,7 +26,7 @@ final class GooglePlacesClient {
                 .build();
     }
 
-    GooglePlaceDtos.Place fetchPlace(String placeId) {
+    public GooglePlaceDtos.Place fetchPlace(String placeId) {
         if (placeId == null || !PLACE_ID.matcher(placeId).matches()) {
             throw new GooglePlacesClientException("The Google Place ID is invalid");
         }

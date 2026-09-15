@@ -1,8 +1,8 @@
 package com.yanzhang.attractionbooking.attraction.internal.places;
 
-final class GooglePlacesClientException extends RuntimeException {
+public final class GooglePlacesClientException extends RuntimeException {
 
-    GooglePlacesClientException(String message) {
+    public GooglePlacesClientException(String message) {
         super(message);
     }
 }

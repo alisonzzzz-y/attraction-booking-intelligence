@@ -13,6 +13,8 @@ import com.yanzhang.attractionbooking.bookingpriority.OfficialAttractionDetails;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingEvidence;
 import com.yanzhang.attractionbooking.bookingpriority.OfficialBookingPolicy;
 import com.yanzhang.attractionbooking.bookingpriority.RomeBookingPriorityQuery;
+import com.yanzhang.attractionbooking.service.RomeBookingExplanationService;
+import com.yanzhang.attractionbooking.service.TemplateBookingExplanation;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;

@@ -12,6 +12,11 @@ import org.springframework.web.client.RestClient;
 class AiExplanationConfiguration {
 
     @Bean
+    ObjectMapper aiObjectMapper() {
+        return new ObjectMapper().findAndRegisterModules();
+    }
+
+    @Bean
     @ConditionalOnProperty(prefix = "ai-explanation", name = "enabled", havingValue = "true")
     BookingExplanationModelClient bookingExplanationModelClient(
             RestClient.Builder restClientBuilder,

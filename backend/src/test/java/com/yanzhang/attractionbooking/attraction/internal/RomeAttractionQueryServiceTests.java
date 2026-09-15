@@ -9,6 +9,7 @@ import com.yanzhang.attractionbooking.provider.ProviderAdapter;
 import com.yanzhang.attractionbooking.provider.ProviderEnvironment;
 import com.yanzhang.attractionbooking.provider.ProviderId;
 import com.yanzhang.attractionbooking.provider.ProviderSearchResult;
+import com.yanzhang.attractionbooking.service.RomeAttractionQueryService;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
