@@ -38,6 +38,8 @@ export const tripPlanSchema = z
     }
   })
 
+export type TripPlan = z.infer<typeof tripPlanSchema>
+
 export function parseTripQuery(params: URLSearchParams) {
   const number = (key: string) => {
     const value = params.get(key)

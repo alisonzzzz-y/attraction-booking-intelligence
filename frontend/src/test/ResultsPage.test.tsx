@@ -460,6 +460,30 @@ afterEach(() => {
 })
 
 describe('ResultsPage', () => {
+  it('returns focus to the details trigger after the dialog closes', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+    renderResults()
+
+    const trigger = await screen.findByRole('button', {
+      name: 'View details for Pantheon',
+    })
+    await user.click(trigger)
+    const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    await user.click(
+      within(dialog).getByRole('button', {
+        name: 'Close details for Pantheon',
+      }),
+    )
+
+    expect(trigger).toHaveFocus()
+  })
+
   it.each([
     `${resultsRoute}&dateMode=flexible&travelMonth=2026-99&tripLengthDays=5&lengthFlexDays=1`,
     '/results?city=rome&stayStartDate=2026-02-30&stayEndDate=2026-03-02',
