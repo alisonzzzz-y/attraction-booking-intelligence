@@ -1,5 +1,7 @@
 # ADR 0004: Historical Availability Observations
 
+> 2026-09-16 更新：用户要求新增具体但允许不精确的订票目标。当前前端提供独立标注的产品规划估算，并结合已核实开售窗口，见 [预约日期规则](../booking-target-dates.md)。这不是历史售罄预测，本文对生产数据、实时余票和统计预测的限制继续适用。
+
 Status: Accepted as a design, implementation deferred
 Date: 2026-08-22
 

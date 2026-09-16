@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ResultsPage } from '../app/ResultsPage'
 
 const resultsRoute =
@@ -43,6 +43,7 @@ function priority(
       sourceType: 'OFFICIAL_OPERATOR',
       policy,
       factualBasis: `Verified official booking rule for ${attractionName}.`,
+      details: { overview: `Official introduction to ${attractionName}.` },
       sourceUrl: `https://official.example/${attractionId}`,
       bookingUrl: `https://booking.example/${attractionId}`,
       checkedOn: '2026-08-21',
@@ -441,7 +442,13 @@ function responseWithAdditionalAttractions(input: RequestInfo | URL) {
   return successfulResponseFor(input)
 }
 
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-08-01T10:00:00Z'))
+})
+
 afterEach(() => {
+  vi.useRealTimers()
   cleanup()
   window.localStorage.clear()
   vi.unstubAllGlobals()
@@ -561,9 +568,11 @@ describe('ResultsPage', () => {
       }),
     ).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByText('Recommended booking action'),
+      within(pantheonDialog).getByText('Booking target (estimate)'),
     ).toBeInTheDocument()
-    expect(within(pantheonDialog).getByText('Check today')).toBeInTheDocument()
+    expect(
+      within(pantheonDialog).getByText('Aim to book by 3 Sept 2026'),
+    ).toBeInTheDocument()
     expect(
       within(pantheonDialog).queryByText('What to do'),
     ).not.toBeInTheDocument()
@@ -990,6 +999,178 @@ describe('ResultsPage', () => {
     expect(
       screen.queryByText('No attraction evidence was returned.'),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows the API introduction and cycles distinct photos with matching credits for every attraction', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+    renderResults()
+
+    for (const attraction of priorityResponse.priorities) {
+      await user.click(
+        await screen.findByRole('button', {
+          name: `View details for ${attraction.attractionName}`,
+        }),
+      )
+      const dialog = await screen.findByRole('dialog', {
+        name: attraction.attractionName,
+      })
+      expect(
+        within(dialog).getByText(attraction.officialEvidence.details.overview),
+      ).toBeVisible()
+      const mainPhoto = dialog.querySelector('.result-photo-main img')!
+      const firstSrc = mainPhoto.getAttribute('src')
+      const firstCredit = dialog.querySelector(
+        '.result-photo-credit',
+      )!.textContent
+      expect(within(dialog).getByText('1 / 2')).toBeVisible()
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Show next photo' }),
+      )
+      expect(mainPhoto.getAttribute('src')).not.toBe(firstSrc)
+      expect(within(dialog).getByText('2 / 2')).toBeVisible()
+      expect(
+        dialog.querySelector('.result-photo-credit')!.textContent,
+      ).not.toBe(firstCredit)
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Show next photo' }),
+      )
+      expect(mainPhoto).toHaveAttribute('src', firstSrc)
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Show previous photo' }),
+      )
+      expect(within(dialog).getByText('2 / 2')).toBeVisible()
+      await user.click(
+        within(dialog).getByRole('button', { name: 'Show photo 1' }),
+      )
+      expect(mainPhoto).toHaveAttribute('src', firstSrc)
+      await user.click(
+        within(dialog).getByRole('button', {
+          name: `Close details for ${attraction.attractionName}`,
+        }),
+      )
+    }
+  })
+
+  it('keeps introductions and galleries available when all backend requests fail', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(jsonResponse({}, 503))),
+    )
+    renderResults()
+    await user.click(
+      await screen.findByRole('button', { name: 'View details for Pantheon' }),
+    )
+    const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    expect(
+      within(dialog).getByText('A preserved ancient Roman monument.'),
+    ).toBeVisible()
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Show next photo' }),
+    )
+    expect(within(dialog).getByText('2 / 2')).toBeVisible()
+    await user.click(
+      within(dialog).getByRole('button', {
+        name: 'Close details for Pantheon',
+      }),
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'View details for Pantheon' }),
+    )
+    expect(
+      within(await screen.findByRole('dialog', { name: 'Pantheon' })).getByText(
+        '1 / 2',
+      ),
+    ).toBeVisible()
+  })
+
+  it('uses the local introduction with older API responses that omit details', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        if (String(input).includes('/booking-priorities?')) {
+          return Promise.resolve(
+            jsonResponse({
+              ...priorityResponse,
+              priorities: priorityResponse.priorities.map((item) => ({
+                ...item,
+                officialEvidence: {
+                  ...item.officialEvidence,
+                  details: undefined,
+                },
+              })),
+            }),
+          )
+        }
+        return Promise.resolve(successfulResponseFor(input))
+      }),
+    )
+    renderResults()
+    await user.click(
+      await screen.findByRole('button', { name: 'View details for Pantheon' }),
+    )
+    const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    expect(
+      within(dialog).getByText('A preserved ancient Roman monument.'),
+    ).toBeVisible()
+    expect(
+      within(dialog).getByRole('link', { name: /Open official booking/ }),
+    ).toBeVisible()
+  })
+
+  it('shows future release dates and estimated targets in both cards and details', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+    renderResults(
+      '/results?city=rome&stayStartDate=2027-06-20&stayEndDate=2027-06-25&dateMode=flexible',
+    )
+    expect(
+      await screen.findByText('Sales expected from 21 May 2027'),
+    ).toBeVisible()
+    expect(screen.getByText('Aim to book by 21 Apr 2027')).toBeVisible()
+    expect(screen.getAllByText('Aim to book by 13 Jun 2027')).toHaveLength(2)
+    expect(screen.queryByText('Book today')).not.toBeInTheDocument()
+    expect(screen.queryByText('Check today')).not.toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: 'View details for Pantheon' }),
+    )
+    const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
+    expect(within(dialog).getByText('Aim to book by 13 Jun 2027')).toBeVisible()
+    expect(
+      within(dialog).getByText(/Sales expected around 15 May 2027/),
+    ).toBeVisible()
+    expect(
+      within(dialog).getByRole('link', { name: 'Release policy' }),
+    ).toHaveAttribute(
+      'href',
+      'https://direzionemuseiroma.cultura.gov.it/pantheon/',
+    )
+    expect(
+      within(dialog).getByText(
+        /Based on a first possible visit on 20 Jun 2027/,
+      ),
+    ).toBeVisible()
+    cleanup()
+    renderResults(
+      '/results?city=rome&stayStartDate=2027-07-20&stayEndDate=2027-07-25',
+    )
+    expect(
+      await screen.findByText('Sales expected from 20 Jun 2027'),
+    ).toBeVisible()
+    expect(screen.getByText('Aim to book by 21 May 2027')).toBeVisible()
+    expect(screen.getAllByText('Aim to book by 13 Jul 2027')).toHaveLength(2)
   })
 
   it('does not request evidence without a complete Rome query', () => {

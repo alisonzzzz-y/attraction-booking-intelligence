@@ -15,6 +15,11 @@ const officialEvidenceSchema = z.object({
     'TICKET_REQUIRED_TIMING_UNKNOWN',
   ]),
   factualBasis: z.string().min(1),
+  details: z
+    .object({
+      overview: z.string().min(1),
+    })
+    .optional(),
   sourceUrl: z.url(),
   bookingUrl: z.url(),
   checkedOn: z.iso.date(),

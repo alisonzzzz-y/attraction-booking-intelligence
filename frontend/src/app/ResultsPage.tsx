@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import {
+  bookingGuidance,
+  formatPlanningDate,
+} from '../features/attractions/bookingGuidance'
 import { RomeResultsMap } from '../features/attractions/RomeResultsMap'
 import { mergeRomeMapPlaces } from '../features/attractions/romeMapReferences'
+import { romeAttractionOverview } from '../features/attractions/romeAttractionOverviews'
 import {
   loadFavouriteAttractionIds,
   saveFavouriteAttractionIds,
@@ -93,15 +98,6 @@ function priorityCopy(priority: RomeBookingPriority['priority']) {
   }
 }
 
-function formatPlanningDate(value: string) {
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(value))
-}
-
 function officialPolicyCopy(
   policy: RomeBookingPriority['officialEvidence']['policy'],
 ) {
@@ -117,52 +113,7 @@ function officialPolicyCopy(
     case 'OPTIONAL_PAID_AREA':
       return 'Optional paid area'
     default:
-      return 'Ticket timing not published'
-  }
-}
-
-function bookingGuidance(priority: RomeBookingPriority, stayStartDate: string) {
-  const tripStartDate = formatPlanningDate(`${stayStartDate}T00:00:00Z`)
-
-  switch (priority.priority) {
-    case 'BOOK_FIRST':
-      return {
-        summary: 'Book today',
-        note: 'ABI planning recommendation. The official source requires a timed reservation but does not publish a verified sell-out deadline.',
-      }
-    case 'BOOK_SOON':
-      return {
-        summary: `Book by ${tripStartDate}`,
-        note: 'ABI planning recommendation. The official source advises booking ahead, but current evidence does not support a precise sell-out window.',
-      }
-    case 'CAN_WAIT':
-      switch (priority.officialEvidence.policy) {
-        case 'FREE_GENERAL_ENTRY':
-          return {
-            summary: 'Walk in for ordinary entry',
-            note: 'Ordinary entry is free. Choose the optional paid reservation only if you want a guaranteed time and the included audio guide.',
-          }
-        case 'NO_ADVANCE_RESERVATION_REQUIRED':
-          return {
-            summary: 'A same-day visit is a practical option',
-            note: 'The official policy says an ordinary visit does not require a reservation. You can decide on the day, but check opening conditions before travelling.',
-          }
-        case 'OPTIONAL_PAID_AREA':
-          return {
-            summary: 'Walk in for the free exterior view',
-            note: 'The normal exterior view is free. Buy a separate ticket only if you want the enclosed inner area.',
-          }
-        default:
-          return {
-            summary: 'Plan this after higher-priority tickets',
-            note: 'The official rule does not require advance booking for the ordinary visit described here. Recheck the official website before travel.',
-          }
-      }
-    default:
-      return {
-        summary: 'Check today',
-        note: 'No verified booking deadline is available. Check the official website before making the rest of your plan.',
-      }
+      return 'Ticket required; lead time unverified'
   }
 }
 
@@ -338,7 +289,7 @@ function AttractionEvidenceCard({
 
         <div className="result-card-glance">
           <span>
-            <small>Recommended action</small>
+            <small>{deadline?.label ?? 'Recommended action'}</small>
             <strong>{deadline?.summary ?? 'Guidance unavailable'}</strong>
           </span>
           <span>
@@ -495,6 +446,12 @@ function AttractionEvidenceDetails({
     : null
   const offering = attraction ? offeringTypeCopy(attraction.offeringType) : null
   const price = attraction ? formatPrice(attraction) : null
+  const localOverview = romeAttractionOverview(attractionId)
+  const overview =
+    priority?.officialEvidence.details?.overview ?? localOverview?.text
+  const overviewSource = priority?.officialEvidence.details?.overview
+    ? priority.officialEvidence.sourceUrl
+    : localOverview?.sourceUrl
   const deadline = priority
     ? bookingGuidance(priority, stayStartDate)
     : undefined
@@ -511,19 +468,57 @@ function AttractionEvidenceDetails({
         </aside>
 
         <div className="result-details-content">
+          {overview ? (
+            <section
+              className="result-attraction-overview"
+              aria-label="About this attraction"
+            >
+              <h3>About this attraction</h3>
+              <p>{overview}</p>
+              <a href={overviewSource} target="_blank" rel="noreferrer">
+                Official source
+              </a>
+            </section>
+          ) : null}
           <section
             className="result-decision-overview"
             aria-label="Booking decision"
           >
             <div className="result-evidence-heading">
               <h3>Booking decision</h3>
-              <span className="official-source-badge">Official source</span>
+              <span className="official-source-badge">
+                {deadline?.targetDate
+                  ? 'Planning estimate'
+                  : 'Official guidance'}
+              </span>
             </div>
             {priority ? (
               <>
                 <div className="result-booking-deadline">
-                  <small>Recommended booking action</small>
+                  <small>
+                    {deadline?.label ?? 'Recommended booking action'}
+                  </small>
                   <strong>{deadline?.summary}</strong>
+                  {deadline?.targetDate ? (
+                    <p className="result-booking-target">
+                      Planning target:{' '}
+                      <strong>{formatPlanningDate(deadline.targetDate)}</strong>
+                    </p>
+                  ) : null}
+                  {deadline?.release ? (
+                    <p>
+                      {deadline.release.summary}
+                      {' · '}
+                      <a
+                        href={deadline.release.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Release policy
+                      </a>
+                      {' · '}Checked {deadline.release.checkedOn}
+                    </p>
+                  ) : null}
                   <p>{deadline?.note}</p>
                 </div>
                 <a
@@ -922,6 +917,14 @@ export function ResultsPage() {
           </Link>
         </div>
       </header>
+
+      {priorities.length > 0 ? (
+        <p className="results-planning-note">
+          Booking targets are estimates based on the first day of your travel
+          window. Official release dates are shown separately. Availability is
+          not confirmed.
+        </p>
+      ) : null}
 
       {isLoading ? (
         <div className="result-state" role="status">

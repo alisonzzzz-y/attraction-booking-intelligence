@@ -1915,6 +1915,34 @@ body:has(.results-section) {
   border-radius: 0.75rem;
 }
 
+.result-attraction-overview {
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+}
+
+.result-attraction-overview h3 {
+  margin: 0 0 0.65rem;
+}
+
+.result-attraction-overview p {
+  margin: 0 0 0.75rem;
+  line-height: 1.65;
+}
+
+.result-attraction-overview a {
+  color: var(--forest);
+  font-size: 0.8rem;
+}
+
+.results-planning-note {
+  margin: 0 0 1.5rem;
+  max-width: 70ch;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
 .result-booking-deadline {
   margin-top: 0.9rem;
   border: 1px solid var(--booking-line);
