@@ -4,6 +4,11 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ResultsPage } from '../app/ResultsPage'
+import {
+  buildSavedTripUrl,
+  saveTrip,
+  saveFavouriteAttractionIds,
+} from '../features/trips/localTripStorage'
 
 const resultsRoute =
   '/results?city=rome&stayStartDate=2026-09-10&stayEndDate=2026-09-12'
@@ -455,6 +460,46 @@ afterEach(() => {
 })
 
 describe('ResultsPage', () => {
+  it.each([
+    `${resultsRoute}&dateMode=flexible&travelMonth=2026-99&tripLengthDays=5&lengthFlexDays=1`,
+    '/results?city=rome&stayStartDate=2026-02-30&stayEndDate=2026-03-02',
+    '/results?city=rome&stayStartDate=2026-10-03&stayEndDate=2026-10-01',
+    '/results?city=rome&stayStartDate=2026-10-01&stayEndDate=2026-12-01',
+  ])(
+    'rejects malformed travel parameters without making requests: %s',
+    (route) => {
+      const fetch = vi.fn()
+      vi.stubGlobal('fetch', fetch)
+      renderResults(route)
+      expect(screen.getByText('Choose your stay first.')).toBeInTheDocument()
+      expect(fetch).not.toHaveBeenCalled()
+    },
+  )
+
+  it('continues the saved attraction snapshot after global favourites change', async () => {
+    const trip = saveTrip({
+      city: 'rome',
+      dateMode: 'exact',
+      stayStartDate: '2026-09-10',
+      stayEndDate: '2026-09-12',
+      attractionIds: ['pantheon'],
+    })!
+    saveFavouriteAttractionIds(['borghese-gallery'])
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) =>
+        Promise.resolve(successfulResponseFor(input)),
+      ),
+    )
+    renderResults(buildSavedTripUrl(trip))
+    expect(
+      await screen.findByRole('button', { name: 'Remove Pantheon' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(
+      screen.getByRole('button', { name: 'Save Borghese Gallery' }),
+    ).toHaveAttribute('aria-pressed', 'false')
+  })
+
   it('saves favourite attractions and the current trip in this browser', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
@@ -1134,7 +1179,7 @@ describe('ResultsPage', () => {
       ),
     )
     renderResults(
-      '/results?city=rome&stayStartDate=2027-06-20&stayEndDate=2027-06-25&dateMode=flexible',
+      '/results?city=rome&stayStartDate=2027-06-20&stayEndDate=2027-06-25&dateMode=flexible&travelMonth=2027-06&tripLengthDays=5&lengthFlexDays=1',
     )
     expect(
       await screen.findByText('Sales expected from 21 May 2027'),

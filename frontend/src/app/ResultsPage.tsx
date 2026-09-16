@@ -9,11 +9,12 @@ import { RomeResultsMap } from '../features/attractions/RomeResultsMap'
 import { mergeRomeMapPlaces } from '../features/attractions/romeMapReferences'
 import { romeAttractionOverview } from '../features/attractions/romeAttractionOverviews'
 import {
-  loadFavouriteAttractionIds,
+  loadResultsAttractionIds,
   saveFavouriteAttractionIds,
   saveTrip,
   type TripDateMode,
 } from '../features/trips/localTripStorage'
+import { parseTripQuery } from '../features/trips/tripDates'
 import {
   fetchRomeAttractions,
   type RomeAttraction,
@@ -765,12 +766,12 @@ export function ResultsPage() {
   const [selectedAttractionId, setSelectedAttractionId] = useState<
     string | undefined
   >()
-  const [favouriteAttractionIds, setFavouriteAttractionIds] = useState(
-    loadFavouriteAttractionIds,
+  const [searchParams] = useSearchParams()
+  const [favouriteAttractionIds, setFavouriteAttractionIds] = useState(() =>
+    loadResultsAttractionIds(searchParams),
   )
   const [saveFeedback, setSaveFeedback] = useState('')
-  const [searchParams] = useSearchParams()
-  const city = searchParams.get('city')
+  const hasValidQuery = parseTripQuery(searchParams).success
   const startDate = searchParams.get('stayStartDate')
   const endDate = searchParams.get('stayEndDate')
   const dateMode: TripDateMode =
@@ -778,12 +779,9 @@ export function ResultsPage() {
   const travelMonth = searchParams.get('travelMonth')
   const tripLengthDays = positiveInteger(searchParams.get('tripLengthDays'))
   const lengthFlexDays = nonNegativeInteger(searchParams.get('lengthFlexDays'))
-  const flexibleDates = flexibleDateCopy(
-    travelMonth,
-    tripLengthDays,
-    lengthFlexDays,
-  )
-  const hasValidQuery = city === 'rome' && Boolean(startDate && endDate)
+  const flexibleDates = hasValidQuery
+    ? flexibleDateCopy(travelMonth, tripLengthDays, lengthFlexDays)
+    : null
   const resultSetKey = `${startDate ?? ''}:${endDate ?? ''}`
   const [pagination, setPagination] = useState({
     resultSetKey,

@@ -189,6 +189,12 @@ The Rome explanation endpoint does not accept an open-ended traveller prompt. Wh
 
 The Viator Sandbox client has a three-second connection timeout, an eight-second response timeout, and at most one immediate retry after a timeout or upstream 5xx failure. It does not retry authentication or rate-limit failures. A failed product remains a provider error, while other verified product results are preserved.
 
+Product checks run concurrently, with up to six workers per search and a nine-second total search budget. Unfinished checks are cancelled and reported separately from completed results. Published schedules are matched against the stay dates, weekdays and timed-entry exclusions; they do not confirm live inventory. This budget starts after the backend receives the request and does not remove hosting cold-start delays.
+
+中文说明：每次查询最多使用六个并行任务，总查询时限为九秒。未完成的任务会被取消，并与已完成结果分别返回。排期按旅行日期、开放星期和分时不可用日期筛选，不代表实时余票。该时限从后端开始处理请求时计算，不能消除部署平台的冷启动等待。
+
+Schedule interpretation follows the [Viator technical guide](https://docs.viator.com/partner-api/technical/), including the 384-day horizon for seasons without an end date. 中文说明：排期解析依据 Viator 官方技术文档，无结束日期的排期按文档中的 384 天范围处理，不视为无限期开放。
+
 中文说明：仓库不会调用 production Provider API。内部 Viator adapter 只有在明确启用后才会发起已授权的 Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。Viator Sandbox client 设置了 3 秒连接超时、8 秒响应超时，并且只会对 timeout 或上游 5xx 失败立即重试一次。认证失败和限流不会重试。单个产品失败会被保留为 Provider error，不会清空其他已经成功核对的产品结果。
 
 ## Not implemented

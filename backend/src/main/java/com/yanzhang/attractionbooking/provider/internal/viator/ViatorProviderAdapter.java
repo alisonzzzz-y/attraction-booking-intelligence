@@ -26,6 +26,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 final class ViatorProviderAdapter implements ProviderAdapter {
 
@@ -35,10 +39,16 @@ final class ViatorProviderAdapter implements ProviderAdapter {
 
     private final ViatorHttpClient client;
     private final Clock clock;
+    private final Duration searchBudget;
 
     ViatorProviderAdapter(ViatorHttpClient client, Clock clock) {
+        this(client, clock, Duration.ofSeconds(9));
+    }
+
+    ViatorProviderAdapter(ViatorHttpClient client, Clock clock, Duration searchBudget) {
         this.client = client;
         this.clock = clock;
+        this.searchBudget = searchBudget;
     }
 
     @Override
@@ -55,39 +65,73 @@ final class ViatorProviderAdapter implements ProviderAdapter {
     public ProviderSearchResult search(AvailabilityQuery query) {
         List<AttractionResult> results = new ArrayList<>();
         List<ProviderError> errors = new ArrayList<>();
-
-        for (AttractionRequest attraction : query.attractions()) {
-            Optional<String> productCode = productCode(attraction);
-            if (productCode.isEmpty()) {
-                errors.add(error(
-                        ProviderError.Type.UNSUPPORTED_REQUEST,
-                        "viator-product-reference-missing",
-                        "The attraction has no verified Viator Sandbox product reference",
-                        attraction));
-                continue;
+        var executor = Executors.newFixedThreadPool(Math.max(1, Math.min(6, query.attractions().size())));
+        try {
+            List<Callable<ProviderSearchResult>> tasks = query.attractions().stream()
+                    .<Callable<ProviderSearchResult>>map(attraction -> () -> searchOne(attraction, query)).toList();
+            var futures = executor.invokeAll(tasks, searchBudget.toMillis(), TimeUnit.MILLISECONDS);
+            for (int index = 0; index < futures.size(); index++) {
+                var future = futures.get(index);
+                AttractionRequest attraction = query.attractions().get(index);
+                if (future.isCancelled()) {
+                    errors.add(error(ProviderError.Type.TIMEOUT, "viator-search-timeout",
+                            "The provider search exceeded its time budget", attraction));
+                    continue;
+                }
+                try {
+                    var result = future.get();
+                    results.addAll(result.attractions());
+                    errors.addAll(result.errors());
+                } catch (ExecutionException exception) {
+                    errors.add(error(ProviderError.Type.INVALID_RESPONSE, "viator-search-failed",
+                            "The provider product could not be read", attraction));
+                }
             }
-
-            try {
-                ViatorDtos.Product product = client.fetchProduct(productCode.get());
-                ViatorDtos.Schedule schedule = client.fetchSchedule(productCode.get());
-                validateResponses(productCode.get(), product, schedule);
-                results.add(map(attraction, product, schedule));
-            } catch (ViatorClientException exception) {
-                errors.add(error(mapErrorType(exception.kind()), exception.code(), exception.getMessage(), attraction));
-            } catch (RuntimeException exception) {
-                errors.add(error(
-                        ProviderError.Type.INVALID_RESPONSE,
-                        "viator-mapping-failed",
-                        "The Viator Sandbox response did not match the expected contract",
-                        attraction));
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            for (AttractionRequest attraction : query.attractions()) {
+                errors.add(error(ProviderError.Type.TIMEOUT, "viator-search-interrupted",
+                        "The provider search was interrupted", attraction));
             }
+        } finally {
+            executor.shutdownNow();
+        }
+        return new ProviderSearchResult(PROVIDER_ID, environment(), results, errors);
+    }
+
+    private ProviderSearchResult searchOne(AttractionRequest attraction, AvailabilityQuery query) {
+        List<AttractionResult> results = new ArrayList<>();
+        List<ProviderError> errors = new ArrayList<>();
+        Optional<String> productCode = productCode(attraction);
+        if (productCode.isEmpty()) {
+            errors.add(error(
+                    ProviderError.Type.UNSUPPORTED_REQUEST,
+                    "viator-product-reference-missing",
+                    "The attraction has no verified Viator Sandbox product reference",
+                    attraction));
+            return new ProviderSearchResult(PROVIDER_ID, environment(), results, errors);
         }
 
+        try {
+            ViatorDtos.Product product = client.fetchProduct(productCode.get());
+            ViatorDtos.Schedule schedule = client.fetchSchedule(productCode.get());
+            validateResponses(productCode.get(), product, schedule);
+            results.add(map(attraction, product, schedule, query));
+        } catch (ViatorClientException exception) {
+            errors.add(error(mapErrorType(exception.kind()), exception.code(), exception.getMessage(), attraction));
+        } catch (RuntimeException exception) {
+            errors.add(error(
+                    ProviderError.Type.INVALID_RESPONSE,
+                    "viator-mapping-failed",
+                    "The Viator Sandbox response did not match the expected contract",
+                    attraction));
+        }
         return new ProviderSearchResult(PROVIDER_ID, environment(), results, errors);
     }
 
     private AttractionResult map(
-            AttractionRequest request, ViatorDtos.Product product, ViatorDtos.Schedule schedule) {
+            AttractionRequest request, ViatorDtos.Product product, ViatorDtos.Schedule schedule,
+            AvailabilityQuery query) {
         Instant retrievedAt = clock.instant();
         SourceMetadata source = new SourceMetadata(
                 SourceMetadata.Type.AFFILIATE_PROVIDER,
@@ -109,12 +153,12 @@ final class ViatorProviderAdapter implements ProviderAdapter {
                 source);
 
         boolean active = "ACTIVE".equals(product.status());
-        boolean hasSchedule = schedule.bookableItems() != null && !schedule.bookableItems().isEmpty();
-        Availability.Status availabilityStatus = active && hasSchedule
-                ? Availability.Status.SCHEDULED
+        Availability.Status availabilityStatus = active
+                ? ViatorScheduleMatcher.status(schedule, query.startDate(), query.endDate(),
+                        retrievedAt.atZone(java.time.ZoneOffset.UTC).toLocalDate())
                 : Availability.Status.UNAVAILABLE;
         Optional<String> reasonCode = availabilityStatus == Availability.Status.UNAVAILABLE
-                ? Optional.of(active ? "schedule-empty" : "product-inactive")
+                ? Optional.of(active ? "no-schedule-in-stay" : "product-inactive")
                 : Optional.empty();
 
         Availability availability = new Availability(

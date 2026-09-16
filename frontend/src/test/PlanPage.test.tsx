@@ -15,6 +15,22 @@ afterEach(() => {
 })
 
 describe('PlanPage', () => {
+  it('rejects manually entered past dates even when native validation is disabled', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <PlanPage today="2026-09-16" />
+      </MemoryRouter>,
+    )
+    await user.type(screen.getByLabelText('Arrival date'), '2026-09-10')
+    await user.type(screen.getByLabelText('Departure date'), '2026-09-12')
+    await user.click(
+      screen.getByRole('button', { name: 'Find Rome attractions' }),
+    )
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Choose an arrival date today or later.',
+    )
+  })
   it('keeps an exact thirty-one-day stay in a shareable results URL', async () => {
     const user = userEvent.setup()
     render(
@@ -92,7 +108,7 @@ describe('PlanPage', () => {
       screen.getByRole('link', { name: 'Continue saved trip' }),
     ).toHaveAttribute(
       'href',
-      '/results?city=rome&stayStartDate=2026-09-01&stayEndDate=2026-09-06&dateMode=flexible&travelMonth=2026-09&tripLengthDays=5&lengthFlexDays=1',
+      '/results?city=rome&stayStartDate=2026-09-01&stayEndDate=2026-09-06&resume=saved&dateMode=flexible&travelMonth=2026-09&tripLengthDays=5&lengthFlexDays=1',
     )
   })
 

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-08-01T10:00:00Z'))
   await page.route('**/api/v1/rome/booking-priorities?**', async (route) => {
     await route.fulfill({
       contentType: 'application/json',

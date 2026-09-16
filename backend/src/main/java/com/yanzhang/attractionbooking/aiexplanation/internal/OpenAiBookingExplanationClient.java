@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.springframework.http.MediaType;
@@ -90,23 +91,28 @@ final class OpenAiBookingExplanationClient implements BookingExplanationModelCli
                 "tool_choice", "required",
                 "parallel_tool_calls", false,
                 "max_output_tokens", 160,
+                "include", List.of("reasoning.encrypted_content"),
                 "store", false);
     }
 
     private Map<String, Object> finalRequest(
             JsonNode firstResponse, ToolCall toolCall, BookingExplanationFacts facts) {
-        String responseId = firstResponse.path("id").asText();
-        if (responseId.isBlank()) {
-            throw new AiExplanationClientException("The explanation model returned no response identifier");
+        List<Object> input = new ArrayList<>();
+        input.add(Map.of("role", "user", "content", firstRequest(facts).get("input")));
+        try {
+            for (JsonNode item : firstResponse.path("output")) {
+                input.add(objectMapper.readValue(item.toString(), Map.class));
+            }
+        } catch (JsonProcessingException exception) {
+            throw new AiExplanationClientException("The explanation context could not be prepared");
         }
+        input.add(Map.of("type", "function_call_output", "call_id", toolCall.callId(),
+                "output", serialiseFacts(facts)));
         return Map.of(
                 "model", properties.model(),
                 "instructions", INSTRUCTIONS,
-                "previous_response_id", responseId,
-                "input", List.of(Map.of(
-                        "type", "function_call_output",
-                        "call_id", toolCall.callId(),
-                        "output", serialiseFacts(facts))),
+                "input", input,
+                "tools", List.of(bookingFactsTool()),
                 "tool_choice", "none",
                 "max_output_tokens", 120,
                 "store", false);

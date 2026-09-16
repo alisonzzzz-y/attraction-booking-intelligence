@@ -62,9 +62,15 @@ class OpenAiBookingExplanationClientContractTests {
         assertEquals(2, requestCount.get());
         assertEquals("required", firstRequest.get().path("tool_choice").asText());
         assertEquals("get_rome_booking_facts", firstRequest.get().path("tools").get(0).path("name").asText());
-        assertEquals("resp_tool", secondRequest.get().path("previous_response_id").asText());
-        assertEquals("function_call_output", secondRequest.get().path("input").get(0).path("type").asText());
-        assertTrue(secondRequest.get().path("input").get(0).path("output").asText().contains("colosseum"));
+        assertTrue(!secondRequest.get().has("previous_response_id"));
+        assertTrue(!firstRequest.get().path("store").asBoolean());
+        assertTrue(!secondRequest.get().path("store").asBoolean());
+        assertEquals("user", secondRequest.get().path("input").get(0).path("role").asText());
+        assertEquals("function_call", secondRequest.get().path("input").get(1).path("type").asText());
+        assertEquals("function_call_output", secondRequest.get().path("input").get(2).path("type").asText());
+        assertEquals(secondRequest.get().path("input").get(1).path("call_id").asText(),
+                secondRequest.get().path("input").get(2).path("call_id").asText());
+        assertTrue(secondRequest.get().path("input").get(2).path("output").asText().contains("colosseum"));
     }
 
     @Test

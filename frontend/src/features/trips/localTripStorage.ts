@@ -1,3 +1,5 @@
+import { tripPlanSchema } from './tripDates'
+
 export type TripDateMode = 'exact' | 'flexible'
 
 export type SavedTrip = {
@@ -17,9 +19,14 @@ const FAVOURITES_KEY = 'abi.favourite-attractions.v1'
 const SAVED_TRIP_KEY = 'abi.saved-trip.v1'
 
 function storageAvailable() {
-  return (
-    typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
-  )
+  try {
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.localStorage !== 'undefined'
+    )
+  } catch {
+    return false
+  }
 }
 
 function isDateMode(value: unknown): value is TripDateMode {
@@ -89,6 +96,7 @@ export function loadSavedTrip(): SavedTrip | null {
     }
 
     const candidate = value as Record<string, unknown>
+    if (!tripPlanSchema.safeParse(candidate).success) return null
     if (
       candidate.version !== 1 ||
       candidate.city !== 'rome' ||
@@ -125,7 +133,7 @@ export function loadSavedTrip(): SavedTrip | null {
 export function saveTrip(
   input: Omit<SavedTrip, 'version' | 'savedAt'>,
 ): SavedTrip | null {
-  if (!storageAvailable()) {
+  if (!storageAvailable() || !tripPlanSchema.safeParse(input).success) {
     return null
   }
 
@@ -149,6 +157,7 @@ export function buildSavedTripUrl(trip: SavedTrip) {
     city: trip.city,
     stayStartDate: trip.stayStartDate,
     stayEndDate: trip.stayEndDate,
+    resume: 'saved',
   })
 
   if (trip.dateMode === 'flexible') {
@@ -165,4 +174,19 @@ export function buildSavedTripUrl(trip: SavedTrip) {
   }
 
   return `/results?${params.toString()}`
+}
+
+export function loadResultsAttractionIds(params: URLSearchParams): string[] {
+  const trip = params.get('resume') === 'saved' ? loadSavedTrip() : null
+  if (trip) {
+    const savedParams = new URLSearchParams(
+      buildSavedTripUrl(trip).split('?')[1],
+    )
+    if (
+      Array.from(savedParams).every(([key, value]) => params.get(key) === value)
+    ) {
+      return trip.attractionIds
+    }
+  }
+  return loadFavouriteAttractionIds()
 }

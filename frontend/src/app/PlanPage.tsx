@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { romeCalendarDate } from '../features/attractions/bookingGuidance'
 import {
   buildSavedTripUrl,
   loadSavedTrip,
@@ -73,7 +74,7 @@ function savedTripDateCopy(
 }
 
 export function PlanPage({
-  today = formatDate(new Date()),
+  today = romeCalendarDate(new Date()),
 }: {
   today?: string
 }) {
@@ -124,6 +125,10 @@ export function PlanPage({
     }
     if (stayEndDate < stayStartDate) {
       setError('Departure must be on or after arrival.')
+      return
+    }
+    if (stayStartDate < today) {
+      setError('Choose an arrival date today or later.')
       return
     }
 

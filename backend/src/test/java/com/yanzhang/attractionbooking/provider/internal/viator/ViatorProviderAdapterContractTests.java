@@ -302,7 +302,7 @@ class ViatorProviderAdapterContractTests extends ProviderAdapterContract {
                           "endDate": "2026-12-31",
                           "pricingRecords": [
                             {
-                              "daysOfWeek": ["MONDAY", "TUESDAY"],
+                              "daysOfWeek": ["THURSDAY", "FRIDAY", "SATURDAY"],
                               "timedEntries": [
                                 {
                                   "startTime": "09:00",

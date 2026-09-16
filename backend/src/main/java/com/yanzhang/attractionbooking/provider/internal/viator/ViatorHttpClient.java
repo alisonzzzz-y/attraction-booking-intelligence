@@ -46,6 +46,10 @@ final class ViatorHttpClient {
 
     private <T> T get(String resourcePath, String productCode, Class<T> responseType) {
         for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new ViatorClientException(ViatorClientException.Kind.TIMEOUT,
+                        "viator-cancelled", "The provider request was cancelled");
+            }
             try {
                 T response = restClient.get()
                         .uri(uriBuilder -> uriBuilder.pathSegment(resourcePath.split("/"))
