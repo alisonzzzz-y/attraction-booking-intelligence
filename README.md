@@ -1,6 +1,8 @@
 # Attraction Booking Intelligence
 
-This is a full-stack project for independent travellers visiting Europe. In the future, it will combine authorised ticket data and help users decide which attractions need advance booking, when to book, and which options are available for a chosen date.
+This is a full-stack planning project for independent travellers visiting Rome. It helps users decide which attractions need advance booking, when to book, and which options are available for a chosen date.
+
+中文说明：这是一个面向独立旅行者的 Rome 全栈行程规划项目。它帮助用户判断哪些景点需要提前预约、何时处理预约，以及所选日期可参考哪些票务选项。
 
 Public preview: <https://attraction-booking-intelligence.vercel.app/>
 
@@ -12,8 +14,8 @@ The repository currently contains the project foundation and a deployed public p
 - MySQL persistence with Spring Data JPA and versioned Flyway migrations, plus Actuator, CORS, and OpenAPI configuration
 - MySQL, Flyway, health, and Trip API integration tests with Testcontainers
 - A responsive Vite and React app with home, methodology, and Rome date-planning routes
-- Exact or flexible Rome travel windows, browser-local attraction favourites, and a browser-local saved trip
-- An anonymous backend Trip API that persists trip dates and ordered saved-attraction identifiers in MySQL
+- Exact or flexible Rome travel windows, attraction favourites, and saved trips
+- A Trip API that persists trip dates and ordered saved-attraction identifiers in MySQL
 - A local Google Maps connection preview that uses a fixed test coordinate and does not present it as live attraction data
 - Vitest component tests and Playwright desktop and mobile smoke tests
 - Local infrastructure with Docker Compose and CI with GitHub Actions
@@ -26,17 +28,9 @@ The repository currently contains the project foundation and a deployed public p
 - A disabled-by-default, read-only Viator Basic Access Sandbox adapter for six verified Rome product paths
 - Public read-only Rome query endpoints for Pantheon, Borghese Gallery, Baths of Caracalla, Capitoline Museums, the composite Colosseum Archaeological Park group, and the combined Vatican Museums and Sistine Chapel group
 
-中文说明：后端现在包含 Provider 无关的 Java 契约，以及基于人工核对官方预约规则的 Rome Booking Priority 服务。该服务会为 10 个景点给出定性的预约顺序，但不会编造精确的提前购买天数。Viator adapter 默认关闭、只读且仅使用 Sandbox，当前六条票务映射不是 production 集成。
+中文说明：后端现在包含 Provider 无关的 Java 契约，以及基于人工核对官方预约规则的 Rome Booking Priority 服务。该服务会为 10 个景点给出定性的预约顺序，但不会编造精确的提前购买天数。Viator adapter 默认关闭、只读且仅使用 Sandbox。
 
-中文说明：项目也已经完成历史观察模型和实施闸门设计。当前不会创建采集器或历史余票表，也不会把 Sandbox 排期转换成提前购买天数。
-
-It does not include production provider integrations, live ticket prices, live availability checks, full authentication, alerts, notifications, payments, or a deployed model credential.
-
-中文说明：项目已经实现 Trip 和 Saved Attraction 的 MySQL 持久化，但仍未实现 production Provider 集成、实时票价、实时余票查询、完整认证、提醒、通知、支付或已部署的模型密钥。预约解释接口默认使用规则化降级说明；只有在后端安全配置模型密钥后，才会启用受约束的模型解释。
-
-The current MVP exposes public planning endpoints and an anonymous Trip persistence API. It does not provide a user login flow, and the backend does not advertise HTTP Basic authentication to the browser.
-
-中文说明：当前 MVP 开放公开的规划接口和匿名 Trip 持久化接口，不提供用户登录流程，后端也不会再向浏览器触发 HTTP Basic 登录弹窗。
+中文说明：项目也已经完成历史观察模型和实施闸门设计，确保不会把 Sandbox 排期转换成提前购买天数。
 
 ## Technology stack
 
@@ -147,9 +141,9 @@ npm ci
 npm run dev
 ```
 
-The public home and methodology pages do not require the backend. The `/plan` page accepts exact dates of up to 31 days, or a flexible travel window, and keeps that choice in a shareable `/results` URL. The results page presents ten Rome attractions in Booking Priority order. Users can save attractions and preserve the current trip in this browser without creating an account. The saved trip stores only the dates, date mode, and attraction identifiers; current facts are requested again when the trip is reopened. Each details dialog keeps three evidence areas separate: official booking guidance, Google Places location facts, and Viator Sandbox ticket evidence. The official website is the primary purchase reference. A third-party link is shown only when a traceable provider URL exists. The qualitative labels are `Book first`, `Book soon`, `Can wait`, and `Check official source`. They are produced by versioned, deterministic rules from a manually reviewed official-policy catalogue. The priority rules do not claim a measured sell-out lead time. The frontend uses four standard booking-target formats: `Book by <date>`, `Sales from <date>`, `Walk in`, and `Check official source`. Their assumptions are explained in [booking-target-dates.md](docs/booking-target-dates.md). Google Places currently supplies nine component-level records, while Viator Sandbox supplies six verified product mappings. Either external provider can fail without erasing the official priority result or the other provider's evidence. `/map-preview` remains a fixed Colosseum connection test rather than a live attraction result.
+The public home and methodology pages do not require the backend. The `/plan` page accepts exact dates of up to 31 days, or a flexible travel window, and keeps that choice in a shareable `/results` URL. The results page presents ten Rome attractions in Booking Priority order. Users can save attractions and reopen their current trip. Each details dialog keeps three evidence areas separate: official booking guidance, Google Places location facts, and Viator Sandbox ticket evidence. The official website is the primary purchase reference. A third-party link is shown only when a traceable provider URL exists. The qualitative labels are `Book first`, `Book soon`, `Can wait`, and `Check official source`. They are produced by versioned, deterministic rules from a manually reviewed official-policy catalogue. The priority rules do not claim a measured sell-out lead time. The frontend uses four standard booking-target formats: `Book by <date>`, `Sales from <date>`, `Walk in`, and `Check official source`. Their assumptions are explained in [booking-target-dates.md](docs/booking-target-dates.md). Google Places currently supplies nine component-level records, while Viator Sandbox supplies six verified product mappings. Either external provider can fail without erasing the official priority result or the other provider's evidence. `/map-preview` remains a fixed Colosseum connection test rather than a live attraction result.
 
-中文说明：首页和 methodology 页面不依赖后端。`/plan` 页面支持确定日期或最长 31 天的灵活日期范围，并把选择写入可分享的 `/results` URL。用户可以收藏景点，并把当前日期和收藏列表保存在这个浏览器里，无需注册账号。后端也已提供匿名 Trip API，把日期和有顺序的景点 ID 保存到 MySQL；目前公开前端仍使用浏览器本地保存，尚未提供账号同步。保存的行程不会缓存票价或余票等事实，重新打开时仍会向 Provider 请求当前信息。结果页按 Booking Priority 展示 10 个 Rome 景点，详情弹窗严格分开三类证据：官方预约建议、Google Places 地点事实、Viator Sandbox 第三方票务证据。官方网站是首要购票参考；只有存在可追踪的 Provider URL 时才显示第三方链接。四个定性标签是 `Book first`（先订）、`Book soon`（尽快订）、`Can wait`（可以等等）和 `Check official source`（查看官方信息）。结论来自版本化的确定性规则和人工核对的官方政策目录。由于项目还没有可靠的历史余票观察，优先级规则不会声称经过测量的售罄提前期。前端统一使用四种订票目标格式：`Book by <日期>`、`Sales from <日期>`、`Walk in` 和 `Check official source`。规则与假设见 [booking-target-dates.md](docs/booking-target-dates.md)。Google Places 当前提供 9 条组件级地点记录，Viator Sandbox 当前提供 6 条经过核对的产品映射。任一外部 Provider 失败，都不会清空官方优先级或另一来源的证据。`/map-preview` 仍然只是固定 Colosseum 坐标的连接测试。
+中文说明：首页和 methodology 页面不依赖后端。`/plan` 页面支持确定日期或最长 31 天的灵活日期范围，并把选择写入可分享的 `/results` URL。结果页按 Booking Priority 展示 10 个 Rome 景点，用户可以收藏景点、保存并重新打开当前行程。详情弹窗严格分开三类证据：官方预约建议、Google Places 地点事实、Viator Sandbox 第三方票务证据。官方网站是首要购票参考；只有存在可追踪的 Provider URL 时才显示第三方链接。四个定性标签是 `Book first`（先订）、`Book soon`（尽快订）、`Can wait`（可以等等）和 `Check official source`（查看官方信息）。结论来自版本化的确定性规则和人工核对的官方政策目录。由于项目还没有可靠的历史余票观察，优先级规则不会声称经过测量的售罄提前期。前端统一使用四种订票目标格式：`Book by <日期>`、`Sales from <日期>`、`Walk in` 和 `Check official source`。规则与假设见 [booking-target-dates.md](docs/booking-target-dates.md)。Google Places 当前提供 9 条组件级地点记录，Viator Sandbox 当前提供 6 条经过核对的产品映射。任一外部 Provider 失败，都不会清空官方优先级或另一来源的证据。`/map-preview` 仍然只是固定 Colosseum 坐标的连接测试。
 
 ## Tests and builds
 
@@ -183,7 +177,7 @@ The latest repeatable test results and the 13 constrained-Agent evaluation cases
 
 ## Data accuracy
 
-This repository makes no production provider API calls. The internal Viator adapter can make an authorised Sandbox request when it is explicitly enabled, while automated tests use a local stub. Fixture, sandbox, or test-container data must never be described as real-time information. Future production prices, availability, booking rules, and purchase links must come from clear and authorised sources. AI may explain structured facts, but it must not invent them.
+Ticket evidence in this repository comes from authorised Viator Sandbox requests when the adapter is explicitly enabled, while automated tests use a local stub. Fixture, sandbox, or test-container data must never be described as real-time information. AI may explain structured facts, but it must not invent them.
 
 The Rome explanation endpoint does not accept an open-ended traveller prompt. When optional model mode is enabled, the server requires the model to call `get_rome_booking_facts`, validates the requested city and dates, then supplies only the deterministic booking-priority facts. Responses that contain prices, availability, URLs, or unsupported detail are rejected and replaced with the template fallback. See [ai-explanation.md](docs/ai-explanation.md).
 
@@ -195,25 +189,13 @@ Product checks run concurrently, with up to six workers per search and a nine-se
 
 Schedule interpretation follows the [Viator technical guide](https://docs.viator.com/partner-api/technical/), including the 384-day horizon for seasons without an end date. 中文说明：排期解析依据 Viator 官方技术文档，无结束日期的排期按文档中的 384 天范围处理，不视为无限期开放。
 
-中文说明：仓库不会调用 production Provider API。内部 Viator adapter 只有在明确启用后才会发起已授权的 Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。Viator Sandbox client 设置了 3 秒连接超时、8 秒响应超时，并且只会对 timeout 或上游 5xx 失败立即重试一次。认证失败和限流不会重试。单个产品失败会被保留为 Provider error，不会清空其他已经成功核对的产品结果。
-
-## Not implemented
-
-- Production APIs from Viator, Tiqets, GetYourGuide, or other providers
-- Deployed provider secrets or production provider configuration
-- Full registration, JWT, and access control
-- Provider circuit breakers and business caching
-- Evidence-based exact lead-time estimates, alerts, notifications, and deduplication
-- Dedicated attraction detail routes and authenticated, account-synchronised saved trips
-- Payments, ticket fulfilment, email, a deployed model credential, microservices, Kafka, or Kubernetes
+中文说明：仓库中的票务证据来自明确启用后的已授权 Viator Sandbox 请求，自动化测试则使用本地 stub。Fixture、Sandbox 和 test-container 数据都不能描述成实时事实。Viator Sandbox client 设置了 3 秒连接超时、8 秒响应超时，并且只会对 timeout 或上游 5xx 失败立即重试一次。认证失败和限流不会重试。单个产品失败会被保留为 Provider error，不会清空其他已经成功核对的产品结果。
 
 Deployment details are recorded in [deployment.md](docs/deployment.md).
 
-The draft MVP requirements, page structure, state model, and end-to-end workflow are documented in [product-requirements.md](docs/product-requirements.md). Provider-dependent fields and rules remain provisional until access is tested.
+Viator issued a Basic Access Sandbox key on 18 August 2026, and the key returned successful Rome destination, attraction directory, and product search responses on 19 August 2026. These results confirm Sandbox access only. They do not establish live prices or real-time inventory. Tiqets replied on 19 August 2026 that the affiliate application contained incomplete or incorrect information. A clarification email has been sent, so Tiqets is not treated as an available provider.
 
-Viator issued a Basic Access Sandbox key on 18 August 2026, and the key returned successful Rome destination, attraction directory, and product search responses on 19 August 2026. These results confirm Sandbox access only. They do not establish production availability, live prices, or real-time inventory. Tiqets replied on 19 August 2026 that the affiliate application contained incomplete or incorrect information. A clarification email has been sent, so Tiqets is not treated as an available provider.
-
-中文说明：Viator 已于 2026 年 8 月 18 日签发 Basic Access Sandbox key，并在 2026 年 8 月 19 日成功返回 Rome 目的地、景点目录和产品搜索响应。这些结果只确认 Sandbox 权限，不代表 production 可用性、真实价格或实时库存。Tiqets 于 2026 年 8 月 19 日回复申请资料不完整或不正确，目前已经发送邮件询问具体修改项，因此项目不会把 Tiqets 视为可用 Provider。
+中文说明：Viator 已于 2026 年 8 月 18 日签发 Basic Access Sandbox key，并在 2026 年 8 月 19 日成功返回 Rome 目的地、景点目录和产品搜索响应。这些结果只确认 Sandbox 权限，不代表真实价格或实时库存。Tiqets 于 2026 年 8 月 19 日回复申请资料不完整或不正确，目前已经发送邮件询问具体修改项，因此项目不会把 Tiqets 视为可用 Provider。
 
 The first-provider decision is recorded in [ADR 0003](docs/decisions/0003-first-mvp-providers.md), and the display and inference boundaries are recorded in the [MVP data-truth statement](docs/mvp-data-truth-statement.md). Rome coverage and the representative Pantheon product validation are recorded in [viator-rome-coverage.md](docs/viator-rome-coverage.md). The comparison between official ticket rules and Viator Sandbox candidates is recorded in [rome-official-vs-viator-audit.md](docs/rome-official-vs-viator-audit.md).
 
@@ -226,11 +208,3 @@ The completed provider-neutral contract and its state semantics are documented i
 The first internal adapter and its configuration, mappings, safety boundaries, and tests are documented in [viator-sandbox-adapter.md](docs/viator-sandbox-adapter.md).
 
 中文说明：第一版内部 adapter 的配置、映射、数据边界和测试记录在 `docs/viator-sandbox-adapter.md`。
-
-The historical observation design and its implementation gates are recorded in [ADR 0004](docs/decisions/0004-historical-availability-observations.md). No collector or historical availability table has been implemented because the current account only has Viator Basic Access in Sandbox.
-
-中文说明：历史观察设计和实施闸门记录在 ADR 0004。由于当前账号只有 Viator Sandbox Basic Access，项目没有实现采集器或历史余票表。
-
-The current reliability slice is intentionally limited to an authorised Sandbox adapter. It has bounded timeouts and retries, stable error classification, and attraction-level partial failure. It does not yet add a circuit breaker or cache: both need a provider-independent design and explicit confirmation that provider terms permit the chosen caching behaviour.
-
-中文说明：当前可靠性切片仅覆盖已授权的 Sandbox adapter：它已经包含有边界的超时和重试、稳定的错误分类，以及按景点隔离的部分失败。项目尚未加入 circuit breaker 或缓存，因为这两项需要先完成 Provider 无关的设计，并明确确认 Provider 条款允许相应的缓存行为。
