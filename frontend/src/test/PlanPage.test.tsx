@@ -11,7 +11,6 @@ function ResultsLocation() {
 
 afterEach(() => {
   cleanup()
-  window.localStorage.clear()
 })
 
 describe('PlanPage', () => {
@@ -74,41 +73,6 @@ describe('PlanPage', () => {
 
     expect(screen.getByText(/Results location:/)).toHaveTextContent(
       '/results?city=rome&stayStartDate=2026-09-01&stayEndDate=2026-09-12&dateMode=flexible&travelMonth=2026-09&tripLengthDays=10&lengthFlexDays=2',
-    )
-  })
-
-  it('offers to continue a trip previously saved in this browser', () => {
-    window.localStorage.setItem(
-      'abi.saved-trip.v1',
-      JSON.stringify({
-        version: 1,
-        city: 'rome',
-        dateMode: 'flexible',
-        stayStartDate: '2026-09-01',
-        stayEndDate: '2026-09-06',
-        travelMonth: '2026-09',
-        tripLengthDays: 5,
-        lengthFlexDays: 1,
-        attractionIds: ['pantheon', 'borghese-gallery'],
-        savedAt: '2026-08-25T08:00:00.000Z',
-      }),
-    )
-
-    render(
-      <MemoryRouter>
-        <PlanPage today="2026-08-19" />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText(/2 saved attractions/)).toBeInTheDocument()
-    expect(
-      screen.getByText(/Around 5 days in September 2026, ±1 day/),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: 'Continue saved trip' }),
-    ).toHaveAttribute(
-      'href',
-      '/results?city=rome&stayStartDate=2026-09-01&stayEndDate=2026-09-06&resume=saved&dateMode=flexible&travelMonth=2026-09&tripLengthDays=5&lengthFlexDays=1',
     )
   })
 

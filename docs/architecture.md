@@ -46,9 +46,9 @@ The API currently provides:
 - `GET /api/v1/trips/{tripId}`
 - `PUT /api/v1/trips/{tripId}`
 
-The public frontend still keeps its browser-local fallback. Connecting that UI to the persistent API is separate from account synchronisation because authentication has not been implemented.
+The public frontend creates, reads, and updates trips through this API. It keeps the returned `tripId` in the results URL, so reopening that URL restores the server-persisted trip.
 
-公开前端目前仍保留浏览器本地保存作为降级方式。由于项目尚未实现登录认证，不能把匿名 Trip API 描述成账号同步功能。
+公开前端通过该 API 创建、读取和更新行程。后端返回的 `tripId` 写入结果页 URL，因此重新打开该 URL 时会恢复服务端持久化的行程。
 
 ## Provider boundary / Provider 边界
 

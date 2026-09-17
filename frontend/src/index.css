@@ -925,38 +925,6 @@ p {
   background: var(--partner-surface);
 }
 
-.saved-trip-resume {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--booking-line);
-  border-radius: var(--radius-medium);
-  background: #fff;
-}
-
-.saved-trip-resume h2,
-.saved-trip-resume p {
-  margin: 0;
-}
-
-.saved-trip-resume h2 {
-  font-size: 1rem;
-}
-
-.saved-trip-resume p:last-child {
-  margin-top: 0.25rem;
-  color: var(--muted);
-  font-size: 0.78rem;
-}
-
-.saved-trip-resume .button {
-  flex: 0 0 auto;
-  margin: 0;
-}
-
 .results-intro {
   min-height: 24rem;
   padding-block: clamp(2.5rem, 5vw, 4.5rem);
@@ -2456,13 +2424,11 @@ body:has(.results-section) {
     grid-template-columns: 1fr;
   }
 
-  .saved-trip-resume,
   .result-list-header {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .saved-trip-resume .button,
   .result-save-trip {
     width: 100%;
   }

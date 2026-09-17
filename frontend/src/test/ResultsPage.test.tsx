@@ -4,11 +4,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ResultsPage } from '../app/ResultsPage'
-import {
-  buildSavedTripUrl,
-  saveTrip,
-  saveFavouriteAttractionIds,
-} from '../features/trips/localTripStorage'
 
 const resultsRoute =
   '/results?city=rome&stayStartDate=2026-09-10&stayEndDate=2026-09-12'
@@ -418,6 +413,24 @@ function successfulResponseFor(input: RequestInfo | URL) {
   return jsonResponse(ticketResponse)
 }
 
+function savedTripResponse(
+  id: string,
+  attractionIds: string[],
+  overrides: Record<string, unknown> = {},
+) {
+  return {
+    id,
+    city: 'Rome',
+    dateMode: 'EXACT',
+    stayStartDate: '2026-09-10',
+    stayEndDate: '2026-09-12',
+    attractionIds,
+    createdAt: '2026-08-01T10:00:00Z',
+    updatedAt: '2026-08-01T10:00:00Z',
+    ...overrides,
+  }
+}
+
 function responseWithAdditionalAttractions(input: RequestInfo | URL) {
   const url = String(input)
 
@@ -455,7 +468,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers()
   cleanup()
-  window.localStorage.clear()
   vi.unstubAllGlobals()
 })
 
@@ -500,22 +512,18 @@ describe('ResultsPage', () => {
     },
   )
 
-  it('continues the saved attraction snapshot after global favourites change', async () => {
-    const trip = saveTrip({
-      city: 'rome',
-      dateMode: 'exact',
-      stayStartDate: '2026-09-10',
-      stayEndDate: '2026-09-12',
-      attractionIds: ['pantheon'],
-    })!
-    saveFavouriteAttractionIds(['borghese-gallery'])
-    vi.stubGlobal(
-      'fetch',
-      vi.fn((input: RequestInfo | URL) =>
-        Promise.resolve(successfulResponseFor(input)),
-      ),
-    )
-    renderResults(buildSavedTripUrl(trip))
+  it('restores saved attractions from the Trip API', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      if (String(input).endsWith('/api/v1/trips/trip-123')) {
+        return Promise.resolve(
+          jsonResponse(savedTripResponse('trip-123', ['pantheon'])),
+        )
+      }
+      return Promise.resolve(successfulResponseFor(input))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderResults('/results?tripId=trip-123')
     expect(
       await screen.findByRole('button', { name: 'Remove Pantheon' }),
     ).toHaveAttribute('aria-pressed', 'true')
@@ -524,14 +532,37 @@ describe('ResultsPage', () => {
     ).toHaveAttribute('aria-pressed', 'false')
   })
 
-  it('saves favourite attractions and the current trip in this browser', async () => {
+  it('saves selected attractions through the Trip API', async () => {
     const user = userEvent.setup()
-    vi.stubGlobal(
-      'fetch',
-      vi.fn((input: RequestInfo | URL) =>
-        Promise.resolve(successfulResponseFor(input)),
-      ),
-    )
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url.endsWith('/api/v1/trips')) {
+        return Promise.resolve(
+          jsonResponse(
+            savedTripResponse('trip-456', ['pantheon'], {
+              dateMode: 'FLEXIBLE',
+              travelMonth: '2026-09',
+              tripLengthDays: 3,
+              lengthFlexDays: 1,
+            }),
+          ),
+        )
+      }
+      if (url.endsWith('/api/v1/trips/trip-456')) {
+        return Promise.resolve(
+          jsonResponse(
+            savedTripResponse('trip-456', ['pantheon'], {
+              dateMode: 'FLEXIBLE',
+              travelMonth: '2026-09',
+              tripLengthDays: 3,
+              lengthFlexDays: 1,
+            }),
+          ),
+        )
+      }
+      return Promise.resolve(successfulResponseFor(input))
+    })
+    vi.stubGlobal('fetch', fetchMock)
 
     renderResults(
       `${resultsRoute}&dateMode=flexible&travelMonth=2026-09&tripLengthDays=3&lengthFlexDays=1`,
@@ -560,26 +591,34 @@ describe('ResultsPage', () => {
         name: 'Remove Pantheon',
       }),
     ).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('1 saved in this browser')).toBeInTheDocument()
+    expect(screen.getByText('1 selected for this trip')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Save trip' }))
     expect(
-      screen.getByText('Trip saved in this browser with 1 attraction.'),
+      await screen.findByText('Trip saved with 1 attraction.'),
     ).toBeInTheDocument()
 
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/trips',
+      expect.objectContaining({
+        body: JSON.stringify({
+          city: 'rome',
+          dateMode: 'FLEXIBLE',
+          stayStartDate: '2026-09-10',
+          stayEndDate: '2026-09-12',
+          travelMonth: '2026-09',
+          tripLengthDays: 3,
+          lengthFlexDays: 1,
+          attractionIds: ['pantheon'],
+        }),
+        method: 'POST',
+      }),
+    )
     expect(
-      JSON.parse(window.localStorage.getItem('abi.saved-trip.v1') ?? 'null'),
-    ).toMatchObject({
-      version: 1,
-      city: 'rome',
-      dateMode: 'flexible',
-      stayStartDate: '2026-09-10',
-      stayEndDate: '2026-09-12',
-      travelMonth: '2026-09',
-      tripLengthDays: 3,
-      lengthFlexDays: 1,
-      attractionIds: ['pantheon'],
-    })
+      fetchMock.mock.calls.some(([input]) =>
+        String(input).endsWith('/api/v1/trips/trip-456'),
+      ),
+    ).toBe(true)
   })
 
   it('keeps the card grid stable and opens evidence in a separate dialog', async () => {

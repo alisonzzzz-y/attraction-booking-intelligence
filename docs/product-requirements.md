@@ -146,9 +146,9 @@
 | Plan a City Stay | `/plan` | 10A 已完成 | 收集 Rome 和最长 14 天的停留日期范围 |
 | Attraction Results | `/results` | Rome Booking Priority MVP 已完成本地实现；地点与 Sandbox 票务覆盖仍为部分映射 | 按预约优先级展示 10 个景点，并分开展示官方、地点和第三方票务证据 |
 | Attraction Detail | `/attractions/:attractionId` | 待开发 | 展示位置、日期范围内的开放、排期、证据和跳转入口 |
-| Saved Trip | `/trips/:tripId` | 后续 | 保存和重新打开行程，不属于首个纵向切片 |
+| Saved Trip | `/results?tripId={tripId}` | 已完成 | 通过 Trip API 保存并重新打开行程 |
 
-第一版只需要前五个页面，其中 Home 和 Methodology 已经完成。Saved Trip 不应阻塞真实查询 MVP。
+第一版的公开行程规划、结果和保存行程流程已经完成。景点详情仍在结果页对话框中展示。
 
 ## 6. 页面需求
 

@@ -1,11 +1,11 @@
 # Frontend application
 
-This Vite and React application contains the public Rome planning MVP. It supports exact or flexible travel dates, Booking Priority results, map focus, attraction favourites, a browser-local saved trip, and evidence dialogs with official and provider sources kept separate.
+This Vite and React application contains the public Rome planning MVP. It supports exact or flexible travel dates, Booking Priority results, map focus, attraction favourites, saved trips through the backend API, and evidence dialogs with official and provider sources kept separate.
 
-Favourites and the saved trip use versioned `localStorage`. They are available only in the current browser and are not synchronised to an account. Ticket facts are not stored as saved-trip truth and are requested again when the results page is opened.
+The frontend creates, reads, and updates saved trips through the Trip API. The `tripId` is kept in the results URL, while ticket facts are requested again when the trip is opened.
 
 Run `npm run dev` for local development. Use `npm run lint`, `npm run format:check`, `npm run test`, and `npm run build` before committing frontend changes. The root `README.md` contains the complete setup and data-accuracy boundaries.
 
-中文说明：这个 Vite 和 React 应用已经包含 Rome 规划 MVP。它支持确定日期或灵活日期范围、Booking Priority 结果、地图定位、景点收藏、浏览器本地保存行程，以及严格区分官网和 Provider 信息的详情弹窗。
+中文说明：这个 Vite 和 React 应用已经包含 Rome 规划 MVP。它支持确定日期或灵活日期范围、Booking Priority 结果、地图定位、景点收藏、通过后端 API 保存行程，以及严格区分官网和 Provider 信息的详情弹窗。
 
-收藏和保存行程使用版本化的 `localStorage`，只存在于当前浏览器，不会同步到账号。票价、余票等事实不会作为保存行程的一部分长期缓存，重新打开结果页时会再次请求。
+前端通过 Trip API 创建、读取和更新保存的行程。`tripId` 写入结果页 URL，票价、余票等事实会在重新打开行程时再次请求。

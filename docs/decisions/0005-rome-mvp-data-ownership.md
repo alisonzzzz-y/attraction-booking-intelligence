@@ -15,7 +15,7 @@ The application keeps five kinds of data separate:
 1. **Attraction catalogue:** Curated attraction names, short introductions, coordinates and official booking links.
 2. **Official ticket rules:** Verified facts such as ticket coverage, timed-entry requirements and opening rules.
 3. **Provider products:** Provider-specific options, prices, links and source metadata from Viator or a future provider.
-4. **User behaviour:** Favourites, outbound-click events and saved trips. The MVP stores favourites and saved trips locally in the browser.
+4. **User behaviour:** Favourites, outbound-click events and saved trips. Saved trips are persisted through the Trip API, while the results URL carries the trip identifier.
 5. **Transactions:** Future booking or conversion records. These do not exist in the MVP and must not be inferred from provider data or user clicks.
 
 系统将以下五类数据严格分开：
@@ -23,7 +23,7 @@ The application keeps five kinds of data separate:
 1. **景点目录：** 人工整理的景点名称、简短介绍、坐标和官网购票链接。
 2. **官方票务规则：** 已经核对的联票范围、预约要求和开放规则等事实。
 3. **Provider 产品：** Viator 或未来 provider 提供的票型、价格、链接和来源元数据。
-4. **用户行为：** 收藏、外链点击和保存行程。MVP 目前仅在浏览器本地保存收藏和行程。
+4. **用户行为：** 收藏、外链点击和保存行程。保存行程通过 Trip API 持久化，结果页 URL 包含行程标识。
 5. **交易记录：** 未来真实的预订或转化记录。MVP 不存在交易记录，也不得从 provider 数据或用户点击中推断交易。
 
 ## Consequences

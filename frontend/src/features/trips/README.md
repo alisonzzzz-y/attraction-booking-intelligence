@@ -1,9 +1,9 @@
-# Browser-local trip state
+# Trip persistence
 
-The MVP stores favourite attraction identifiers and one saved Rome trip in versioned `localStorage`. The saved record contains the city, exact or flexible date mode, date range, attraction identifiers, and save time.
+The trip feature sends the date plan and selected attraction identifiers to the backend Trip API. The results URL carries the returned `tripId`, which lets the frontend retrieve the saved trip when the link is reopened.
 
-This is not an account or cloud-sync feature. Provider facts are deliberately excluded so reopening a trip requests current evidence instead of presenting cached ticket data as current truth.
+Provider facts are deliberately excluded from saved trips. Reopening a trip requests current evidence instead of presenting cached ticket data as current truth.
 
-中文说明：MVP 会在版本化的 `localStorage` 中保存收藏景点 ID 和一份 Rome 行程。保存内容包括城市、确定或灵活日期模式、日期范围、景点 ID 和保存时间。
+中文说明：行程功能会把日期计划和已选择的景点 ID 发送到后端 Trip API。结果页 URL 包含后端返回的 `tripId`，重新打开链接时前端会据此读取保存的行程。
 
-这不是账号或云同步功能。Provider 事实不会写进保存记录，重新打开行程时会重新请求证据，避免把旧票务数据描述成当前事实。
+Provider 事实不会写进保存记录。重新打开行程时会重新请求证据，避免把旧票务数据描述成当前事实。

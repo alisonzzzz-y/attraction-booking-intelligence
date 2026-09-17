@@ -39,6 +39,7 @@ export const tripPlanSchema = z
   })
 
 export type TripPlan = z.infer<typeof tripPlanSchema>
+export type TripDateMode = TripPlan['dateMode']
 
 export function parseTripQuery(params: URLSearchParams) {
   const number = (key: string) => {

@@ -6,16 +6,52 @@ import { RomeResultsMap } from '../features/attractions/RomeResultsMap'
 import { flexibleDateCopy } from '../features/attractions/resultPresentation'
 import { useRomeResults } from '../features/attractions/useRomeResults'
 import { useTripSelection } from '../features/trips/useTripSelection'
+import { useSavedTrip } from '../features/trips/useSavedTrip'
 import { parseTripQuery, type TripPlan } from '../features/trips/tripDates'
+import type { SavedTrip } from '../shared/api/trips'
 
 const INITIAL_VISIBLE_ATTRACTION_COUNT = 10
 const LOAD_MORE_ATTRACTION_COUNT = 8
 
 export function ResultsPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tripId = searchParams.get('tripId') ?? undefined
+  const savedTrip = useSavedTrip(tripId)
   const parsedTrip = parseTripQuery(searchParams)
 
-  if (!parsedTrip.success) {
+  if (tripId && savedTrip.isPending) {
+    return (
+      <section className="page-section results-section">
+        <div className="result-state" role="status">
+          <strong>Loading saved trip...</strong>
+        </div>
+      </section>
+    )
+  }
+
+  if (tripId && savedTrip.isError) {
+    return (
+      <section className="page-section results-section">
+        <h1>Saved trip unavailable.</h1>
+        <p className="intro">
+          {savedTrip.error instanceof Error
+            ? savedTrip.error.message
+            : 'The saved trip could not be loaded.'}
+        </p>
+        <Link className="button button-secondary" to="/plan">
+          Plan a Rome stay
+        </Link>
+      </section>
+    )
+  }
+
+  const tripPlan = savedTrip.data
+    ? tripPlanFromSavedTrip(savedTrip.data)
+    : parsedTrip.success
+      ? parsedTrip.data
+      : undefined
+
+  if (!tripPlan) {
     return (
       <section className="page-section results-section">
         <h1>Choose your stay first.</h1>
@@ -32,18 +68,57 @@ export function ResultsPage() {
 
   return (
     <ResultsPageContent
-      key={searchParams.toString()}
-      searchParams={searchParams}
-      tripPlan={parsedTrip.data}
+      initialAttractionIds={savedTrip.data?.attractionIds ?? []}
+      onTripSaved={(trip) => {
+        const nextParams = tripParams(trip)
+        setSearchParams(nextParams)
+      }}
+      tripId={tripId}
+      tripPlan={tripPlan}
     />
   )
 }
 
+function tripPlanFromSavedTrip(trip: SavedTrip): TripPlan {
+  return {
+    city: trip.city,
+    dateMode: trip.dateMode,
+    lengthFlexDays: trip.lengthFlexDays ?? undefined,
+    stayEndDate: trip.stayEndDate,
+    stayStartDate: trip.stayStartDate,
+    travelMonth: trip.travelMonth ?? undefined,
+    tripLengthDays: trip.tripLengthDays ?? undefined,
+  }
+}
+
+function tripParams(trip: SavedTrip) {
+  const plan = tripPlanFromSavedTrip(trip)
+  const params = new URLSearchParams({
+    city: plan.city,
+    dateMode: plan.dateMode,
+    stayEndDate: plan.stayEndDate,
+    stayStartDate: plan.stayStartDate,
+    tripId: trip.id,
+  })
+
+  if (plan.dateMode === 'flexible') {
+    params.set('travelMonth', plan.travelMonth!)
+    params.set('tripLengthDays', String(plan.tripLengthDays))
+    params.set('lengthFlexDays', String(plan.lengthFlexDays))
+  }
+
+  return params
+}
+
 function ResultsPageContent({
-  searchParams,
+  initialAttractionIds,
+  onTripSaved,
+  tripId,
   tripPlan,
 }: {
-  searchParams: URLSearchParams
+  initialAttractionIds: string[]
+  onTripSaved: (trip: SavedTrip) => void
+  tripId?: string
   tripPlan: TripPlan
 }) {
   const [detailAttractionId, setDetailAttractionId] = useState<string>()
@@ -55,8 +130,10 @@ function ResultsPageContent({
     favouriteAttractionIds,
     saveCurrentTrip,
     saveFeedback,
+    saveError,
+    isSaving,
     toggleFavourite,
-  } = useTripSelection(searchParams, tripPlan)
+  } = useTripSelection(tripPlan, tripId, initialAttractionIds, onTripSaved)
   const {
     attractionById,
     isLoading,
@@ -159,21 +236,32 @@ function ResultsPageContent({
                   {orderedAttractionIds.length} attractions in booking order
                 </strong>
                 <span>
-                  {favouriteAttractionIds.length} saved in this browser
+                  {favouriteAttractionIds.length} selected for this trip
                 </span>
               </div>
               <button
                 className="button button-primary result-save-trip"
-                disabled={favouriteAttractionIds.length === 0}
+                disabled={favouriteAttractionIds.length === 0 || isSaving}
                 onClick={saveCurrentTrip}
                 type="button"
               >
-                Save trip
+                {isSaving
+                  ? 'Saving trip...'
+                  : tripId
+                    ? 'Save changes'
+                    : 'Save trip'}
               </button>
             </header>
             {saveFeedback ? (
               <p className="result-save-feedback" role="status">
                 {saveFeedback}
+              </p>
+            ) : null}
+            {saveError ? (
+              <p className="result-save-feedback" role="alert">
+                {saveError instanceof Error
+                  ? saveError.message
+                  : 'The trip could not be saved. Please try again.'}
               </p>
             ) : null}
             {visibleAttractionIds.map((attractionId) => (

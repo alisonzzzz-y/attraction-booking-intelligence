@@ -1,11 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { romeCalendarDate } from '../features/attractions/bookingGuidance'
-import {
-  buildSavedTripUrl,
-  loadSavedTrip,
-  type TripDateMode,
-} from '../features/trips/localTripStorage'
+import type { TripDateMode } from '../features/trips/tripDates'
 
 const MAX_STAY_DAYS = 31
 const FLEXIBLE_MONTH_COUNT = 8
@@ -49,30 +45,6 @@ function flexibleEvidenceRange(
   return { stayStartDate, stayEndDate: formatDate(endDate) }
 }
 
-function savedTripDateCopy(
-  trip: NonNullable<ReturnType<typeof loadSavedTrip>>,
-) {
-  if (
-    trip.dateMode === 'flexible' &&
-    trip.travelMonth &&
-    trip.tripLengthDays !== undefined &&
-    trip.lengthFlexDays !== undefined
-  ) {
-    const month = new Intl.DateTimeFormat('en-GB', {
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'UTC',
-    }).format(new Date(`${trip.travelMonth}-01T00:00:00Z`))
-    const flexibility =
-      trip.lengthFlexDays === 0
-        ? 'exact length'
-        : `±${trip.lengthFlexDays} day${trip.lengthFlexDays === 1 ? '' : 's'}`
-    return `Around ${trip.tripLengthDays} days in ${month}, ${flexibility}`
-  }
-
-  return `${trip.stayStartDate} to ${trip.stayEndDate}`
-}
-
 export function PlanPage({
   today = romeCalendarDate(new Date()),
 }: {
@@ -89,7 +61,6 @@ export function PlanPage({
   const [tripLengthDays, setTripLengthDays] = useState(5)
   const [lengthFlexDays, setLengthFlexDays] = useState(1)
   const [error, setError] = useState('')
-  const [savedTrip] = useState(loadSavedTrip)
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -331,29 +302,6 @@ export function PlanPage({
           Sandbox schedules are development evidence, not live inventory.
         </p>
       </form>
-
-      {savedTrip ? (
-        <aside className="saved-trip-resume" aria-label="Saved trip">
-          <div>
-            <p className="eyebrow">Saved on this device</p>
-            <h2>Continue your Rome trip</h2>
-            <p>
-              {savedTripDateCopy(savedTrip)}
-              {' · '}
-              {savedTrip.attractionIds.length}{' '}
-              {savedTrip.attractionIds.length === 1
-                ? 'saved attraction'
-                : 'saved attractions'}
-            </p>
-          </div>
-          <Link
-            className="button button-secondary"
-            to={buildSavedTripUrl(savedTrip)}
-          >
-            Continue saved trip
-          </Link>
-        </aside>
-      ) : null}
     </section>
   )
 }
