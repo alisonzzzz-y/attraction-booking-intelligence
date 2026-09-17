@@ -2,7 +2,7 @@ import type { RomeAttraction } from '../../shared/api/romeAttractions'
 import type { RomeBookingPriority } from '../../shared/api/romeBookingPriorities'
 import type { RomePlace } from '../../shared/api/romePlaces'
 import { AttractionPhotoGallery } from './AttractionPhotoGallery'
-import { bookingGuidance, formatPlanningDate } from './bookingGuidance'
+import { bookingGuidance } from './bookingGuidance'
 import { romeAttractionOverview } from './romeAttractionOverviews'
 import {
   attractionName,
@@ -68,43 +68,15 @@ export function AttractionEvidenceDetails({
 
           <section
             className="result-decision-overview"
-            aria-label="Booking decision"
+            aria-label="Booking target"
           >
             <div className="result-evidence-heading">
-              <h3>Booking decision</h3>
-              <span className="official-source-badge">
-                {guidance?.targetDate
-                  ? 'Planning estimate'
-                  : 'Official guidance'}
-              </span>
+              <h3>Booking target</h3>
             </div>
             {priority ? (
               <>
                 <div className="result-booking-deadline">
-                  <small>
-                    {guidance?.label ?? 'Recommended booking action'}
-                  </small>
                   <strong>{guidance?.summary}</strong>
-                  {guidance?.targetDate ? (
-                    <p className="result-booking-target">
-                      Planning target:{' '}
-                      <strong>{formatPlanningDate(guidance.targetDate)}</strong>
-                    </p>
-                  ) : null}
-                  {guidance?.release ? (
-                    <p>
-                      {guidance.release.summary}
-                      {' · '}
-                      <a
-                        href={guidance.release.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Release policy
-                      </a>
-                      {' · '}Checked {guidance.release.checkedOn}
-                    </p>
-                  ) : null}
                   <p>{guidance?.note}</p>
                 </div>
                 <a

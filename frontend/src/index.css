@@ -1085,7 +1085,6 @@ body:has(.results-section) {
   line-height: 1.55;
 }
 
-.official-source-badge,
 .source-badge,
 .booking-priority-badge {
   display: inline-flex;
@@ -1096,13 +1095,6 @@ body:has(.results-section) {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.official-source-badge {
-  padding: 0.42rem 0.62rem;
-  border: 1px solid var(--line);
-  color: var(--ink) !important;
-  background: #fff;
 }
 
 .source-badge {

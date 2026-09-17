@@ -1,21 +1,21 @@
 # 预约目标日期与开售日期
 
-更新日期：2026-09-16。规划规则版本：`rome-planning-targets-v1`。
+更新日期：2026-09-17。规划规则版本：`rome-planning-targets-v2`。
 
 ## 本次范围变更
 
 用户明确要求给出随行程变化的具体订票目标日期，并接受不精确的估算。因此增加独立的产品规划日期，不把估算包装为官方截止日、历史售罄预测或实时余票。此前历史观察数据的限制继续适用，不新增抓取器、模型预测、价格或库存事实。
 
-Booking targets now provide a concrete date for planning. They are provisional estimates, separate from official release rules and the existing booking-priority labels. They do not predict sell-outs or confirm availability.
+Booking targets now use four standard formats: `Book by <date>`, `Sales from <date>`, `Walk in`, and `Check official source`. The date rules remain separate from the existing booking-priority labels. They do not predict sell-outs or confirm availability.
 
-中文：预约目标现在提供具体的规划日期。这些日期是暂定估算，与官方开售规则及原有预约优先级分开，不预测售罄时间，也不确认余票。
+中文：订票目标现在统一使用四种格式：`Book by <日期>`、`Sales from <日期>`、`Walk in` 和 `Check official source`。日期规则仍与原有订票优先级分开，不预测售罄时间，也不确认余票。
 
 ## 已核对的开售规则
 
 | 景点 | 规则 | 日期计算 | 来源 |
 | --- | --- | --- | --- |
 | 斗兽场普通官方票 | 官方说明参观前 30 天开售 | 最早可能参观日减 30 个日历日 | [官方票务页](https://colosseo.it/en/visit/orari-e-biglietti/) |
-| 万神殿 | 官网说明按月安排参观，前一月中旬放票 | 用前一月 15 日作为近似提醒，明确显示 around | [官方介绍及票务页](https://direzionemuseiroma.cultura.gov.it/pantheon/) |
+| 万神殿 | 官网说明按月安排参观，前一月中旬放票 | 用前一月 15 日作为内部提醒，但不把近似日期显示为确定开售日 | [官方介绍及票务页](https://direzionemuseiroma.cultura.gov.it/pantheon/) |
 
 以上来源在本次排查中核对。万神殿页面直接访问返回 502，但搜索索引返回了上述官方原文；该证据不支持把 15 日或某个小时说成保证的开售时刻。斗兽场的特殊票种、免费日和特别开放安排可能不同，界面提示在官方页面确认。没有核实的开售日期保持未知，不以订票目标反推开售日期。
 
@@ -36,9 +36,9 @@ Booking targets now provide a concrete date for planning. They are provisional e
 
 ## 日期与状态
 
-- 未到斗兽场开售日：主行动显示预计开售日期，不要求今天购买；详情同时给出开售当天的规划目标。
+- 未到斗兽场开售日：主行动显示 `Sales from <日期>`，不要求今天购买。
 - 目标已过但尚未参观：把当前可执行目标推进到罗马当天，保留原目标日期说明，提示查询官方日历并在开放后购买，不推断已售罄。
-- 万神殿的中旬提醒是近似日期，不将它视为已经确认的实时状态。
+- 万神殿的中旬提醒是近似日期，因此界面显示 `Book by <日期>`，不将中旬提醒显示成确定开售日。
 - 其他未核实开售规则的景点：显示目标日期，并明确“仅在所选参观日开放后购买”。
 - 行程起始日已过：要求更新日期，不给出参观结束之后的订票建议。
 - 每个景点尚未选择独立参观日，所以统一使用行程开始日，即最早可能参观日。灵活日期同样使用所选范围的最早日，并在界面说明。
@@ -49,21 +49,14 @@ Booking targets now provide a concrete date for planning. They are provisional e
 
 | English | 中文 |
 | --- | --- |
-| Booking target (estimate) | 订票目标日期（估算） |
-| Aim to book by 13 Jun 2027 | 建议争取在 2027 年 6 月 13 日前订好 |
-| Official release window | 官方开售窗口 |
-| Sales expected from 21 May 2027 | 预计从 2027 年 5 月 21 日开售 |
-| Sales expected around 15 May 2027 | 预计在 2027 年 5 月 15 日前后开售 |
-| Planning target | 规划目标 |
-| Planning estimate | 规划估算 |
-| Official guidance | 官方指引 |
-| Ordinary visit | 普通参观 |
-| Release policy | 开售规则 |
+| Booking target | 订票目标 |
+| Book by 13 Jun 2027 | 在 2027 年 6 月 13 日前预订 |
+| Sales from 21 May 2027 | 2027 年 5 月 21 日起开售 |
+| Walk in | 现场前往 |
+| Check official source | 查看官方来源 |
 | Ticket required; lead time unverified | 需要门票，提前购买时间尚未核实 |
-| Choose new travel dates | 请重新选择旅行日期 |
-| Past travel dates | 已过去的旅行日期 |
-| Booking targets are estimates based on the first day of your travel window. Official release dates are shown separately. Availability is not confirmed. | 订票目标按旅行时间范围的第一天估算。官方开售日期单独展示，余票尚未确认。 |
-| ABI uses a 7-day planning buffer for this attraction. This is a provisional estimate, not a measured demand prediction. | ABI 为这个景点设置了 7 天的规划缓冲。这是暂定估算，不是根据实际需求测量得到的预测。 |
+| Targets use the first day of your travel window. Availability is not confirmed, so check the official source before booking. | 目标日期按旅行时间范围的第一天计算。余票尚未确认，因此预订前请查看官方来源。 |
+| ABI uses a 7-day planning buffer for this attraction. It is a planning rule, not a measured demand prediction. | ABI 为这个景点设置了 7 天的规划缓冲。这是规划规则，不是根据实际需求测量得到的预测。 |
 | The official standard ticket window opens 30 days before the visit. Aim to book on the opening date; the exact release time and special admission days must be checked with the operator. | 普通官方票在参观前 30 天开售。建议在开售当天预订，具体放票时刻及特殊参观日的安排需向运营方确认。 |
 | The operator says tickets open in the middle of the previous month. The 15th is an approximate reminder, not a confirmed release day. | 运营方说明门票在前一个月中旬开售。15 日只是近似提醒，并非已确认的开售日。 |
 | An official release date has not been verified for this ticket. | 尚未核实这种门票的官方开售日期。 |

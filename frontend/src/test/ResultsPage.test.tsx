@@ -633,14 +633,11 @@ describe('ResultsPage', () => {
     })
     expect(
       within(pantheonDialog).getByRole('heading', {
-        name: 'Booking decision',
+        name: 'Booking target',
       }),
     ).toBeInTheDocument()
     expect(
-      within(pantheonDialog).getByText('Booking target (estimate)'),
-    ).toBeInTheDocument()
-    expect(
-      within(pantheonDialog).getByText('Aim to book by 3 Sept 2026'),
+      within(pantheonDialog).getByText('Book by 3 Sept 2026'),
     ).toBeInTheDocument()
     expect(
       within(pantheonDialog).queryByText('What to do'),
@@ -830,19 +827,13 @@ describe('ResultsPage', () => {
     expect(caracallaCard).not.toBeNull()
     expect(treviCard).not.toBeNull()
     expect(
-      within(stPetersCard as HTMLElement).getByText(
-        'Walk in for ordinary entry',
-      ),
+      within(stPetersCard as HTMLElement).getByText('Walk in'),
     ).toBeInTheDocument()
     expect(
-      within(caracallaCard as HTMLElement).getByText(
-        'A same-day visit is a practical option',
-      ),
+      within(caracallaCard as HTMLElement).getByText('Walk in'),
     ).toBeInTheDocument()
     expect(
-      within(treviCard as HTMLElement).getByText(
-        'Walk in for the free exterior view',
-      ),
+      within(treviCard as HTMLElement).getByText('Walk in'),
     ).toBeInTheDocument()
     expect(
       screen.queryByText('No advance booking deadline'),
@@ -1194,7 +1185,7 @@ describe('ResultsPage', () => {
     ).toBeVisible()
   })
 
-  it('shows future release dates and estimated targets in both cards and details', async () => {
+  it('shows standard future release dates and booking targets in cards and details', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
       'fetch',
@@ -1205,27 +1196,16 @@ describe('ResultsPage', () => {
     renderResults(
       '/results?city=rome&stayStartDate=2027-06-20&stayEndDate=2027-06-25&dateMode=flexible&travelMonth=2027-06&tripLengthDays=5&lengthFlexDays=1',
     )
-    expect(
-      await screen.findByText('Sales expected from 21 May 2027'),
-    ).toBeVisible()
-    expect(screen.getByText('Aim to book by 21 Apr 2027')).toBeVisible()
-    expect(screen.getAllByText('Aim to book by 13 Jun 2027')).toHaveLength(2)
+    expect(await screen.findByText('Sales from 21 May 2027')).toBeVisible()
+    expect(screen.getByText('Book by 21 Apr 2027')).toBeVisible()
+    expect(screen.getAllByText('Book by 13 Jun 2027')).toHaveLength(2)
     expect(screen.queryByText('Book today')).not.toBeInTheDocument()
     expect(screen.queryByText('Check today')).not.toBeInTheDocument()
     await user.click(
       screen.getByRole('button', { name: 'View details for Pantheon' }),
     )
     const dialog = await screen.findByRole('dialog', { name: 'Pantheon' })
-    expect(within(dialog).getByText('Aim to book by 13 Jun 2027')).toBeVisible()
-    expect(
-      within(dialog).getByText(/Sales expected around 15 May 2027/),
-    ).toBeVisible()
-    expect(
-      within(dialog).getByRole('link', { name: 'Release policy' }),
-    ).toHaveAttribute(
-      'href',
-      'https://direzionemuseiroma.cultura.gov.it/pantheon/',
-    )
+    expect(within(dialog).getByText('Book by 13 Jun 2027')).toBeVisible()
     expect(
       within(dialog).getByText(
         /Based on a first possible visit on 20 Jun 2027/,
@@ -1235,11 +1215,9 @@ describe('ResultsPage', () => {
     renderResults(
       '/results?city=rome&stayStartDate=2027-07-20&stayEndDate=2027-07-25',
     )
-    expect(
-      await screen.findByText('Sales expected from 20 Jun 2027'),
-    ).toBeVisible()
-    expect(screen.getByText('Aim to book by 21 May 2027')).toBeVisible()
-    expect(screen.getAllByText('Aim to book by 13 Jul 2027')).toHaveLength(2)
+    expect(await screen.findByText('Sales from 20 Jun 2027')).toBeVisible()
+    expect(screen.getByText('Book by 21 May 2027')).toBeVisible()
+    expect(screen.getAllByText('Book by 13 Jul 2027')).toHaveLength(2)
   })
 
   it('does not request evidence without a complete Rome query', () => {

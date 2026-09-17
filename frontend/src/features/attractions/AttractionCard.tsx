@@ -91,8 +91,8 @@ export function AttractionCard({
 
         <div className="result-card-glance">
           <span>
-            <small>{guidance?.label ?? 'Recommended action'}</small>
-            <strong>{guidance?.summary ?? 'Guidance unavailable'}</strong>
+            <small>Booking target</small>
+            <strong>{guidance?.summary ?? 'Check official source'}</strong>
           </span>
           <span>
             <small>Official rule</small>

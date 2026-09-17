@@ -1,6 +1,6 @@
 import type { RomeBookingPriority } from '../../shared/api/romeBookingPriorities'
 
-export const PLANNING_RULE_VERSION = 'rome-planning-targets-v1'
+export const PLANNING_RULE_VERSION = 'rome-planning-targets-v2'
 
 // Product planning buffers, not observed sell-out times or official deadlines.
 // 产品规划缓冲天数，不是历史售罄预测或官方截止日期。
@@ -16,13 +16,11 @@ const targetDaysBeforeVisit: Record<string, number> = {
 export type BookingGuidance = {
   summary: string
   note: string
-  label: string
   targetDate?: string
   originalTargetDate?: string
   release?: {
     date: string
     approximate: boolean
-    summary: string
     sourceUrl: string
     checkedOn: string
   }
@@ -63,7 +61,6 @@ function releaseFor(
     return {
       date,
       approximate: false,
-      summary: `Sales expected from ${formatPlanningDate(date)}`,
       sourceUrl: 'https://colosseo.it/en/visit/orari-e-biglietti/',
       checkedOn: '2026-09-16',
     }
@@ -75,7 +72,6 @@ function releaseFor(
     return {
       date,
       approximate: true,
-      summary: `Sales expected around ${formatPlanningDate(date)}`,
       sourceUrl: 'https://direzionemuseiroma.cultura.gov.it/pantheon/',
       checkedOn: '2026-09-16',
     }
@@ -91,37 +87,31 @@ export function bookingGuidance(
   const today = romeCalendarDate(now)
   if (stayStartDate < today) {
     return {
-      summary: 'Choose new travel dates',
-      label: 'Past travel dates',
+      summary: 'Check official source',
       note: 'The first possible visit date has passed. Update your travel dates to calculate a new booking target.',
     }
   }
 
   if (priority.priority === 'CAN_WAIT') {
-    const label = 'Ordinary visit'
     switch (priority.officialEvidence.policy) {
       case 'FREE_GENERAL_ENTRY':
         return {
-          label,
-          summary: 'Walk in for ordinary entry',
+          summary: 'Walk in',
           note: 'Ordinary entry is free. Choose the optional paid reservation only if you want a guaranteed time and the included audio guide.',
         }
       case 'NO_ADVANCE_RESERVATION_REQUIRED':
         return {
-          label,
-          summary: 'A same-day visit is a practical option',
+          summary: 'Walk in',
           note: 'The official policy says an ordinary visit does not require a reservation. You can decide on the day, but check opening conditions before travelling.',
         }
       case 'OPTIONAL_PAID_AREA':
         return {
-          label,
-          summary: 'Walk in for the free exterior view',
+          summary: 'Walk in',
           note: 'The normal exterior view is free. Buy a separate ticket only if you want the enclosed inner area.',
         }
       default:
         return {
-          label,
-          summary: 'Plan this after higher-priority tickets',
+          summary: 'Check official source',
           note: 'The official rule does not require advance booking for the ordinary visit described here. Recheck the official website before travelling.',
         }
     }
@@ -146,7 +136,7 @@ export function bookingGuidance(
   const basis =
     priority.attractionId === 'colosseum-archaeological-park'
       ? 'The official standard ticket window opens 30 days before the visit. Aim to book on the opening date; the exact release time and special admission days must be checked with the operator.'
-      : `ABI uses a ${leadDays}-day planning buffer for this attraction. This is a provisional estimate, not a measured demand prediction.`
+      : `ABI uses a ${leadDays}-day planning buffer for this attraction. It is a planning rule, not a measured demand prediction.`
   const releaseNote = release?.approximate
     ? 'The operator says tickets open in the middle of the previous month. The 15th is an approximate reminder, not a confirmed release day.'
     : !release
@@ -160,12 +150,8 @@ export function bookingGuidance(
   return {
     summary:
       release && !release.approximate && release.date > today
-        ? release.summary
-        : `Aim to book by ${formatPlanningDate(targetDate)}`,
-    label:
-      release && !release.approximate && release.date > today
-        ? 'Official release window'
-        : 'Booking target (estimate)',
+        ? `Sales from ${formatPlanningDate(release.date)}`
+        : `Book by ${formatPlanningDate(targetDate)}`,
     note: [basis, releaseNote, missed, anchor, caveat]
       .filter(Boolean)
       .join(' '),

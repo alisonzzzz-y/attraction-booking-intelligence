@@ -117,9 +117,8 @@ function ResultsPageContent({
 
       {priorities.length > 0 ? (
         <p className="results-planning-note">
-          Booking targets are estimates based on the first day of your travel
-          window. Official release dates are shown separately. Availability is
-          not confirmed.
+          Targets use the first day of your travel window. Availability is not
+          confirmed, so check the official source before booking.
         </p>
       ) : null}
 

@@ -46,22 +46,21 @@ describe('date-aware booking targets', () => {
     const plan = bookingGuidance(colosseum, '2030-06-20', now)
     expect(plan.release?.date).toBe('2030-05-21')
     expect(plan.targetDate).toBe('2030-05-21')
-    expect(plan.summary).toBe('Sales expected from 21 May 2030')
-    expect(plan.label).toBe('Official release window')
+    expect(plan.summary).toBe('Sales from 21 May 2030')
     expect(plan.note).toContain('does not confirm current availability')
   })
 
   it.each([
-    ['2026-10-17', '2026-09-17', 'Official release window'],
-    ['2026-10-16', '2026-09-16', 'Booking target (estimate)'],
-    ['2026-10-01', '2026-09-16', 'Booking target (estimate)'],
-    ['2026-09-16', '2026-09-16', 'Booking target (estimate)'],
+    ['2026-10-17', '2026-09-17', 'Sales from 17 Sept 2026'],
+    ['2026-10-16', '2026-09-16', 'Book by 16 Sept 2026'],
+    ['2026-10-01', '2026-09-16', 'Book by 16 Sept 2026'],
+    ['2026-09-16', '2026-09-16', 'Book by 16 Sept 2026'],
   ])(
     'handles the release boundary and never asks users to book in the past: %s',
-    (visit, target, label) => {
+    (visit, target, summary) => {
       const plan = bookingGuidance(colosseum, visit, now)
       expect(plan.targetDate).toBe(target)
-      expect(plan.label).toBe(label)
+      expect(plan.summary).toBe(summary)
       expect(plan.note).toContain('Book only after your visit date is released')
     },
   )
@@ -74,12 +73,11 @@ describe('date-aware booking targets', () => {
     ['domus-aurea', '2027-06-06'],
     ['capitoline-museums', '2027-06-17'],
   ])(
-    'gives %s an explicit estimated target that changes with travel dates',
+    'gives %s an explicit target that changes with travel dates',
     (id, target) => {
       const plan = bookingGuidance(attraction(id), '2027-06-20', now)
       expect(plan.targetDate).toBe(target)
-      expect(plan.summary).toContain('Aim to book by')
-      expect(plan.label).toBe('Booking target (estimate)')
+      expect(plan.summary).toContain('Book by')
       expect(plan.note).toContain('not a measured demand prediction')
       expect(
         bookingGuidance(attraction(id), '2027-07-20', now).targetDate,
@@ -87,7 +85,7 @@ describe('date-aware booking targets', () => {
     },
   )
 
-  it('keeps an unverified release date distinct from an estimated purchase target', () => {
+  it('keeps an unverified release date distinct from a purchase target', () => {
     const plan = bookingGuidance(
       attraction('vatican-museums-sistine-chapel'),
       '2027-06-20',
@@ -145,12 +143,31 @@ describe('date-aware booking targets', () => {
       now,
     )
     expect(plan.targetDate).toBeUndefined()
-    expect(plan.summary).toBe('Walk in for ordinary entry')
+    expect(plan.summary).toBe('Walk in')
   })
 
   it('asks for new dates instead of suggesting a booking after the visit', () => {
     const plan = bookingGuidance(colosseum, '2026-09-15', now)
     expect(plan.targetDate).toBeUndefined()
-    expect(plan.summary).toBe('Choose new travel dates')
+    expect(plan.summary).toBe('Check official source')
+  })
+
+  it('only returns one of the four standard booking target formats', () => {
+    const plans = [
+      bookingGuidance(colosseum, '2030-06-20', now),
+      bookingGuidance(attraction('pantheon'), '2027-06-20', now),
+      bookingGuidance(
+        attraction('st-peters-basilica', 'FREE_GENERAL_ENTRY'),
+        '2027-06-20',
+        now,
+      ),
+      bookingGuidance(colosseum, '2026-09-15', now),
+    ]
+
+    for (const plan of plans) {
+      expect(plan.summary).toMatch(
+        /^(Book by \d{1,2} [A-Z][a-z]{2} \d{4}|Sales from \d{1,2} [A-Z][a-z]{2} \d{4}|Walk in|Check official source)$/,
+      )
+    }
   })
 })
