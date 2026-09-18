@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, render, screen, within } from '@testing-library/react'
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -614,11 +620,13 @@ describe('ResultsPage', () => {
         method: 'POST',
       }),
     )
-    expect(
-      fetchMock.mock.calls.some(([input]) =>
-        String(input).endsWith('/api/v1/trips/trip-456'),
-      ),
-    ).toBe(true)
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.some(([input]) =>
+          String(input).endsWith('/api/v1/trips/trip-456'),
+        ),
+      ).toBe(true)
+    })
   })
 
   it('keeps the card grid stable and opens evidence in a separate dialog', async () => {
